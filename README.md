@@ -1,1 +1,1 @@
-# la-training-planner
+# Test einer App zur Planung/Vorbreitung von Leichtathletik-Trainings
