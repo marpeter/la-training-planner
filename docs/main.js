@@ -14,7 +14,39 @@ const Disziplinen = [
 ];
 
 const TrainingsPlaene = [
-  { id: 1, disciplines: ["Ausdauer", "Weitsprung (mit Grube)"]},
+  { id: 1, disciplines: ["Ausdauer", "Weitsprung (mit Grube)"],
+    warmup: [
+      { name: "Seilspringen und Runden laufen",
+        material: "Sprungseile", duration: "5", repeat: "2-3 Runden",
+        details: [] },
+      { name: "Lauf ABC",
+        material: "H\xFCtchen", duration: "10", repeat: " - ",
+        details: ["Froschspr\xFCnge", "Hopserlauf", "Anversen", "Knieheberlauf", "Steps", "Sprungläufe", "Steigerung"]
+      }],
+    mainex: [
+      { name: "Seilspringen langes Seil",
+        material: "Langes Seil", duration: "10", repeat: "",
+        details: [] },
+      { name: "Seilspringen",
+        material: "Sprungseile", duration: "10", repeat: "",
+        details: []},
+      { name: "Weitsprung in Sprunggrube mit Bananenkisten",
+        material: "Bananenkiste, Besen, Rechen, Reifen", duration: "10", repeat: "",
+        details: ["Sprünge die Treppenstufen hoch --> jedes Kind nach dem Sprung auf dem Rückweg rechts",
+                  "Sprünge 5x mal rein und raus aus dem Reifen", "Aufteilen nach Stärke"]},
+      { name: "Weitsprung in Sprunggrube ohne Bananenkisten",
+        material: "Bananenkiste, Besen, Rechen, Reifen", duration: "10", repeat: "",
+        details: ["Sprünge die Treppenstufen hoch --> jedes Kind nach dem Sprung auf dem Rückweg rechts",
+                  "Sprünge 5x mal rein und raus aus dem Reifen", "Aufteilen nach Stärke"]
+      }],
+    ending: [
+      { name: "Anhänger - Abhänger Staffel",
+        material: "Seil", duration: "10", repeat: "1 mal",
+        details: [] },
+      { name: "Auslaufen",
+        material: "Sprungseile", duration: "5", repeat: "2 Runden",
+        details: []}] 
+  },
   { id: 2, disciplines: ["Ausdauer", "Weitsprung (mit Grube)"] },
   { id: 3, disciplines: ["Ausdauer", "Weitsprung (ohne Grube)", "Wurf"] },
   { id: 4, disciplines: ["Ausdauer", "Weitsprung (ohne Grube)", "Wurf"] },
@@ -64,6 +96,73 @@ function updateShowButtonText() {
   }
 }
 
+function showSelectedPlan() {
+  if(availablePlans.length==0) {
+    return;
+  }
+
+  plan = availablePlans[0]; // TODO: make random if availablePlans.length > 1
+
+  document.getElementById("plan-title").innerHTML = "Plan " + plan.id + ": " + plan.disciplines.join(" & ");
+  
+  let warmupDiv = document.getElementById("warmup");
+  // clear the current content
+  while(warmupDiv.firstChild) { warmupDiv.removeChild(warmupDiv.firstChild);};
+  // add cards for the warmup methods
+  plan.warmup.forEach( (exercise) => addExerciseCard(exercise, warmupDiv));
+
+  let mainexDiv = document.getElementById("mainex");
+  // clear the current content
+  while(mainexDiv.firstChild) { mainexDiv.removeChild(mainexDiv.firstChild);};
+  // add cards for the main methods
+  plan.mainex.forEach( (exercise) => addExerciseCard(exercise, mainexDiv));
+
+  let endingDiv = document.getElementById("ending");
+  // clear the current content
+  while(endingDiv.firstChild) { endingDiv.removeChild(endingDiv.firstChild);};
+  // add cards for the ending methods
+  plan.ending.forEach( (exercise) => addExerciseCard(exercise, endingDiv));
+}
+
+function addExerciseCard(exercise, toElement) {
+  let exerciseDiv = document.createElement("div");
+  exerciseDiv.classList.add("col", "s12", "m6");
+  let exerciseCard = document.createElement("div");
+  exerciseCard.classList.add("card", "red", "lighten-4");
+  let exerciseContent = document.createElement("div");
+  exerciseContent.classList.add("card-content", "center");
+  if (exercise.details.length>0) {
+    exerciseContent.innerHTML = `<span class="card-title activator">${exercise.name}<i class="material-icons right">more_vert</i></span><ul>`;
+  } else {
+    exerciseContent.innerHTML = `<span class="card-title">${exercise.name}</span><ul>`
+  }
+  exerciseContent.innerHTML +=
+    `<li>Material: ${exercise.material}</li>` +
+    `<li>Dauer: ${exercise.duration}</li>`+
+    `<li>Wiederholungen: ${exercise.repeat}</li>` +
+    `</ul>`;
+  if (exercise.details.length>0) {
+    let exerciseReveal = document.createElement("div");
+    exerciseReveal.classList.add("card-reveal");
+    exerciseReveal.innerHTML = '<span class="card-title grey-text text-darken-4">Details<i class="material-icons right">close</i></span>';
+    exerciseReveal.innerHTML += '<ul>';
+    addListItems(exerciseReveal, exercise.details);
+    exerciseReveal.innerHTML += '</ul>'; 
+    exerciseCard.appendChild(exerciseContent);
+    exerciseCard.appendChild(exerciseReveal);
+  } else {
+    exerciseCard.appendChild(exerciseContent);
+  }
+  exerciseDiv.appendChild(exerciseCard);
+  toElement.appendChild(exerciseDiv);
+}
+
+function addListItems(element, list) {
+  list.forEach( (item) => {
+    element.innerHTML += `<li>${item}</li>`;
+  });
+}
+
 function initializeCardList() {
   let disziplinen = document.getElementById("disziplinen");
   Disziplinen.forEach( (discipline) => {
@@ -86,6 +185,9 @@ function initializeCardList() {
      disziplin.appendChild(disziplinCard);
      disziplinen.appendChild(disziplin);
   } );
+  let showBtn = document.getElementById("showBtn");
+  showBtn.addEventListener("click", showSelectedPlan);
+
 }
 
 document.addEventListener('DOMContentLoaded', function() {
