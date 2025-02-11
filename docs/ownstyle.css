@@ -1,0 +1,7 @@
+.disziplin {
+    max-height: 40px;
+    max-width: 40px;
+    margin: 10px auto -10px;
+    display: inline-block;
+    position: relative;
+}
