@@ -3,7 +3,7 @@ const Disziplinen = [
     { name: "Hochsprung", img: "assets/Hochsprung.png"},
     { name: "Koordination", img: "assets/Koordination.png"},
     { name: "Schnelligkeit", img: "assets/Lauf.png"},
-    { name: "Schnellaufen", img: "assets/Lauf.png"},
+    { name: "Schnelllaufen", img: "assets/Lauf.png"},
     { name: "Stabweitsprung", img: "assets/Weitsprung.png"},
     { name: "Staffellauf", img: "assets/Lauf.png"},
     { name: "Staffellauf Hürde", img: "assets/Huerdenlauf.png"},
@@ -47,6 +47,7 @@ const TrainingsPlaene = [
           material: "", duration: "5", repeat: "2 Runden",
           details: []}] 
     },
+
     { id: 2, disciplines: ["Ausdauer", "Weitsprung (mit Grube)"],
       warmup: [
         { name: "Seilspringen und Runden laufen",
@@ -80,6 +81,7 @@ const TrainingsPlaene = [
           material: "", duration: "5", repeat: "2 Runden",
           details: []}]
     },
+
     { id: 3, disciplines: ["Ausdauer", "Weitsprung (ohne Grube)", "Wurf"],
       warmup: [
         { name: "Überholstaffel",
@@ -108,6 +110,7 @@ const TrainingsPlaene = [
           material: "", duration: "5", repeat: "2 Runden",
           details: []}]
     },
+
     { id: 4, disciplines: ["Ausdauer", "Weitsprung (ohne Grube)", "Wurf"],
       warmup: [
         { name: "Transportlauf",
@@ -136,6 +139,7 @@ const TrainingsPlaene = [
           material: "", duration: "5", repeat: "2 Runden",
           details: []}]
     },
+
     { id: 5, disciplines: ["Ausdauer", "Weitsprung (ohne Grube)", "Wurf"],
       warmup: [
         { name: "Autofahren mit Gängen",
@@ -165,6 +169,7 @@ const TrainingsPlaene = [
           material: "", duration: "5", repeat: "2 Runden",
           details: []}]
     },
+
     { id: 6, disciplines: ["Ausdauer", "Weitsprung (ohne Grube)", "Wurf"],
       warmup: [
         { name: "Überholstaffel",
@@ -194,6 +199,7 @@ const TrainingsPlaene = [
           material: "", duration: "5", repeat: "2 Runden",
           details: []}]
     },
+
     { id: 7, disciplines: ["Ausdauer", "Wurf"],
       warmup: [
         { name: "Bälle prellen",
@@ -225,6 +231,7 @@ const TrainingsPlaene = [
           material: "", duration: "5", repeat: "2 Runden",
           details: []}]    
      },
+
     { id: 8, disciplines: ["Ausdauer", "Hochsprung"],
       warmup: [
         { name: "Formen ablaufen auf Rasen",
@@ -256,4 +263,133 @@ const TrainingsPlaene = [
           material: "", duration: "5", repeat: "2 Runden",
           details: []}]    
      },
+
+     { id: 9, disciplines: ["Ausdauer", "Hochsprung"],
+      warmup: [
+        { name: "Autofahren mit Gängen",
+          material: "Hütchen", duration: "10", repeat: "2-3 Runden",
+          details: [] },
+        { name: "Lauf ABC",
+          material: "Hütchen", duration: "10", repeat: " - ",
+          details: ["Hopserlauf", "Anversen", "Knieheberlauf", "Steps", "Sprungläufe", "Steigerung"]
+        }],
+      mainex: [
+        { name: "Staffelrennen",
+          material: "Hütchen", duration: "10", repeat: "",
+          details: [] },
+        { name: "Band schräg nach unten und hochspringen in Kurve",
+          material: "Band", duration: "10", repeat: "",
+          details: []},
+        { name: "8er in Kurven laufen",
+          material: "Hütchen", duration: "10", repeat: "",
+          details: ["5 Sprünge hoch auf Sitzsteine"]},
+        { name: "Hochsprung an Anlage mit Hütchen als Absperrung, ggf. im Schersprung",
+          material: "Hütchen", duration: "10", repeat: "",
+          details: ["5 Sprünge hoch auf Sitzsteine"]
+        }],
+      ending: [
+        { name: "Transportlauf",
+          material: "Klammern", duration: "10", repeat: "1 mal",
+          details: [] },
+        { name: "Auslaufen",
+          material: "", duration: "5", repeat: "2 Runden",
+          details: []}]    
+     },
+
+     { id: 10, disciplines: ["Schnelllaufen", "Hochsprung"],
+      warmup: [
+        { name: "Einlaufen mit Sprungseil",
+          material: "Sprungseil", duration: "10", repeat: "2-3 Runden",
+          details: [] },
+        { name: "Lauf ABC",
+          material: "Hütchen", duration: "10", repeat: " - ",
+          details: ["Hopserlauf", "Anversen", "Knieheberlauf", "Skippings", "Steps", "Seitkreuzschritte", "Steigerung"]
+        }],
+      mainex: [
+        { name: "Star Wars",
+          material: "Hütchen", duration: "10", repeat: "",
+          details: [] },
+        { name: "Reaktionsstart aus verschiedenen Lagen mit Worten",
+          material: "Hütchen", duration: "10", repeat: "",
+          details: []},
+        { name: "Pendelstaffel",
+          material: "Hütchen", duration: "10", repeat: "",
+          details: []},
+        { name: "Band schräg nach unten und hochspringen in Kurve",
+          material: "Band, Hütchen", duration: "10", repeat: "",
+          details: []
+        }],
+      ending: [
+        { name: "2 Runden mit Rollbrett",
+          material: "Rollbretter", duration: "10", repeat: "1 mal",
+          details: ["Immer ein Kind sitzt drauf und das andere zieht"] },
+        { name: "Auslaufen",
+          material: "", duration: "5", repeat: "2 Runden",
+          details: []}]    
+     },
+
+     { id: 11, disciplines: ["Schnelllaufen", "Hochsprung"],
+      warmup: [
+        { name: "Klammerlauf",
+          material: "Klammern", duration: "10", repeat: "2-3 Runden",
+          details: ["Wir verteilen uns auf der Bahn, damit jeder mehr Klammern bekommt"] },
+        { name: "Lauf ABC",
+          material: "Hütchen", duration: "10", repeat: " - ",
+          details: ["Hopserlauf", "Anversen", "Knieheberlauf", "Skippings", "Steps", "Seitgalopp", "Steigerung"]
+        }],
+      mainex: [
+        { name: "Chinesische Mauer",
+          material: "Hütchen", duration: "10", repeat: "",
+          details: [] },
+        { name: "Reaktionsstart mit Bällen, die von hinten kommen",
+          material: "Bälle, Hütchen", duration: "10", repeat: "",
+          details: ["Die, die warten machen 10 Kniebeugen"]},
+        { name: "Staffelrennen mit Karten holen",
+          material: "Hütchen, Spielkarten", duration: "10", repeat: "",
+          details: []},
+        { name: "Band schräg nach unten und hochspringen in Kurve",
+          material: "Band, Hütchen", duration: "10", repeat: "",
+          details: []
+        }],
+      ending: [
+        { name: "Schere-Stein-Papier",
+          material: "", duration: "10", repeat: "je nach Rundengröße",
+          details: ["Der Gewinner rennt eine kleine Bahn, der Verlierer eine große Bahn"] },
+        { name: "Auslaufen",
+          material: "", duration: "5", repeat: "2 Runden",
+          details: []}]    
+     },
+
+     { id: 12, disciplines: ["Hochsprung", "Wurf"],
+      warmup: [
+        { name: "Einlaufen mit Sprungseil",
+          material: "Sprungseil", duration: "10", repeat: "2-3 Runden",
+          details: [] },
+        { name: "Lauf ABC",
+          material: "Hütchen", duration: "10", repeat: " - ",
+          details: ["Hopserlauf", "Anversen", "Knieheberlauf", "Skippings", "Steps", "Seitkreuzschritt", "Steigerung"]
+        }],
+      mainex: [
+        { name: "Mit Seil fangen spielen",
+          material: "Hütchen, Seil", duration: "10", repeat: "",
+          details: [] },
+        { name: "Band schräg nach unten und hochspringen",
+          material: "Band", duration: "10", repeat: "",
+          details: ["Die, die warten machen 10 Kniebeugen"]},
+        { name: "Werfen ohne Anlauf",
+          material: "Alle werfbaren Gegenstände, Hütchen. Maßband", duration: "10", repeat: "",
+          details: ["3 Liegesützen nach jedem Wurf"]},
+        { name: "Werfen mit Anlauf",
+          material: "Alle werfbaren Gegenstände, Hütchen. Maßband", duration: "10", repeat: "",
+          details: ["3 Liegesützen nach jedem Wurf"]
+        }],
+      ending: [
+        { name: "2 Runden mit Rollbrett",
+          material: "Rollbretter", duration: "10", repeat: "1 mal",
+          details: ["Immer ein Kind sitzt drauf und das andere zieht"] },
+        { name: "Auslaufen",
+          material: "", duration: "5", repeat: "2 Runden",
+          details: []}]    
+     },
+
   ];

@@ -108,7 +108,7 @@ function addExerciseCard(exercise, toElement) {
   }
   exerciseContent.innerHTML +=
     `<li>Material: ${exercise.material}</li>` +
-    `<li>Dauer: ${exercise.duration}</li>`+
+    `<li>Dauer: ${exercise.duration}min</li>`+
     `<li>Wiederholungen: ${exercise.repeat}</li>` +
     `</ul>`;
   if (exercise.details.length>0) {
