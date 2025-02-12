@@ -3,6 +3,9 @@
    <head>
       <title>Planer für Leichtathletik-Training</title>
          <meta name="viewport" content="width=device-width, initial-scale=1">
+         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+         <!-- <link rel="icon" type="image/x-icon" href="assets/tsvlogo.png"> -->
+         <link rel="apple-touch-icon" type="image/png" href="assets/tsvlogo.png">
          <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
         <!-- Compiled and minified CSS -->
         <link rel="stylesheet"
@@ -14,12 +17,17 @@
          <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
    </head>
    <body>
+    <div class="container">
     <div class="section">
         <h4 class="card-panel red darken-1 center">LA Trainings-Planer</h4>
         <div class="row" id="disziplinen">
         <!-- wird mittels JavaScript gefüllt-->
       </div>
-      <button id="showBtn" class="btn center red">Trainingsplan anzeigen</button>
+      <div class="center">
+        <button id="prevBtn" class="btn center red lighten-1 disabled"><i class="material-icons">chevron_left</i></button>
+        <button id="showBtn" class="btn center red">Trainingsplan anzeigen</button>
+        <button id="nextBtn" class="btn center red lighten-1 disabled"><i class="material-icons">chevron_right</i></button>
+      </div>
     </div>
     <div class="divider"></div>
     <div class="section">
@@ -30,8 +38,7 @@
       <div class="row" id="mainex"></div>
       <h6 class="card-small red darken-2 center white-text">Schluss</h6>
       <div class="row" id="ending"></div>
-      
-        Hier kommt der ausgew&auml;hlte Trainingsplan hin ...
     </div>
+  </div>
    </body>
 </html>
