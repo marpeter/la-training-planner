@@ -39,6 +39,10 @@ function updateShowButtonText() {
   }
 }
 
+function updateSelectedPlans() {
+  planOffset=0;
+  showSelectedPlan();
+}
 function showSelectedPlan() {
   if(availablePlans.length==0) {
     return;
@@ -152,7 +156,7 @@ function initializeCardList() {
      disziplinen.appendChild(disziplin);
   } );
   let showBtn = document.getElementById("showBtn");
-  showBtn.addEventListener("click", showSelectedPlan);
+  showBtn.addEventListener("click", updateSelectedPlans);
   prevBtn.addEventListener("click", showPreviousPlan);
   nextBtn.addEventListener("click", showNextPlan)
 
