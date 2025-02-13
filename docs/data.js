@@ -646,4 +646,68 @@ const TrainingsPlaene = [
           details: []}]    
      },
 
+     { id: 21, disciplines: ["Ausdauer", "Überlaufen"],
+      warmup: [
+        { name: "Anhänger + Abhängerstaffel",
+          material: "Hürden, Hütchen, Seile", duration: "10", repeat: "2-3 Runden",
+          details: [] },
+        { name: "Lauf ABC",
+          material: "Hütchen", duration: "10", repeat: " - ",
+          details: ["Hopserlauf", "Anversen", "Knieheberlauf", "Skippings", "Steps", "Seitkreuzschritte", "Steigerung"]
+        }],
+      mainex: [
+        { name: "Hürdenbahn und Staffel",
+          material: "Bloxx, Hürden", duration: "10", repeat: "",
+          details: [] },
+        { name: "Reihenfolge im Reifen erarbeiten",
+          material: "Reifen", duration: "10", repeat: "",
+          details: []},
+        { name: "Hürdenbahn mit Schwungbeintraining",
+          material: "Bananenkisten, bunte Bälle", duration: "10", repeat: "",
+          details: []},
+        { name: "Medibälle hin und her werfen",
+          material: "Medibälle", duration: "10", repeat: "",
+          details: []
+        }],
+      ending: [
+        { name: "Crosslauf auf Rasen",
+          material: "Hürden, Hütchen", duration: "10", repeat: "1 mal",
+          details: [] },
+        { name: "Auslaufen",
+          material: "", duration: "5", repeat: "2 Runden",
+          details: []}]    
+     },
+
+     { id: 22, disciplines: ["Überlaufen", "Wurf"],
+      warmup: [
+        { name: "Mit Bällen prellen und rennen",
+          material: "Bälle", duration: "5", repeat: "2-3 Runden",
+          details: [] },
+        { name: "Lauf ABC",
+          material: "Hütchen", duration: "10", repeat: " - ",
+          details: ["Hopserlauf", "Anversen", "Knieheberlauf", "Auf einem Bein hüpfen und links 1 Kontakt, rechts 2 Kontakte", "Schlagläufe", "Steps", "Steigerung"]
+        }],
+      mainex: [
+        { name: "Pendelstaffel mit Hürden",
+          material: "Hürden, Hütchen", duration: "10", repeat: "",
+          details: [] },
+        { name: "Hürdenbahn mit Schwungbeintraining",
+          material: "Bananenkisten, bunte Bälle", duration: "10", repeat: "",
+          details: []},
+        { name: "Werfen ohne Anlauf oder stoßen",
+          material: "Alle werfbaren Gegenständ, Hütchen, Maßband", duration: "10", repeat: "",
+          details: ["3 Liegesützen nach jedem Wurf"]},
+        { name: "Werfen mit Anlauf oder stoßen",
+          material: "Alle werfbaren Gegenständ, Hütchen, Maßband", duration: "10", repeat: "",
+          details: ["3 Liegesützen nach jedem Wurf"]
+        }],
+      ending: [
+        { name: "Biathlon",
+          material: "Bälle, Hütchen", duration: "10", repeat: "1 mal",
+          details: [] },
+        { name: "Auslaufen",
+          material: "", duration: "5", repeat: "2 Runden",
+          details: []}]    
+     },
+
   ];
