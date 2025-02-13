@@ -1,6 +1,7 @@
 const Disziplinen = [
     { name: "Ausdauer", img: ""},
     { name: "Hochsprung", img: "assets/Hochsprung.png"},
+    { name: "Hochsprung ohne Anlage", img: "assets/Hochsprung.png"},
     { name: "Koordination", img: "assets/Koordination.png"},
     { name: "Schnelligkeit", img: "assets/Lauf.png"},
     { name: "Schnelllaufen", img: "assets/Lauf.png"},
@@ -296,7 +297,7 @@ const TrainingsPlaene = [
           details: []}]    
      },
 
-     { id: 10, disciplines: ["Schnelllaufen", "Hochsprung"],
+     { id: 10, disciplines: ["Schnelllaufen", "Hochsprung ohne Anlage"],
       warmup: [
         { name: "Einlaufen mit Sprungseil",
           material: "Sprungseil", duration: "10", repeat: "2-3 Runden",
@@ -328,7 +329,7 @@ const TrainingsPlaene = [
           details: []}]    
      },
 
-     { id: 11, disciplines: ["Schnelllaufen", "Hochsprung"],
+     { id: 11, disciplines: ["Schnelllaufen", "Hochsprung ohne Anlage"],
       warmup: [
         { name: "Klammerlauf",
           material: "Klammern", duration: "10", repeat: "2-3 Runden",
@@ -343,7 +344,7 @@ const TrainingsPlaene = [
           details: [] },
         { name: "Reaktionsstart mit Bällen, die von hinten kommen",
           material: "Bälle, Hütchen", duration: "10", repeat: "",
-          details: ["Die, die warten machen 10 Kniebeugen"]},
+          details: ["Die, die warten, machen 10 Kniebeugen"]},
         { name: "Staffelrennen mit Karten holen",
           material: "Hütchen, Spielkarten", duration: "10", repeat: "",
           details: []},
@@ -360,7 +361,7 @@ const TrainingsPlaene = [
           details: []}]    
      },
 
-     { id: 12, disciplines: ["Hochsprung", "Wurf"],
+     { id: 12, disciplines: ["Hochsprung ohne Anlage", "Wurf"],
       warmup: [
         { name: "Einlaufen mit Sprungseil",
           material: "Sprungseil", duration: "10", repeat: "2-3 Runden",
@@ -375,7 +376,7 @@ const TrainingsPlaene = [
           details: [] },
         { name: "Band schräg nach unten und hochspringen",
           material: "Band", duration: "10", repeat: "",
-          details: ["Die, die warten machen 10 Kniebeugen"]},
+          details: []},
         { name: "Werfen ohne Anlauf",
           material: "Alle werfbaren Gegenstände, Hütchen. Maßband", duration: "10", repeat: "",
           details: ["3 Liegesützen nach jedem Wurf"]},
@@ -387,6 +388,259 @@ const TrainingsPlaene = [
         { name: "2 Runden mit Rollbrett",
           material: "Rollbretter", duration: "10", repeat: "1 mal",
           details: ["Immer ein Kind sitzt drauf und das andere zieht"] },
+        { name: "Auslaufen",
+          material: "", duration: "5", repeat: "2 Runden",
+          details: []}]    
+     },
+
+     { id: 13, disciplines: ["Hochsprung ohne Anlage", "Wurf"],
+      warmup: [
+        { name: "Einlaufen und Ball prellen",
+          material: "Bälle", duration: "10", repeat: "2-3 Runden",
+          details: [] },
+        { name: "Lauf ABC",
+          material: "Hütchen", duration: "10", repeat: " - ",
+          details: ["Schlagläufe", "Anversen", "Skippings", "Knieheberlauf", "Steps", "B Steps", "Steigerung"]
+        }],
+      mainex: [
+        { name: "Staffelrennen und Sachen hin und her tragen",
+          material: "Boxen, Sachen zum Transport", duration: "10", repeat: "",
+          details: [] },
+        { name: "Band schräg nach unten und hochspringen",
+          material: "Band", duration: "10", repeat: "",
+          details: []},
+        { name: "Werfen ohne Anlauf oder stoßen",
+          material: "Alle werfbaren Gegenstände, Hütchen. Maßband", duration: "10", repeat: "",
+          details: ["3 Liegesützen nach jedem Wurf"]},
+        { name: "Werfen mit Anlauf oder stoßen",
+          material: "Alle werfbaren Gegenstände, Hütchen. Maßband", duration: "10", repeat: "",
+          details: ["3 Liegesützen nach jedem Wurf"]
+        }],
+      ending: [
+        { name: "Biathlon",
+          material: "Bälle, Hütchen", duration: "10", repeat: "1 mal",
+          details: [] },
+        { name: "Auslaufen",
+          material: "", duration: "5", repeat: "2 Runden",
+          details: []}]    
+     },
+
+     { id: 14, disciplines: ["Ausdauer", "Schnelllaufen"],
+      warmup: [
+        { name: "Autofahren mit Gängen",
+          material: "", duration: "10", repeat: "2-3 Runden",
+          details: [] },
+        { name: "Lauf ABC",
+          material: "Hütchen", duration: "10", repeat: " - ",
+          details: ["Schlagläufe", "Anversen", "Skippings", "Knieheberlauf", "Steps", "B Steps", "Steigerung"]
+        }],
+      mainex: [
+        { name: "Star Wars",
+          material: "Bloxx", duration: "10", repeat: "",
+          details: [] },
+        { name: "Start aus verschiedenen Positionen",
+          material: "Hütchen", duration: "10", repeat: "",
+          details: ["Die, die warten, machen 3 Liegestützen"]},
+        { name: "Schere, Stein, Papier und Rennen",
+          material: "Hütchen, Spielkarten", duration: "10", repeat: "",
+          details: ["Verlierer macht 3 Situps"]},
+        { name: "Staffelrennen mit Karten",
+          material: "Hütchen, Spielkarten", duration: "10", repeat: "",
+          details: []
+        }],
+      ending: [
+        { name: "Schere, Stein, Papier",
+          material: "", duration: "10", repeat: "je nach Rundengröße",
+          details: ["Der Gewinner rennt eine kleine Bahn, der Verlierer eine große Bahn"] },
+        { name: "Auslaufen",
+          material: "", duration: "5", repeat: "2 Runden",
+          details: []}]    
+     },
+
+     { id: 15, disciplines: ["Ausdauer", "Schnelllaufen"],
+      warmup: [
+        { name: "Zeitschätzlauf",
+          material: "Hütchen", duration: "10", repeat: "2-3 Runden",
+          details: [] },
+        { name: "Lauf ABC",
+          material: "Hütchen", duration: "10", repeat: " - ",
+          details: ["Froschsprünge", "Hopserlauf", "Anversen", "Knieheberlauf", "Steps", "Sprungläufe", "Steigerung"]
+        }],
+      mainex: [
+        { name: "Star Wars",
+          material: "Bloxx", duration: "10", repeat: "",
+          details: [] },
+        { name: "Geschichte und immer bei Wörtern wird gerannt",
+          material: "Hütchen", duration: "10", repeat: "",
+          details: []},
+        { name: "Seil und dann losrennen",
+          material: "Hütchen, Spielkarten", duration: "10", repeat: "",
+          details: ["Verlierer macht 3 Situps"]},
+        { name: "Staffelrennen mit Hürden",
+          material: "Hürden, Hütchen", duration: "10", repeat: "",
+          details: []
+        }],
+      ending: [
+        { name: "Formen ablaufen",
+          material: "", duration: "10", repeat: "je nach Rundengröße",
+          details: [] },
+        { name: "Auslaufen",
+          material: "", duration: "5", repeat: "2 Runden",
+          details: []}]    
+     },
+
+     { id: 16, disciplines: ["Schnelllaufen", "Überlaufen"],
+      warmup: [
+        { name: "Überholstaffel",
+          material: "", duration: "10", repeat: "2-3 Runden",
+          details: [] },
+        { name: "Lauf ABC",
+          material: "Hütchen", duration: "10", repeat: " - ",
+          details: ["Hopserlauf", "Anversen", "Knieheberlauf", "Skippings", "Steps", "Seitkreuzschritte", "Steigerung"]
+        }],
+      mainex: [
+        { name: "Star Wars",
+          material: "Bloxx", duration: "10", repeat: "",
+          details: [] },
+        { name: "Hürdenbahn",
+          material: "Hürden, Medibälle", duration: "10", repeat: "",
+          details: ["Die, die warten heben Medibälle vom Boden auf und strecken sie nach oben"]},
+        { name: "Hürdenbahn mit Schwungbeintraining",
+          material: "Bananenkisten, bunte Bälle", duration: "10", repeat: "",
+          details: []},
+        { name: "Überholstaffel",
+          material: "Hütchen", duration: "10", repeat: "",
+          details: []
+        }],
+      ending: [
+        { name: "2 Runden mit Rollbrett",
+          material: "Rollbretter", duration: "10", repeat: "1 mal",
+          details: ["Immer ein Kind sitzt drauf und das andere zieht"] },
+        { name: "Auslaufen",
+          material: "", duration: "5", repeat: "2 Runden",
+          details: []}]    
+     },
+
+     { id: 17, disciplines: ["Schnelllaufen", "Überlaufen"],
+      warmup: [
+        { name: "Formen ablaufen",
+          material: "Hütchen", duration: "10", repeat: "2-3 Runden",
+          details: [] },
+        { name: "Lauf ABC",
+          material: "Hütchen", duration: "10", repeat: " - ",
+          details: ["Hopserlauf", "Anversen", "Knieheberlauf", "Skippings", "Steps", "Seitkreuzschritte", "Seitgalopp", "Steigerung"]
+        }],
+      mainex: [
+        { name: "Staffelrennen",
+          material: "Hütchen", duration: "10", repeat: "",
+          details: [] },
+        { name: "Hürdenbahn",
+          material: "Hürden", duration: "10", repeat: "",
+          details: []},
+        { name: "Hürdenbahn mit Schwungbeintraining",
+          material: "Hütchen, Spielkarten", duration: "10", repeat: "",
+          details: []},
+        { name: "Staffelrennen mit Hürden",
+          material: "Hürden, Hütchen", duration: "10", repeat: "",
+          details: []
+        }],
+      ending: [
+        { name: "Sechs Tage Rennen",
+          material: "Seil", duration: "10", repeat: "je nach Rundengröße",
+          details: [] },
+        { name: "Auslaufen",
+          material: "", duration: "5", repeat: "2 Runden",
+          details: []}]    
+     },
+
+     { id: 18, disciplines: ["Schnelligkeit", "Wurf"],
+      warmup: [
+        { name: "Autofahren mit Gängen",
+          material: "", duration: "5", repeat: "2-3 Runden",
+          details: ["Selbst mitlaufen"] },
+        { name: "Lauf ABC",
+          material: "Hütchen", duration: "10", repeat: " - ",
+          details: ["Hopserlauf", "Anversen", "Schlagläufe", "Auf einem Bein hüpfen und links 1 Kontakt, rechts 2 Kontakte", "Steps", "Steigerung"]
+        }],
+      mainex: [
+        { name: "Pendelstaffel",
+          material: "Hütchen, Bloxx", duration: "10", repeat: "",
+          details: [] },
+        { name: "Ball in Reifen dopsen lassen",
+          material: "Bälle, Reifen", duration: "15", repeat: "",
+          details: ["Zwei Kinder stehen sich immer gegenüber. Immer wenn ein Ball daneben geht machen beide Kinder 3 Liegestützen"]},
+        { name: "Abwerfen von Hütchen auf dem Boden",
+          material: "Hütchen, Bälle", duration: "15", repeat: "",
+          details: []
+        }],
+      ending: [
+        { name: "Brennball",
+          material: "Hütchen, Bälle", duration: "10", repeat: "1 mal",
+          details: [] },
+        { name: "Auslaufen",
+          material: "", duration: "5", repeat: "2 Runden",
+          details: []}]    
+     },
+
+     { id: 19, disciplines: ["Schnelligkeit", "Wurf"],
+      warmup: [
+        { name: "2 Runden mit Rollbrett",
+          material: "Rollbretter", duration: "10", repeat: "1 mal",
+          details: ["Immer ein Kind sitzt drauf und das andere zieht"] },
+        { name: "Lauf ABC",
+          material: "Hütchen", duration: "10", repeat: " - ",
+          details: ["Schlagläufe", "Anversen", "Skippings", "Knieheberlauf", "Steps", "B Steps", "Steigerung"]
+        }],
+      mainex: [
+        { name: "Transportsprint",
+          material: "Hütchen, etwas zum Transportieren", duration: "10", repeat: "",
+          details: [] },
+        { name: "Wer trifft den rollenden Ball",
+          material: "Bälle, großer Ball", duration: "15", repeat: "",
+          details: ["Zwei Kinder stehen sich immer gegenüber. Immer wenn ein Ball daneben geht machen beide Kinder 3 Liegestützen"]},
+        { name: "Sau durchs Dorf",
+          material: "Hütchen, Bälle, Medibälle", duration: "15", repeat: "",
+          details: []},
+        { name: "Werfen ohne Anlauf",
+          material: "Alle werfbaren Gegenstände, Hütchen, Maßband", duration: "10", repeat: "",
+          details: ["3 Liegesützen nach jedem Wurf"]
+        }],
+      ending: [
+        { name: "Biathlon",
+          material: "Hütchen, Bälle", duration: "10", repeat: "1 mal",
+          details: [] },
+        { name: "Auslaufen",
+          material: "", duration: "5", repeat: "2 Runden",
+          details: []}]    
+     },
+
+     { id: 20, disciplines: ["Ausdauer", "Überlaufen"],
+      warmup: [
+        { name: "Crosslauf auf Rasen",
+          material: "Hürden, Hütchen", duration: "10", repeat: "2-3 Runden",
+          details: [] },
+        { name: "Lauf ABC",
+          material: "Hütchen", duration: "10", repeat: " - ",
+          details: ["Hopserlauf", "Anversen", "Knieheberlauf", "Skippings", "Steps", "Seitkreuzschritte", "Steigerung"]
+        }],
+      mainex: [
+        { name: "Pendelstaffel mit Bloxx + Hürden",
+          material: "Bloxx, Hürden", duration: "10", repeat: "",
+          details: [] },
+        { name: "Koordinationsleiter",
+          material: "Koordinationsleiter", duration: "10", repeat: "",
+          details: ["Die wartenden Kinder machen Standwagen"]},
+        { name: "Hürdenbahn mit Schwungbeintraining",
+          material: "Bananenkisten, bunte Bälle", duration: "10", repeat: "",
+          details: []},
+        { name: "Überholstaffel",
+          material: "Hütchen", duration: "10", repeat: "",
+          details: []
+        }],
+      ending: [
+        { name: "Klammerlauf",
+          material: "Klammern", duration: "10", repeat: "1 mal",
+          details: ["Wir verteilen uns auf der Bahn, damit jeder mehr Klammern bekommt"] },
         { name: "Auslaufen",
           material: "", duration: "5", repeat: "2 Runden",
           details: []}]    
