@@ -122,6 +122,7 @@ function addExerciseCard(exercise, toElement) {
     `<li>Dauer: ${exercise.duration}min</li>`+
     `<li>Wiederholungen: ${exercise.repeat}</li>` +
     `</ul>`;
+  exerciseCard.appendChild(exerciseContent);
   if (exercise.details.length>0) {
     let exerciseReveal = document.createElement("div");
     exerciseReveal.classList.add("card-reveal");
@@ -129,10 +130,7 @@ function addExerciseCard(exercise, toElement) {
     exerciseReveal.innerHTML += '<ul>';
     exercise.details.forEach( (item) => exerciseReveal.innerHTML += `<li>${item}</li>`);
     exerciseReveal.innerHTML += '</ul>'; 
-    exerciseCard.appendChild(exerciseContent);
     exerciseCard.appendChild(exerciseReveal);
-  } else {
-    exerciseCard.appendChild(exerciseContent);
   }
   exerciseDiv.appendChild(exerciseCard);
   toElement.appendChild(exerciseDiv);
