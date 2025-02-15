@@ -113,10 +113,10 @@ function addExerciseCard(exercise, toElement) {
   let exerciseCard = document.createElement("div");
   exerciseCard.classList.add("card", "red", "lighten-4");
   let exerciseContent = document.createElement("div");
-  exerciseContent.classList.add("card-content", "center");
+  exerciseContent.classList.add("card-content");
   exerciseContent.innerHTML = (exercise.details.length>0) ?
-     `<span class="card-title activator">${exercise.name}<i class="material-icons right">more_vert</i></span><ul>` :
-     `<span class="card-title">${exercise.name}</span><ul>`;
+     `<span class="card-title center activator">${exercise.name}<i class="material-icons right">more_vert</i></span><ul>` :
+     `<span class="card-title center">${exercise.name}</span><ul>`;
   exerciseContent.innerHTML +=
     `<li>Material: ${exercise.material}</li>` +
     `<li>Dauer: ${exercise.duration}min</li>`+
