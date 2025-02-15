@@ -40,21 +40,21 @@ function onDisciplineSelected(event) {
 }
 
 function createDisciplineCardList() {
-  Disciplines.forEach( (discipline) => {
+  Object.keys(Disciplines).forEach( (discipline) => {
      let disciplineDiv = document.createElement("div");
      disciplineDiv.classList.add("col", "s4", "m3", "l2");
      let disciplineCard = document.createElement("div");
      disciplineCard.classList.add("card", "red", "lighten-4");
      let disciplineCardContent = document.createElement("div");
      disciplineCardContent.classList.add("card-content", "center");
-     disciplineCardContent.id = discipline.name;
-     if( discipline.img.length>0) {
+     disciplineCardContent.id = Disciplines[discipline].name;
+     if( Disciplines[discipline].img.length>0) {
        let disciplineCardImage = document.createElement("img");
        disciplineCardImage.classList.add("disziplin");
-       disciplineCardImage.src = discipline.img;
+       disciplineCardImage.src = Disciplines[discipline].img;
        disciplineCardContent.appendChild(disciplineCardImage);
      }
-     disciplineCardContent.appendChild(document.createTextNode(discipline.name));
+     disciplineCardContent.appendChild(document.createTextNode(Disciplines[discipline].name));
      disciplineCard.appendChild(disciplineCardContent);
      disciplineCard.addEventListener("click", onDisciplineSelected);
      disciplineDiv.appendChild(disciplineCard);
@@ -90,7 +90,8 @@ function showSelectedPlan() {
 
   plan = availablePlans[planOffset];
   
-  document.getElementById("plan-title").innerHTML = "Plan " + plan.id + ": " + plan.disciplines.join(" & ");  
+  document.getElementById("plan-title").innerHTML = "Plan " + plan.id + ": "
+    + plan.disciplines.map((discipline) => discipline.name ).join(" & ");  
   fillCardsForPhase("warmup", plan.warmup);
   fillCardsForPhase("mainex", plan.mainex);
   fillCardsForPhase("ending", plan.ending);
