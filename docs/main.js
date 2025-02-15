@@ -1,10 +1,32 @@
 let selectedDisciplines = [];
-let availablePlans = [];
+let availablePlans = getAvailablePlans();
 let planOffset = 0;
 
-function selectDiscipline(event) {
+document.addEventListener('DOMContentLoaded', function() {
+  createDisciplineCardList();
+  updateShowButtonText(); 
+  document.getElementById("showBtn").addEventListener("click", onShowPlansButtonPressed);
+  document.getElementById("prevBtn").addEventListener("click", onPreviousButtonPressed);
+  document.getElementById("nextBtn").addEventListener("click", onNextButtonPressed)
+ });
+
+// Event handler
+function onShowPlansButtonPressed() {
+  planOffset=0;
+  showSelectedPlan();
+}
+function onPreviousButtonPressed() {
+  planOffset = (planOffset==0) ? availablePlans.length-1 : planOffset-1;
+  showSelectedPlan();
+}
+function onNextButtonPressed() {
+  planOffset = (planOffset==availablePlans.length-1) ? 0 : planOffset+1;
+  showSelectedPlan();
+}
+function onDisciplineSelected(event) {
   let index = selectedDisciplines.indexOf(event.target.id);
   if (index>=0) {
+    // discipline was de-selected -> remove it from the list of selected disciplines
     selectedDisciplines.splice(index,1);
     event.target.parentElement.classList.remove("lighten-2");
     event.target.parentElement.classList.add("lighten-4");
@@ -13,25 +35,45 @@ function selectDiscipline(event) {
     event.target.parentElement.classList.add("lighten-2");
     selectedDisciplines.push(event.target.id);
   }
-
-  determineAvailablePlans();
+  availablePlans = getAvailablePlans();
   updateShowButtonText();
 }
 
-function determineAvailablePlans() {
-  if(selectedDisciplines.length>0) {
-    availablePlans = TrainingsPlaene.filter(
-      (plan) => {return selectedDisciplines.filter( (selected) => plan.disciplines.includes(selected)).length==selectedDisciplines.length;}
-    );
-  } else {
-    availablePlans = TrainingsPlaene;
-  }
+function createDisciplineCardList() {
+  Disciplines.forEach( (discipline) => {
+     let disciplineDiv = document.createElement("div");
+     disciplineDiv.classList.add("col", "s4", "m3", "l2");
+     let disciplineCard = document.createElement("div");
+     disciplineCard.classList.add("card", "red", "lighten-4");
+     let disciplineCardContent = document.createElement("div");
+     disciplineCardContent.classList.add("card-content", "center");
+     disciplineCardContent.id = discipline.name;
+     if( discipline.img.length>0) {
+       let disciplineCardImage = document.createElement("img");
+       disciplineCardImage.classList.add("disziplin");
+       disciplineCardImage.src = discipline.img;
+       disciplineCardContent.appendChild(disciplineCardImage);
+     }
+     disciplineCardContent.appendChild(document.createTextNode(discipline.name));
+     disciplineCard.appendChild(disciplineCardContent);
+     disciplineCard.addEventListener("click", onDisciplineSelected);
+     disciplineDiv.appendChild(disciplineCard);
+     document.getElementById("disziplinen").appendChild(disciplineDiv);
+  } );
+}
+
+function getAvailablePlans() {
+  return (selectedDisciplines.length==0) ? TrainingPlans :
+    TrainingPlans.filter( (plan) => {
+        return selectedDisciplines.length == 
+          selectedDisciplines.filter( (selected) => plan.disciplines.includes(selected)).length;
+      });
 }
 
 function updateShowButtonText() {
   let showBtn = document.getElementById("showBtn");
   if(availablePlans.length>0) {
-    showBtn.innerHTML = "Einen der " + availablePlans.length + " Trainingspl&auml;ne anzeigen";
+    showBtn.innerHTML = "Einen der " + availablePlans.length + " Trainingspläne anzeigen";
     showBtn.classList.remove("disabled");
   } else {
     showBtn.innerHTML = "Kein passender Trainingsplan vorhanden";
@@ -41,10 +83,6 @@ function updateShowButtonText() {
   }
 }
 
-function updateSelectedPlans() {
-  planOffset=0;
-  showSelectedPlan();
-}
 function showSelectedPlan() {
   if(availablePlans.length==0) {
     return;
@@ -52,42 +90,20 @@ function showSelectedPlan() {
 
   plan = availablePlans[planOffset];
   
-  document.getElementById("plan-title").innerHTML = "Plan " + plan.id + ": " + plan.disciplines.join(" & ");
-  
-  // clear the current warmup content, add cards for the warmup methods
-  let warmupDiv = document.getElementById("warmup");
-  while(warmupDiv.firstChild) { warmupDiv.removeChild(warmupDiv.firstChild);};
-  plan.warmup.forEach( (exercise) => addExerciseCard(exercise, warmupDiv));
-
-  // clear the current main exercises content, add cards for the main methods
-  let mainexDiv = document.getElementById("mainex");
-  while(mainexDiv.firstChild) { mainexDiv.removeChild(mainexDiv.firstChild);};
-  plan.mainex.forEach( (exercise) => addExerciseCard(exercise, mainexDiv));
-
-  // clear the current main exercises content, add cards for the main methods
-  let endingDiv = document.getElementById("ending");
-  while(endingDiv.firstChild) { endingDiv.removeChild(endingDiv.firstChild);};
-  plan.ending.forEach( (exercise) => addExerciseCard(exercise, endingDiv));
-
+  document.getElementById("plan-title").innerHTML = "Plan " + plan.id + ": " + plan.disciplines.join(" & ");  
+  fillCardsForPhase("warmup", plan.warmup);
+  fillCardsForPhase("mainex", plan.mainex);
+  fillCardsForPhase("ending", plan.ending);
   // update the "previous" and "next" plan buttons
-    document.getElementById("prevBtn").classList.remove("disabled");
-    document.getElementById("nextBtn").classList.remove("disabled");
+  document.getElementById("prevBtn").classList.remove("disabled");
+  document.getElementById("nextBtn").classList.remove("disabled");
 }
 
-function showPreviousPlan() {
-  planOffset--;
-  if(planOffset<0) {
-    planOffset = availablePlans.length-1;
-  }
-  showSelectedPlan();
-}
-
-function showNextPlan() {
-  planOffset++;
-  if(planOffset==availablePlans.length) {
-    planOffset=0;
-  }
-  showSelectedPlan();
+function fillCardsForPhase(phaseName, exercises) {
+  let phaseDiv = document.getElementById(phaseName);
+  // clear the current phase content, add cards for the phase exercises
+  while(phaseDiv.firstChild) { phaseDiv.removeChild(phaseDiv.firstChild);};
+  exercises.forEach( (exercise) => addExerciseCard(exercise, phaseDiv));
 }
 
 function addExerciseCard(exercise, toElement) {
@@ -97,11 +113,9 @@ function addExerciseCard(exercise, toElement) {
   exerciseCard.classList.add("card", "red", "lighten-4");
   let exerciseContent = document.createElement("div");
   exerciseContent.classList.add("card-content", "center");
-  if (exercise.details.length>0) {
-    exerciseContent.innerHTML = `<span class="card-title activator">${exercise.name}<i class="material-icons right">more_vert</i></span><ul>`;
-  } else {
-    exerciseContent.innerHTML = `<span class="card-title">${exercise.name}</span><ul>`
-  }
+  exerciseContent.innerHTML = (exercise.details.length>0) ?
+     `<span class="card-title activator">${exercise.name}<i class="material-icons right">more_vert</i></span><ul>` :
+     `<span class="card-title">${exercise.name}</span><ul>`;
   exerciseContent.innerHTML +=
     `<li>Material: ${exercise.material}</li>` +
     `<li>Dauer: ${exercise.duration}min</li>`+
@@ -112,7 +126,7 @@ function addExerciseCard(exercise, toElement) {
     exerciseReveal.classList.add("card-reveal");
     exerciseReveal.innerHTML = '<span class="card-title grey-text text-darken-4">Details<i class="material-icons right">close</i></span>';
     exerciseReveal.innerHTML += '<ul>';
-    addListItems(exerciseReveal, exercise.details);
+    exercise.details.forEach( (item) => exerciseReveal.innerHTML += `<li>${item}</li>`);
     exerciseReveal.innerHTML += '</ul>'; 
     exerciseCard.appendChild(exerciseContent);
     exerciseCard.appendChild(exerciseReveal);
@@ -122,44 +136,3 @@ function addExerciseCard(exercise, toElement) {
   exerciseDiv.appendChild(exerciseCard);
   toElement.appendChild(exerciseDiv);
 }
-
-function addListItems(element, list) {
-  list.forEach( (item) => {
-    element.innerHTML += `<li>${item}</li>`;
-  });
-}
-
-function initializeCardList() {
-  let disziplinen = document.getElementById("disziplinen");
-  Disziplinen.forEach( (discipline) => {
-     let disziplin = document.createElement("div");
-     disziplin.classList.add("col", "s4", "m3", "l2");
-     let disziplinCard = document.createElement("div");
-     disziplinCard.classList.add("card", "red", "lighten-4");
-     let disziplinCardContent = document.createElement("div");
-     disziplinCardContent.classList.add("card-content", "center");
-     disziplinCardContent.id = discipline.name;
-     if( discipline.img.length>0) {
-       let disziplinCardImage = document.createElement("img");
-       disziplinCardImage.classList.add("disziplin");
-       disziplinCardImage.src = discipline.img;
-       disziplinCardContent.appendChild(disziplinCardImage);
-     }
-     disziplinCardContent.appendChild(document.createTextNode(discipline.name));
-     disziplinCard.appendChild(disziplinCardContent);
-     disziplinCard.addEventListener("click", selectDiscipline);
-     disziplin.appendChild(disziplinCard);
-     disziplinen.appendChild(disziplin);
-  } );
-  let showBtn = document.getElementById("showBtn");
-  showBtn.addEventListener("click", updateSelectedPlans);
-  prevBtn.addEventListener("click", showPreviousPlan);
-  nextBtn.addEventListener("click", showNextPlan)
-
-}
-
-document.addEventListener('DOMContentLoaded', function() {
-  initializeCardList();
-  determineAvailablePlans();
-  updateShowButtonText(); 
- });
