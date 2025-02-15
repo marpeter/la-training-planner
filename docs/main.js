@@ -36,6 +36,8 @@ function updateShowButtonText() {
   } else {
     showBtn.innerHTML = "Kein passender Trainingsplan vorhanden";
     showBtn.classList.add("disabled");
+    document.getElementById("prevBtn").classList.add("disabled");
+    document.getElementById("nextBtn").classList.add("disabled");
   }
 }
 
@@ -68,28 +70,22 @@ function showSelectedPlan() {
   plan.ending.forEach( (exercise) => addExerciseCard(exercise, endingDiv));
 
   // update the "previous" and "next" plan buttons
-  if(planOffset>0) {
     document.getElementById("prevBtn").classList.remove("disabled");
-  } else {
-    document.getElementById("prevBtn").classList.add("disabled");
-  }
-  if(planOffset<availablePlans.length-1) {
     document.getElementById("nextBtn").classList.remove("disabled");
-  } else {
-    document.getElementById("nextBtn").classList.add("disabled");
-  }
 }
 
 function showPreviousPlan() {
-  if(planOffset>0) {
-    planOffset--;
+  planOffset--;
+  if(planOffset<0) {
+    planOffset = availablePlans.length-1;
   }
   showSelectedPlan();
 }
 
 function showNextPlan() {
-  if(planOffset<availablePlans.length-1) {
-    planOffset++;
+  planOffset++;
+  if(planOffset==availablePlans.length) {
+    planOffset=0;
   }
   showSelectedPlan();
 }
