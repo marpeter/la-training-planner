@@ -24,7 +24,7 @@ function onNextButtonPressed() {
   showSelectedPlan();
 }
 function onDisciplineSelected(event) {
-  let index = selectedDisciplines.indexOf(event.target.id);
+  let index = selectedDisciplines.indexOf(Disciplines[event.target.id]);
   if (index>=0) {
     // discipline was de-selected -> remove it from the list of selected disciplines
     selectedDisciplines.splice(index,1);
@@ -33,7 +33,7 @@ function onDisciplineSelected(event) {
   } else {
     event.target.parentElement.classList.remove("lighten-4");
     event.target.parentElement.classList.add("lighten-2");
-    selectedDisciplines.push(event.target.id);
+    selectedDisciplines.push(Disciplines[event.target.id]);
   }
   availablePlans = getAvailablePlans();
   updateShowButtonText();
