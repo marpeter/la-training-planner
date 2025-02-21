@@ -24,16 +24,19 @@ function onNextButtonPressed() {
   showSelectedPlan();
 }
 function onDisciplineSelected(event) {
-  let index = selectedDisciplines.indexOf(Disciplines[event.target.id]);
+  let targetElement = (event.target.localName=='img') ?
+      event.target.parentElement // click was on image -> discipline element is the parent element
+    : event.target;
+  let index = selectedDisciplines.indexOf(Disciplines[targetElement.id]);
   if (index>=0) {
     // discipline was de-selected -> remove it from the list of selected disciplines
     selectedDisciplines.splice(index,1);
-    event.target.parentElement.classList.remove("lighten-2");
-    event.target.parentElement.classList.add("lighten-4");
+    targetElement.parentElement.classList.remove("lighten-2");
+    targetElement.parentElement.classList.add("lighten-4");
   } else {
-    event.target.parentElement.classList.remove("lighten-4");
-    event.target.parentElement.classList.add("lighten-2");
-    selectedDisciplines.push(Disciplines[event.target.id]);
+    targetElement.parentElement.classList.remove("lighten-4");
+    targetElement.parentElement.classList.add("lighten-2");
+    selectedDisciplines.push(Disciplines[targetElement.id]);
   }
   availablePlans = getAvailablePlans();
   updateShowButtonText();
@@ -47,7 +50,7 @@ function createDisciplineCardList() {
      disciplineCard.classList.add("card", "red", "lighten-4");
      let disciplineCardContent = document.createElement("div");
      disciplineCardContent.classList.add("card-content", "center");
-     disciplineCardContent.id = Disciplines[discipline].name;
+     disciplineCardContent.id = discipline;
      if( Disciplines[discipline].img.length>0) {
        let disciplineCardImage = document.createElement("img");
        disciplineCardImage.classList.add("disziplin");
