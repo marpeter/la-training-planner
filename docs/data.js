@@ -8,7 +8,7 @@ const Disciplines = {
   Stabweitsprung: { name: "Stabweitsprung", img: "assets/Weitsprung.png"},
   Staffellauf: { name: "Staffellauf", img: "assets/Lauf.png"},
   StaffellaufHürde: { name: "Staffellauf Hürde", img: "assets/Huerdenlauf.png"},
-  Überlaufen: { name: "Überlaufen", img: "assets/Hochsprung.png"},
+  Überlaufen: { name: "Überlaufen", img: "assets/Huerdenlauf.png"},
   WeitsprungMitGrube: { name: "Weitsprung (mit Grube)", img: "assets/Weitsprung.png"},
   WeitsprungOhneGrube: { name: "Weitsprung (ohne Grube)", img: "assets/Weitsprung.png"},
   Wurf: { name: "Wurf", img: "assets/Wurf.png"},
