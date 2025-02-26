@@ -118,7 +118,7 @@ function addExerciseCard(exercise, toElement) {
   let exerciseContent = document.createElement("div");
   exerciseContent.classList.add("card-content");
   exerciseContent.innerHTML = (exercise.details.length>0) ?
-     `<span class="card-title center activator">${exercise.name}<i class="material-icons right">more_vert</i></span><ul>` :
+     `<span class="card-title center activator">${exercise.name}<i class="material-symbols right">more_vert</i></span><ul>` :
      `<span class="card-title center">${exercise.name}</span><ul>`;
   exerciseContent.innerHTML +=
     `<li>Material: ${exercise.material}</li>` +
@@ -129,7 +129,7 @@ function addExerciseCard(exercise, toElement) {
   if (exercise.details.length>0) {
     let exerciseReveal = document.createElement("div");
     exerciseReveal.classList.add("card-reveal");
-    exerciseReveal.innerHTML = '<span class="card-title grey-text text-darken-4">Details<i class="material-icons right">close</i></span>';
+    exerciseReveal.innerHTML = '<span class="card-title grey-text text-darken-4">Details<i class="material-symbols right">close</i></span>';
     exerciseReveal.innerHTML += '<ul>';
     exercise.details.forEach( (item) => exerciseReveal.innerHTML += `<li>${item}</li>`);
     exerciseReveal.innerHTML += '</ul>'; 
