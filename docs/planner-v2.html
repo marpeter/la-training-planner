@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
    <head>
-      <title>Planer für Leichtathletik-Training</title>
+      <title>Planer für Leichtathletik-Training, Version 2</title>
          <meta name="viewport" content="width=device-width, initial-scale=1">
          <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
          <link rel="icon" type="image/x-icon" href="assets/tsvlogo.png">
@@ -11,8 +11,8 @@
         <link rel="stylesheet"
               href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css">
         <link rel="stylesheet" href="ownstyle.css">
-        <script src="data.js"></script>
-        <script src="main.js"></script>
+        <script src="model.js"></script>
+        <script src="controller.js"></script>
          <!-- script type="text/javascript" src="https://code.jquery.com/jquery-2.1.1.min.js"></script -->
          <!-- Compiled and minified JavaScript -->
          <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
@@ -21,9 +21,8 @@
     <div class="container">
     <div class="section">
         <h4 class="card-panel red darken-1 center">LA Trainings-Planer</h4>
-        <span class="right"><a href="planner-v2.html" target="_blank"><i class="material-icons">logout</i>Neue Version testen ...</a></span>
-     </div>
-     <div class="section">
+        <!-- <div class="row" id="dauer">Dauer des Trainings:</div>
+        Abzudeckende Disziplinen: -->
         <div class="row" id="disziplinen">
         <!-- wird mittels JavaScript gefüllt-->
       </div>
@@ -36,7 +35,7 @@
     <div class="divider"></div>
     <div class="section">
       <h5 id="plan-title" class="card-small red darken-1 center white-text">LA Trainings-Plan</h5>
-      <h6 class="card-small red darken-2 center white-text">Aufw&auml;rmen</h6>
+      <h6 class="card-small red darken-2 center white-text">Aufwärmen</h6>
       <div class="row" id="warmup"></div>
       <h6 class="card-small red darken-2 center white-text">Hauptteil</h6>
       <div class="row" id="mainex"></div>
@@ -45,7 +44,7 @@
     </div>
   </div>
   <footer class="section">
-    <div class="center grey-text">Version 0.9.2, &copy; Copyright 2025 Markus Peter</div>
+    <div class="center grey-text">Version 0.10.0, &copy; Copyright 2025 Markus Peter</div>
   </footer>
    </body>
 </html>
