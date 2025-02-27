@@ -21,13 +21,28 @@
     <div class="container">
     <div class="section">
         <h4 class="card-panel red darken-1 center">LA Trainings-Planer</h4>
-        <!-- <div class="row" id="dauer">Dauer des Trainings:</div>
-        Abzudeckende Disziplinen: -->
-        <div class="row" id="disziplinen">
+        <div class="row">
+          <div class="col s12">Disziplinen:</div>
+        </div>
+        <div class="row">
+          <div id="disziplinen"></div>
         <!-- wird mittels JavaScript gefüllt-->
       </div>
+      <div class="row">
+        <div class="col s4 m3 l3">Trainingsdauer:</div>
+        <div class="col s8 m9 l9">
+          <form name="durationForm">
+            <label><input name="duration" type="radio" value="60" class="red" checked/><span>60 Minuten</span></label>
+            <label><input name="duration" type="radio" value="75"/><span>75 Minuten</span></label>
+            <label><input name="duration" type="radio" value="90"/><span>90 Minuten</span></label>
+          </form>
+          <!-- <div class="chip">60 Minuten</div>
+          <div class="chip">75 Minuten</div>
+          <div class="chip">90 Minuten</div>   -->
+        </div>
+      </div>
       <div class="center">
-        <button id="prevBtn" class="btn center red disabled"><i class="material-icons">arrow_back_ios</i></button>
+        <button id="prevBtn" name="prevButton" class="btn center red disabled"><i class="material-icons">arrow_back_ios</i></button>
         <button id="showBtn" class="btn center red">Trainingsplan anzeigen</button>
         <button id="nextBtn" class="btn center red disabled"><i class="material-icons">arrow_forward_ios</i></button>
       </div>

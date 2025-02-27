@@ -1,13 +1,15 @@
 let selectedDisciplines = [];
 let availablePlans = getAvailablePlans();
 let planOffset = 0;
+let duration = 60;
 
 document.addEventListener('DOMContentLoaded', function() {
   createDisciplineCardList();
   updateShowButtonText(); 
   document.getElementById("showBtn").addEventListener("click", onShowPlansButtonPressed);
   document.getElementById("prevBtn").addEventListener("click", onPreviousButtonPressed);
-  document.getElementById("nextBtn").addEventListener("click", onNextButtonPressed)
+  document.getElementById("nextBtn").addEventListener("click", onNextButtonPressed);
+  document.durationForm.duration.forEach( (radio) => radio.addEventListener("change",onDurationChanged));
  });
 
 // Event handler
@@ -24,6 +26,7 @@ function onNextButtonPressed() {
   showSelectedPlan();
 }
 function onDisciplineSelected(event) {
+
   let targetElement = (event.target.localName=='img') ?
       event.target.parentElement // click was on image -> discipline element is the parent element
     : event.target;
@@ -31,37 +34,38 @@ function onDisciplineSelected(event) {
   if (index>=0) {
     // discipline was de-selected -> remove it from the list of selected disciplines
     selectedDisciplines.splice(index,1);
-    targetElement.parentElement.classList.remove("lighten-2");
-    targetElement.parentElement.classList.add("lighten-4");
+    targetElement.classList.remove("lighten-2");
+    targetElement.classList.add("lighten-4");
   } else {
-    targetElement.parentElement.classList.remove("lighten-4");
-    targetElement.parentElement.classList.add("lighten-2");
+    targetElement.classList.remove("lighten-4");
+    targetElement.classList.add("lighten-2");
     selectedDisciplines.push(Disciplines[targetElement.id]);
   }
   availablePlans = getAvailablePlans();
   updateShowButtonText();
 }
 
+function onDurationChanged(event) {
+  duration = event.target.value;
+  alert(duration);
+}
+
+// helper functions
+
 function createDisciplineCardList() {
   Object.keys(Disciplines).forEach( (discipline) => {
-     let disciplineDiv = document.createElement("div");
-     disciplineDiv.classList.add("col", "s4", "m3", "l2");
-     let disciplineCard = document.createElement("div");
-     disciplineCard.classList.add("card", "red", "lighten-4");
-     let disciplineCardContent = document.createElement("div");
-     disciplineCardContent.classList.add("card-content", "center");
-     disciplineCardContent.id = discipline;
+     let disciplineChip = document.createElement("div");
+     disciplineChip.classList.add("chip", "red", "lighten-4");
+     disciplineChip.id = discipline;
      if( Disciplines[discipline].img.length>0) {
-       let disciplineCardImage = document.createElement("img");
-       disciplineCardImage.classList.add("disziplin");
-       disciplineCardImage.src = Disciplines[discipline].img;
-       disciplineCardContent.appendChild(disciplineCardImage);
+       let disciplineImage = document.createElement("img");
+       disciplineImage.classList.add("disziplin");
+       disciplineImage.src = Disciplines[discipline].img;
+       disciplineChip.appendChild(disciplineImage);
      }
-     disciplineCardContent.appendChild(document.createTextNode(Disciplines[discipline].name));
-     disciplineCard.appendChild(disciplineCardContent);
-     disciplineCard.addEventListener("click", onDisciplineSelected);
-     disciplineDiv.appendChild(disciplineCard);
-     document.getElementById("disziplinen").appendChild(disciplineDiv);
+     disciplineChip.appendChild(document.createTextNode(Disciplines[discipline].name));
+     disciplineChip.addEventListener("click", onDisciplineSelected);
+     document.getElementById("disziplinen").appendChild(disciplineChip);
   } );
 }
 
