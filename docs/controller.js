@@ -1,30 +1,30 @@
 let selectedDisciplines = [];
-let availablePlans = getAvailablePlans();
-let planOffset = 0;
 let duration = 60;
 
 document.addEventListener('DOMContentLoaded', function() {
   createDisciplineCardList();
-  updateShowButtonText(); 
-  document.getElementById("showBtn").addEventListener("click", onShowPlansButtonPressed);
-  document.getElementById("prevBtn").addEventListener("click", onPreviousButtonPressed);
-  document.getElementById("nextBtn").addEventListener("click", onNextButtonPressed);
+  updateShowButton(); 
+  document.getElementById("showBtn").addEventListener("click", onCreatePlanButtonPressed);
   document.durationForm.duration.forEach( (radio) => radio.addEventListener("change",onDurationChanged));
  });
 
 // Event handler
-function onShowPlansButtonPressed() {
-  planOffset=0;
-  showSelectedPlan();
+function onCreatePlanButtonPressed() {
+  let availablePlans = getAvailablePlans();
+  if(availablePlans.length==0) {
+    alert("Ich konnte keinen Plan finden / erzeugen :-(");
+    return;
+  }
+
+  plan = availablePlans[Math.floor(Math.random() * availablePlans.length)];
+  
+  document.getElementById("plan-title").innerHTML = "Plan " + plan.id + ": "
+    + plan.disciplines.map((discipline) => discipline.name ).join(" & ");  
+  fillCardsForPhase("warmup", plan.warmup);
+  fillCardsForPhase("mainex", plan.mainex);
+  fillCardsForPhase("ending", plan.ending);
 }
-function onPreviousButtonPressed() {
-  planOffset = (planOffset==0) ? availablePlans.length-1 : planOffset-1;
-  showSelectedPlan();
-}
-function onNextButtonPressed() {
-  planOffset = (planOffset==availablePlans.length-1) ? 0 : planOffset+1;
-  showSelectedPlan();
-}
+
 function onDisciplineSelected(event) {
 
   let targetElement = (event.target.localName=='img') ?
@@ -42,14 +42,12 @@ function onDisciplineSelected(event) {
     selectedDisciplines.push(Disciplines[targetElement.id]);
   }
   availablePlans = getAvailablePlans();
-  updateShowButtonText();
+  updateShowButton();
 }
 
 function onDurationChanged(event) {
   duration = event.target.value;
-  alert(duration);
 }
-
 // helper functions
 
 function createDisciplineCardList() {
@@ -77,34 +75,13 @@ function getAvailablePlans() {
       });
 }
 
-function updateShowButtonText() {
+function updateShowButton() {
   let showBtn = document.getElementById("showBtn");
-  if(availablePlans.length>0) {
-    showBtn.innerHTML = "Einen der " + availablePlans.length + " Trainingspläne anzeigen";
+  if(selectedDisciplines.length>0) {
     showBtn.classList.remove("disabled");
   } else {
-    showBtn.innerHTML = "Kein passender Trainingsplan vorhanden";
     showBtn.classList.add("disabled");
-    document.getElementById("prevBtn").classList.add("disabled");
-    document.getElementById("nextBtn").classList.add("disabled");
   }
-}
-
-function showSelectedPlan() {
-  if(availablePlans.length==0) {
-    return;
-  }
-
-  plan = availablePlans[planOffset];
-  
-  document.getElementById("plan-title").innerHTML = "Plan " + plan.id + ": "
-    + plan.disciplines.map((discipline) => discipline.name ).join(" & ");  
-  fillCardsForPhase("warmup", plan.warmup);
-  fillCardsForPhase("mainex", plan.mainex);
-  fillCardsForPhase("ending", plan.ending);
-  // update the "previous" and "next" plan buttons
-  document.getElementById("prevBtn").classList.remove("disabled");
-  document.getElementById("nextBtn").classList.remove("disabled");
 }
 
 function fillCardsForPhase(phaseName, exercises) {
