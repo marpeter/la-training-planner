@@ -368,7 +368,7 @@ const TrainingPlans = [
       warmup: [ Exercises.ZweiRundenRollbrett,     Exercises.LaufABC_18],
       mainex: [ Exercises.TransportSprintLang,     Exercises.TurnenAufHochsprungMatte, Exercises.TheorieStaffelübergabe ],
       ending: [ Exercises.Rundenstaffel,           Exercises.Auslaufen] },
-    { id: 37, disciplines: [Disciplines.Überlaufen],
+    { id: 37, disciplines: [Disciplines.Staffellauf, Disciplines.Überlaufen],
       warmup: [ Exercises.CrosslaufAufRasenIntervalle, Exercises.LaufABC_19],
       mainex: [ Exercises.PendelstaffelMitHürden,  Exercises.KoordinationsLeiter, Exercises.HürdenbahnMitSchwungbein ],
       ending: [ Exercises.TheorieStaffelübergabe,  Exercises.Rundenstaffel, Exercises.Auslaufen] },
