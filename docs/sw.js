@@ -1,4 +1,4 @@
-var taPlannerVersion = '0.9.3',
+var taPlannerVersion = '0.9.3.1',
     cacheName = `ta-planner-pwa-${taPlannerVersion}`,
     filesToCache = [
         'planner.html',

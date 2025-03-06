@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html>
+   <head>
+      <title>Planer für Leichtathletik-Training, Version 2</title>
+         <meta name="viewport" content="width=device-width, initial-scale=1">
+         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+         <link rel="icon" type="image/x-icon" href="assets/tsvlogo.png">
+         <link rel="apple-touch-icon" type="image/png" href="assets/tsvlogo.png">
+         <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+        <!-- Compiled and minified CSS -->
+        <link rel="stylesheet"
+              href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css">
+        <link rel="stylesheet" href="ownstyle.css">
+        <script src="model.js"></script>
+        <script src="controller.js"></script>
+         <!-- Compiled and minified JavaScript -->
+         <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
+   </head>
+   <body>
+    <div class="container">
+    <div class="section">
+        <h4 class="card-panel red darken-1 center">LA Trainings-Planer</h4>
+        <div class="row">
+          <div class="col s12">Disziplinen:</div>
+        </div>
+        <div class="row">
+          <div id="disziplinen"></div>
+        <!-- wird mittels JavaScript gefüllt-->
+      </div>
+      <div class="row">
+        <div class="col s4 m3 l3">Trainingsdauer:</div>
+        <div class="col s8 m9 l9">
+          <form name="durationForm">
+            <label><input name="duration" type="radio" value="60" class="red" checked/><span>60 Minuten</span></label>
+            <label><input name="duration" type="radio" value="75"/><span>75 Minuten</span></label>
+            <label><input name="duration" type="radio" value="90"/><span>90 Minuten</span></label>
+          </form>
+        </div>
+      </div>
+      <div class="center">
+        <!-- <button id="prevBtn" name="prevButton" class="btn center red disabled"><i class="material-icons">arrow_back_ios</i></button> -->
+        <button id="showBtn" class="btn center red">Trainingsplan erzeugen</button>
+        <!-- <button id="nextBtn" class="btn center red disabled"><i class="material-icons">arrow_forward_ios</i></button> -->
+      </div>
+    </div>
+    <div class="divider"></div>
+    <div class="section">
+      <h5 id="plan-title" class="card-small red darken-1 center white-text">LA Trainings-Plan</h5>
+      <h6 class="card-small red darken-2 center white-text">Aufwärmen</h6>
+      <div class="row" id="warmup"></div>
+      <h6 class="card-small red darken-2 center white-text">Hauptteil</h6>
+      <div class="row" id="mainex"></div>
+      <h6 class="card-small red darken-2 center white-text">Schluss</h6>
+      <div class="row" id="ending"></div>
+    </div>
+  </div>
+  <footer class="section">
+    <div class="center grey-text">Version 0.10.0, &copy; Copyright 2025 Markus Peter</div>
+  </footer>
+   </body>
+</html>
