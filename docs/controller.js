@@ -10,23 +10,19 @@ document.addEventListener('DOMContentLoaded', function() {
 
 // Event handler
 function onCreatePlanButtonPressed() {
-  let availablePlans = getAvailablePlans();
-  if(availablePlans.length==0) {
+  let plan = generatePlan();
+  if(!plan) {
     alert("Ich konnte keinen Plan finden / erzeugen :-(");
     return;
   }
-
-  plan = availablePlans[Math.floor(Math.random() * availablePlans.length)];
-  
   document.getElementById("plan-title").innerHTML = "Plan " + plan.id + ": "
-    + plan.disciplines.map((discipline) => discipline.name ).join(" & ");  
+    + plan.disciplines.map((discipline) => discipline.name ).join(" & ") + " (" + plan.duration + "min)";  
   fillCardsForPhase("warmup", plan.warmup);
   fillCardsForPhase("mainex", plan.mainex);
   fillCardsForPhase("ending", plan.ending);
 }
 
 function onDisciplineSelected(event) {
-
   let targetElement = (event.target.localName=='img') ?
       event.target.parentElement // click was on image -> discipline element is the parent element
     : event.target;
@@ -41,14 +37,13 @@ function onDisciplineSelected(event) {
     targetElement.classList.add("lighten-2");
     selectedDisciplines.push(Disciplines[targetElement.id]);
   }
-  availablePlans = getAvailablePlans();
   updateShowButton();
 }
 
 function onDurationChanged(event) {
   duration = event.target.value;
 }
-// helper functions
+// helper functions for UI
 
 function createDisciplineCardList() {
   Object.keys(Disciplines).forEach( (discipline) => {
@@ -65,14 +60,6 @@ function createDisciplineCardList() {
      disciplineChip.addEventListener("click", onDisciplineSelected);
      document.getElementById("disziplinen").appendChild(disciplineChip);
   } );
-}
-
-function getAvailablePlans() {
-  return (selectedDisciplines.length==0) ? TrainingPlans :
-    TrainingPlans.filter( (plan) => {
-        return selectedDisciplines.length == 
-          selectedDisciplines.filter( (selected) => plan.disciplines.includes(selected)).length;
-      });
 }
 
 function updateShowButton() {
@@ -118,4 +105,32 @@ function addExerciseCard(exercise, toElement) {
   }
   exerciseDiv.appendChild(exerciseCard);
   toElement.appendChild(exerciseDiv);
+}
+
+// helper functions - logic
+
+function generatePlan() {
+
+  let plans = (selectedDisciplines.length==0) ? TrainingPlans :
+    TrainingPlans.filter( (plan) => {
+        return selectedDisciplines.length == 
+          selectedDisciplines.filter( (selected) => plan.disciplines.includes(selected)).length;
+      });
+  if(plans.length==0) {
+    return null;
+  } else {
+    let plan = structuredClone(plans[Math.floor(Math.random() * plans.length)]);
+    plan.ending.push(Exercises.Auslaufen);
+    
+    determinePlanDuration(plan);
+    
+    return plan;
+  }
+}
+
+function determinePlanDuration(plan) {
+  plan.duration = 0;
+  plan.warmup.forEach( (exercise) =>  plan.duration += parseInt(exercise.duration) );
+  plan.mainex.forEach( (exercise) =>  plan.duration += parseInt(exercise.duration) );
+  plan.ending.forEach( (exercise) =>  plan.duration += parseInt(exercise.duration) );  
 }
