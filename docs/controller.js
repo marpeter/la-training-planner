@@ -1,5 +1,5 @@
 let selectedDisciplines = [];
-let duration = 60;
+let duration = 70;
 
 document.addEventListener('DOMContentLoaded', function() {
   createDisciplineCardList();
@@ -16,7 +16,7 @@ function onCreatePlanButtonPressed() {
     return;
   }
   document.getElementById("plan-title").innerHTML = "Plan " + plan.id + ": "
-    + plan.disciplines.map((discipline) => discipline.name ).join(" & ") + " (" + plan.duration + "min)";  
+    + plan.disciplines.map((discipline) => discipline.name ).join(" & ") + " (" + plan.duration() + "min)";  
   fillCardsForPhase("warmup", plan.warmup);
   fillCardsForPhase("mainex", plan.mainex);
   fillCardsForPhase("ending", plan.ending);
@@ -110,27 +110,33 @@ function addExerciseCard(exercise, toElement) {
 // helper functions - logic
 
 function generatePlan() {
+  if (selectedDisciplines.length==0) return null;
 
-  let plans = (selectedDisciplines.length==0) ? TrainingPlans :
-    TrainingPlans.filter( (plan) => {
-        return selectedDisciplines.length == 
-          selectedDisciplines.filter( (selected) => plan.disciplines.includes(selected)).length;
-      });
-  if(plans.length==0) {
-    return null;
-  } else {
-    let plan = structuredClone(plans[Math.floor(Math.random() * plans.length)]);
-    plan.ending.push(Exercises.Auslaufen);
-    
-    determinePlanDuration(plan);
-    
-    return plan;
+  let suitableExercises = ExerciseWorksForDiscipline.filter(
+    (exercise) => selectedDisciplines.filter( (selected) => exercise.disciplines.includes(selected)).length > 0
+    ).map( (exercise) => exercise.exercise);
+  let warmups = suitableExercises.filter( (exercise) => exercise.warmup );
+  let runabcs = suitableExercises.filter( (exercise) => exercise.runabc );
+  let mainexs = suitableExercises.filter( (exercise) => exercise.mainex );
+  let endings = suitableExercises.filter( (exercise) => exercise.ending ); 
+
+  let plan = new TrainingPlan(selectedDisciplines);
+  // the following algorithm is based purely on randomly picking exercises and does
+  // not consider potential dependencies between exercises
+  while((plan.duration()!=duration)) {
+    // pick a random warmup and a random runabc
+    plan.warmup = [ warmups.at(Math.floor(Math.random()*warmups.length)), runabcs.at(Math.floor(Math.random()*runabcs.length)) ];
+    // pick a random ending and add the standard Auslaufen
+    plan.ending = [ endings.at(Math.floor(Math.random()*endings.length)), Exercises.Auslaufen ];
+    // pick main exercises until the target duration is reached or exceeded.
+    plan.mainex = [];
+    while(plan.duration()<=duration-10) {
+      let index = Math.floor(Math.random()*mainexs.length);
+      let exerciseToAdd = mainexs.at(index);
+      if(!plan.mainex.includes(exerciseToAdd)) {
+        plan.mainex.push(exerciseToAdd);
+      }
+    }
   }
-}
-
-function determinePlanDuration(plan) {
-  plan.duration = 0;
-  plan.warmup.forEach( (exercise) =>  plan.duration += parseInt(exercise.duration) );
-  plan.mainex.forEach( (exercise) =>  plan.duration += parseInt(exercise.duration) );
-  plan.ending.forEach( (exercise) =>  plan.duration += parseInt(exercise.duration) );  
+  return plan;
 }
