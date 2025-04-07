@@ -1,5 +1,8 @@
+import { TrainingPlan } from "./model.js";
+
+
 document.addEventListener('DOMContentLoaded', function() {
-  
+
   let uiModel = {
     disciplines: TrainingPlan.getAllDisciplines(),
     selectedDisciplines: [],
@@ -20,6 +23,7 @@ const view = {
     this.updateShowButton();
   },
 
+  // add the list of disciplines as clickable "chips" to the UI
   createDisciplineCardList() {
     Object.keys(this.model.disciplines).forEach( (discipline) => {
       let disciplineChip = document.createElement("div");
@@ -37,6 +41,7 @@ const view = {
    } );
   },
   
+  // the "generate training plan" button should only be active if a disciplines is selected
   updateShowButton() {
     let showBtn = document.getElementById("showBtn");
     if(this.model.selectedDisciplines.length>0) {
@@ -97,7 +102,7 @@ const controller = {
       alert("Ich konnte keinen Plan finden / erzeugen :-(");
       return;
     }
-    document.getElementById("plan-title").innerHTML = "Plan " + plan.id + ": "
+    document.getElementById("plan-title").innerHTML = "Plan für "
       + plan.disciplines.map((discipline) => discipline.name ).join(" & ") + " (" + plan.duration() + "min)";  
     view.fillCardsForPhase("warmup", plan.warmup);
     view.fillCardsForPhase("mainex", plan.mainex);

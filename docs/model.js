@@ -603,3 +603,4 @@ class TrainingPlan {
 
 function adder(total, exercise) { return total + parseInt(exercise.duration) };
 
+export { TrainingPlan };
