@@ -564,6 +564,42 @@ class TrainingPlan {
     return this.mainex.reduce( adder, this.ending.reduce( adder, this.warmup.reduce( adder, 0 ) ) );
   }
 
+  static getAllDisciplines() {
+    return Disciplines;
+  }
+
+  static generate(theDisciplines, targetDuration) {
+    if (theDisciplines.length==0) return null;
+  
+    let suitableExercises = ExerciseWorksForDiscipline.filter(
+      (exercise) => theDisciplines.filter( (selected) => exercise.disciplines.includes(selected)).length > 0
+      ).map( (exercise) => exercise.exercise);
+    let warmups = suitableExercises.filter( (exercise) => exercise.warmup );
+    let runabcs = suitableExercises.filter( (exercise) => exercise.runabc );
+    let mainexs = suitableExercises.filter( (exercise) => exercise.mainex );
+    let endings = suitableExercises.filter( (exercise) => exercise.ending ); 
+  
+    let plan = new TrainingPlan(theDisciplines);
+    // the following algorithm is based purely on randomly picking exercises and does
+    // not consider potential dependencies between exercises
+    while((plan.duration()!=targetDuration)) {
+      // pick a random warmup and a random runabc
+      plan.warmup = [ warmups.at(Math.floor(Math.random()*warmups.length)), runabcs.at(Math.floor(Math.random()*runabcs.length)) ];
+      // pick a random ending and add the standard Auslaufen
+      plan.ending = [ endings.at(Math.floor(Math.random()*endings.length)), Exercises.Auslaufen ];
+      // pick main exercises until the target duration is reached or exceeded.
+      plan.mainex = [];
+      while(plan.duration()<=targetDuration-10) {
+        let index = Math.floor(Math.random()*mainexs.length);
+        let exerciseToAdd = mainexs.at(index);
+        if(!plan.mainex.includes(exerciseToAdd)) {
+          plan.mainex.push(exerciseToAdd);
+        }
+      }
+    }
+    return plan;
+  };
 };
 
-function adder(total, exercise) { return total + parseInt(exercise.duration) }
+function adder(total, exercise) { return total + parseInt(exercise.duration) };
+
