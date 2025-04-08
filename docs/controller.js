@@ -116,7 +116,7 @@ const controller = {
     let index = view.model.selectedDisciplines.indexOf(view.model.disciplines[targetElement.id]);
     if (index>=0) {
       // discipline was de-selected -> remove it from the list of selected disciplines
-      this.model.selectedDisciplines.splice(index,1);
+      view.model.selectedDisciplines.splice(index,1);
       targetElement.classList.remove("lighten-2");
       targetElement.classList.add("lighten-4");
     } else {
