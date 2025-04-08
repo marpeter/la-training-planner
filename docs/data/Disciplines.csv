@@ -1,0 +1,13 @@
+﻿Id,Name,Image
+Ausdauer,Ausdauer,
+Hochsprung,Hochsprung,assets/Hochsprung.png
+HochsprungOhneAnlage,Hochsprung ohne Anlage,assets/Hochsprung.png
+Koordination,Koordination,assets/Koordination.png
+Schnelligkeit,Schnelligkeit,assets/Lauf.png
+Schnelllaufen,Schnelllaufen,assets/Lauf.png
+Stabweitsprung,Stabweitsprung,assets/Weitsprung.png
+Staffellauf,Staffellauf,assets/Lauf.png
+Überlaufen,Überlaufen,assets/Huerdenlauf.png
+WeitsprungMitGrube,Weitsprung mit Grube,assets/Weitsprung.png
+WeitsprungOhneGrube,Weitsprung ohne Grube,assets/Weitsprung.png
+Wurf,Wurf,assets/Wurf.png

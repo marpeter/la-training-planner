@@ -501,7 +501,7 @@ const ExerciseWorksForDiscipline = [
     disciplines: [Disciplines.Hochsprung, Disciplines.HochsprungOhneAnlage, Disciplines.Schnelllaufen, Disciplines.Staffellauf, Disciplines.Überlaufen, Disciplines.Wurf]},
 ];
 
-class TrainingPlan {
+export class TrainingPlan {
   constructor(disciplines) {
     this.id = 1;
     this.disciplines = disciplines;
@@ -553,4 +553,4 @@ class TrainingPlan {
 
 function adder(total, exercise) { return total + parseInt(exercise.duration) };
 
-export { TrainingPlan };
+// export { TrainingPlan };
