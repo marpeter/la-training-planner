@@ -10,10 +10,10 @@ async function loadObjectFromCSV(url) {
     let result = {};
     lines.forEach( (line) => {
       let fields = line.split(separator);
-      let id = fields.shift(); // the first field must be the property name in the result object
+      let id = fields[0]; // the first field must be the property name in the result object
       let entry = {};
       fields.forEach( (value, index) => { 
-        entry[header[index+1]] = value;
+        entry[header[index]] = value;
        });
       result[id] = entry;
     });

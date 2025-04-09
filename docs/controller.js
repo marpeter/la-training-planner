@@ -111,19 +111,19 @@ const controller = {
   },
 
   onDisciplineSelected(event) {
-    let targetElement = (event.target.localName=='img') ?
+    let selectedDiscipline = (event.target.localName=='img') ?
         event.target.parentElement // click was on image -> discipline element is the parent element
       : event.target;
-    let index = view.model.selectedDisciplines.indexOf(view.model.disciplines[targetElement.id]);
+    let index = view.model.selectedDisciplines.indexOf(selectedDiscipline.id);
     if (index>=0) {
       // discipline was de-selected -> remove it from the list of selected disciplines
       view.model.selectedDisciplines.splice(index,1);
-      targetElement.classList.remove("lighten-2");
-      targetElement.classList.add("lighten-4");
+      selectedDiscipline.classList.remove("lighten-2");
+      selectedDiscipline.classList.add("lighten-4");
     } else {
-      targetElement.classList.remove("lighten-4");
-      targetElement.classList.add("lighten-2");
-      view.model.selectedDisciplines.push(view.model.disciplines[targetElement.id]);
+      selectedDiscipline.classList.remove("lighten-4");
+      selectedDiscipline.classList.add("lighten-2");
+      view.model.selectedDisciplines.push(selectedDiscipline.id);
     }
     view.updateShowButton();
   },

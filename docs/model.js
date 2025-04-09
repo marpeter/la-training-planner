@@ -512,9 +512,13 @@ class TrainingPlan {
     return Disciplines;
   }
 
-  static generate(forDisciplines, targetDuration) {
-    if (forDisciplines.length==0) return null;
+  static generate(forDisciplineIds, targetDuration) {
+    if (forDisciplineIds.length==0) return null;
   
+    let forDisciplines = Object.keys(Disciplines)
+      .filter( (disciplineId) => forDisciplineIds.includes(disciplineId))
+      .map( (disciplineId) => Disciplines[disciplineId]);
+ 
     let suitableExercises = ExerciseWorksForDiscipline.filter(
       (exercise) => forDisciplines.filter( (selected) => exercise.disciplines.includes(selected)).length > 0
       ).map( (exercise) => exercise.exercise);
