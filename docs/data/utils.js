@@ -6,7 +6,7 @@ async function loadObjectFromCSV(url) {
     return response.text();
   }).then( (csv) => {
     let lines = csv.split(newLine);
-    const header = lines.shift().split(separator); // the first line contains the column headers
+    const header = lines.shift().split(separator).map( (field) => field.toLowerCase() ); // the first line contains the column headers
     let result = {};
     lines.forEach( (line) => {
       let fields = line.split(separator);

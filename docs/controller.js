@@ -1,17 +1,18 @@
 import { TrainingPlan } from "./model.js";
 
-
 document.addEventListener('DOMContentLoaded', function() {
-
-  let uiModel = {
-    disciplines: TrainingPlan.getAllDisciplines(),
-    selectedDisciplines: [],
-    duration: 70,
-  };
-  
-  view.finishUi(uiModel);
-  controller.registerEventHandlers();
- });
+  TrainingPlan.loadData().then( (result) => {
+      console.log("Data loaded");
+      let uiModel = {
+        disciplines: TrainingPlan.getAllDisciplines(),
+        selectedDisciplines: [],
+        duration: 70,
+      };
+      
+      view.finishUi(uiModel);
+      controller.registerEventHandlers();    
+  });
+});
 
 const view = {
 
@@ -29,10 +30,10 @@ const view = {
       let disciplineChip = document.createElement("div");
       disciplineChip.classList.add("chip", "red", "lighten-4");
       disciplineChip.id = discipline;
-      if( this.model.disciplines[discipline].img.length>0) {
+      if( this.model.disciplines[discipline].image) {
         let disciplineImage = document.createElement("img");
         disciplineImage.classList.add("disziplin");
-        disciplineImage.src = this.model.disciplines[discipline].img;
+        disciplineImage.src = this.model.disciplines[discipline].image;
         disciplineChip.appendChild(disciplineImage);
       }
       disciplineChip.appendChild(document.createTextNode(this.model.disciplines[discipline].name));
