@@ -1,19 +1,25 @@
-async function loadObjectFromCSV(url) {
+async function loadObjectFromCSV(url, fieldSeparator=/,/) {
   const newLine = /\r?\n/;
-  const separator = /,/;
   return fetch(url).then( (response) => {
     if(!response.ok) throw new Error(`HTTP error: ${response.status}`);
     return response.text();
   }).then( (csv) => {
     let lines = csv.split(newLine);
-    const header = lines.shift().split(separator).map( (field) => field.toLowerCase() ); // the first line contains the column headers
+    const header = lines.shift().split(fieldSeparator).map( (field) => field.toLowerCase() ); // the first line contains the column headers
     let result = {};
     lines.forEach( (line) => {
-      let fields = line.split(separator);
+      let fields = line.split(fieldSeparator);
       let id = fields[0]; // the first field must be the property name in the result object
       let entry = {};
-      fields.forEach( (value, index) => { 
-        entry[header[index]] = value;
+      header.forEach( (field, index) => {
+        let value = fields[index].replaceAll('"',''); // replaceAll to get rid if text-delimiting " characters added by MS Excel
+        if(value=="true") {
+          entry[field] = true;
+        } else if(value=="false") {
+          entry[field] = false;
+        } else {
+          entry[field] = value;
+        }
        });
       result[id] = entry;
     });
@@ -22,9 +28,5 @@ async function loadObjectFromCSV(url) {
     alert(error);
   });
 };
-
-// the following does not work, at least not locally using plain HTTP:
-// const Disciplines = loadObjectFromCSV('data/Disciplines.csv');
-// export default await Disciplines;
 
 export { loadObjectFromCSV };
