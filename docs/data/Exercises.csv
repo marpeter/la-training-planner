@@ -103,7 +103,7 @@ SteigesprüngeAufBahn;Steigesprünge auf der Bahn;false;false;true;false;Bananen
 SteigesprüngeÜberBahn;Steigesprünge über die Bahn;false;false;true;false;Bananenkisten;10;;
 TheorieStaffelübergabe;Theorie Staffelübergabe;false;false;true;false;Staffelhölzer;10;;
 TicTacToe;Tic Tac Toe;false;false;true;true;;15;;
-Transportlauf_01;Transportlauf;true;false;false;true;"Tennisbälle;Bananenkisten";5;2-3 Runden;
+Transportlauf_01;Transportlauf;true;false;false;true;Tennisbälle,Bananenkisten;5;2-3 Runden;
 Transportlauf_02;Transportlauf;true;false;false;true;Hütchen, etwas zu transportieren;10;1 mal;
 Transportlauf_03;Transportlauf;true;false;false;true;Klammern;10;1 mal;
 TransportSprint;Transportsprint;false;false;true;false;Hütchen, etwas zum Transportieren;10;;
