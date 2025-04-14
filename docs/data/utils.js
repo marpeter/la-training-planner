@@ -5,7 +5,10 @@ async function loadObjectFromCSV(url, fieldSeparator=/,/) {
     return response.text();
   }).then( (csv) => {
     let lines = csv.split(newLine);
-    const header = lines.shift().split(fieldSeparator).map( (field) => field.toLowerCase() ); // the first line contains the column headers
+    let header = lines.shift().split(fieldSeparator) // the first line contains the column headers
+      .map( (field) => field.toLowerCase() )         // convert field names to lowercase
+      .map( (field) => field.endsWith("[]") ?        // detect fields the values of which are lists
+        { name: field.replace("[]",""), makeArray: true } : { name: field, makeArray: false }  ); 
     let result = {};
     lines.forEach( (line) => {
       let fields = line.split(fieldSeparator);
@@ -13,12 +16,10 @@ async function loadObjectFromCSV(url, fieldSeparator=/,/) {
       let entry = {};
       header.forEach( (field, index) => {
         let value = fields[index].replaceAll('"',''); // replaceAll to get rid if text-delimiting " characters added by MS Excel
-        if(value=="true") {
-          entry[field] = true;
-        } else if(value=="false") {
-          entry[field] = false;
+        if(field.makeArray) {
+          entry[field.name] = value=="" ? [] : value.split(':').map( (val) => convertIfBoolean(val) );
         } else {
-          entry[field] = value;
+          entry[field.name] = convertIfBoolean(value);
         }
        });
       result[id] = entry;
@@ -28,5 +29,15 @@ async function loadObjectFromCSV(url, fieldSeparator=/,/) {
     alert(error);
   });
 };
+
+function convertIfBoolean(value) {
+  if(value=="true") {
+    return true;
+  } else if(value=="false") {
+    return false;
+  } else {
+   return value;
+  } 
+}
 
 export { loadObjectFromCSV };
