@@ -236,17 +236,17 @@ class TrainingPlan {
       (exercise) => forDisciplines.filter( (selected) => exercise.disciplines.includes(selected)).length > 0
       ).map( (exercise) => exercise.exercise);
 
-    console.log("Suitable: " + JSON.stringify(suitableExercises));
+    // console.log("Suitable: " + JSON.stringify(suitableExercises));
 
     let warmups = suitableExercises.filter( (exercise) => exercise.warmup );
     let runabcs = suitableExercises.filter( (exercise) => exercise.runabc );
     let mainexs = suitableExercises.filter( (exercise) => exercise.mainex );
     let endings = suitableExercises.filter( (exercise) => exercise.ending ); 
   
-    console.log(warmups.length + " Warm-ups: " + JSON.stringify(warmups));
-    console.log("RunABCs: " + JSON.stringify(runabcs));
-    console.log("Main exercises: " + JSON.stringify(mainexs));
-    console.log("Endings: " + JSON.stringify(endings));
+    // console.log(warmups.length + " Warm-ups: " + JSON.stringify(warmups));
+    // console.log("RunABCs: " + JSON.stringify(runabcs));
+    // console.log("Main exercises: " + JSON.stringify(mainexs));
+    // console.log("Endings: " + JSON.stringify(endings));
 
     let plan = new TrainingPlan(forDisciplines);
     // the following algorithm is based purely on randomly picking exercises and does

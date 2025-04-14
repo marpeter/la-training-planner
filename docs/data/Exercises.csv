@@ -1,7 +1,7 @@
 ﻿Id;Name;Warmup;RunABC;MainEx;Ending;Material;Duration;Repeat;Details
 AchterInKurvenLaufen;8er in Kurven laufen;false;false;true;false;Hütchen;10;;5 Sprünge hoch auf Sitzsteine
 AnhängerAbhängerStaffel;Anhänger - Abhänger Staffel;true;false;false;true;Seile;10;1 mal;
-AnhängerAbhängerStaffelHürde;Anhänger + Abhängerstaffel;true;false;false;true;Hürden, Hütchen, Seile;10;2-3 Runden;
+AnhängerAbhängerStaffelHürde;Anhänger - Abhängerstaffel;true;false;false;true;Hürden, Hütchen, Seile;10;2-3 Runden;
 Auslaufen;Auslaufen;false;false;false;false;;5;2 Runden;
 AutofahrenKurz;Autofahren mit Gängen;true;false;true;false; - ;5;2-3 Runden;Selbst mitlaufen
 AutofahrenLang;Autofahren mit Gängen;true;false;true;false;Hütchen;10;2-3 Runden;
