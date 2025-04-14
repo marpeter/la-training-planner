@@ -18,9 +18,8 @@ class TrainingPlan {
 
   static async loadData() {
     Disciplines = await loadObjectFromCSV('data/Disciplines.csv');
-
     Exercises = await loadObjectFromCSV('data/Exercises.csv',/;/);
-    // convert exercise details from strings) into arrays
+    // convert exercise details from strings into arrays
     Object.keys(Exercises).forEach( (exercise) =>  {
       Exercises[exercise].details = Exercises[exercise].details=="" ? [] : Exercises[exercise].details.split(':');
     } );
@@ -124,15 +123,16 @@ class TrainingPlan {
       { exercise: Exercises.LaufenZuMusik,
         disciplines: [Disciplines.Ausdauer, Disciplines.Koordination]},
     
-      { exercise: Exercises.LäuferGegenWerfer,            disciplines: [Disciplines.Ausdauer]}, 
-    
+      { exercise: Exercises.LäuferGegenWerfer,            disciplines: [Disciplines.Ausdauer]},
+      { exercise: Exercises.MattenbergHochkommen,         disciplines: [Disciplines.Hochsprung, Disciplines.HochsprungOhneAnlage]},
+      { exercise: Exercises.MattenbergRückenAufkommen,    disciplines: [Disciplines.Hochsprung, Disciplines.HochsprungOhneAnlage]},
+
       { exercise: Exercises.MedibälleHinHerWerfen,
         disciplines: [Disciplines.Ausdauer, Disciplines.Überlaufen]}, 
       { exercise: Exercises.MitSeilFangen,
         disciplines: [Disciplines.HochsprungOhneAnlage, Disciplines.Wurf]},
     
-      { exercise: Exercises.Nummernwettläufe,
-        disciplines: [Disciplines.Ausdauer, Disciplines.Koordination]}, 
+      { exercise: Exercises.Nummernwettläufe,             disciplines: [Disciplines.Ausdauer, Disciplines.Koordination]}, 
     
       { exercise: Exercises.Pendelstaffel,
         disciplines: [Disciplines.Ausdauer, Disciplines.Hochsprung, Disciplines.HochsprungOhneAnlage, Disciplines.Schnelligkeit, Disciplines.Schnelllaufen, Disciplines.Wurf]},
@@ -144,6 +144,7 @@ class TrainingPlan {
       { exercise: Exercises.Reaktionsstart_01,            disciplines: [Disciplines.Schnelligkeit, Disciplines.Schnelllaufen]},
       { exercise: Exercises.Reaktionsstart_02,            disciplines: [Disciplines.Schnelligkeit, Disciplines.Schnelllaufen]},
       { exercise: Exercises.Reaktionsstart_03,            disciplines: [Disciplines.Schnelligkeit, Disciplines.Schnelllaufen]}, 
+      { exercise: Exercises.Reaktionsstart_04,            disciplines: [Disciplines.Schnelligkeit, Disciplines.Schnelllaufen]}, 
       { exercise: Exercises.ReihenfolgeErarbeiten,        disciplines: [Disciplines.WeitsprungMitGrube, Disciplines.WeitsprungOhneGrube]},
       { exercises: Exercises.ReiseNachJerusalemMitRingen, disciplines: [Disciplines.Schnelligkeit, Disciplines.Schnelllaufen]},
       { exercise: Exercises.Rundenstaffel,                disciplines: [Disciplines.Staffellauf]},
@@ -157,9 +158,8 @@ class TrainingPlan {
       { exercise: Exercises.SchereSteinPapierRennen,      disciplines: [Disciplines.Schnelligkeit, Disciplines.Schnelllaufen]},
       { exercise: Exercises.SchersprungAufMatte,          disciplines: [Disciplines.Hochsprung, Disciplines.HochsprungOhneAnlage]},
       { exercise: Exercises.SechsTageRennen,              disciplines: [Disciplines.Ausdauer] },
-    
-      { exercise: Exercises.SeilDannRennen,
-        disciplines: [Disciplines.Ausdauer, Disciplines.Koordination]},
+      { exercise: Exercises.SeilDannRennen,               disciplines: [Disciplines.Ausdauer, Disciplines.Koordination]},
+
       { exercise: Exercises.SeileRausziehen,
         disciplines: [Disciplines.Ausdauer, Disciplines.Koordination]},
     
@@ -167,9 +167,8 @@ class TrainingPlan {
       { exercise: Exercises.SeilspringenLangesSeil,       disciplines: [Disciplines.Stabweitsprung, Disciplines.WeitsprungMitGrube, Disciplines.WeitsprungOhneGrube] },
       { exercise: Exercises.SeilspringenUndRunden,        disciplines: [Disciplines.Stabweitsprung, Disciplines.WeitsprungMitGrube, Disciplines.WeitsprungOhneGrube] },
       { exercise: Exercises.SpringenAmReifen,             disciplines: [Disciplines.Stabweitsprung, Disciplines.WeitsprungMitGrube, Disciplines.WeitsprungOhneGrube]}, 
-      { exercise: Exercises.StabweitsprungMitKisten,      disciplines: [Disciplines.Hochsprung, Disciplines.HochsprungOhneAnlage, Disciplines.Stabweitsprung, Disciplines.WeitsprungMitGrube, Disciplines.WeitsprungOhneGrube]},
-      { exercise: Exercises.StabweitsprungOhneKisten,     disciplines: [Disciplines.Hochsprung, Disciplines.HochsprungOhneAnlage, Disciplines.Stabweitsprung, Disciplines.WeitsprungMitGrube, Disciplines.WeitsprungOhneGrube]},
-    
+      { exercise: Exercises.Stabweitsprung,               disciplines: [Disciplines.Hochsprung, Disciplines.HochsprungOhneAnlage, Disciplines.Stabweitsprung, Disciplines.WeitsprungMitGrube, Disciplines.WeitsprungOhneGrube]},
+      
       { exercise: Exercises.StaffelMitEinholen,
         disciplines: [Disciplines.Ausdauer, Disciplines.Koordination]},
     
