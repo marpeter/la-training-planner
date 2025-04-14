@@ -122,20 +122,8 @@ VonInselZuInselSpringenMitReifen;Von Insel zu Insel springen mit Reifen;false;fa
 WeitsprungInGrube;Weitsprung in Sprunggrube ohne Bananenkisten;false;false;true;false;Bananenkiste, Besen, Rechen, Reifen;10;;Sprünge die Treppenstufen hoch → jedes Kind nach dem Sprung auf dem Rückweg rechts:Sprünge 5x mal rein und raus aus dem Reifen:Aufteilen nach Stärke
 WeitsprungInGrubeMitBananenKiste;Weitsprung in Sprunggrube mit Bananenkisten;false;false;true;false;Bananenkiste, Besen, Rechen, Reifen;10;;Sprünge die Treppenstufen hoch → jedes Kind nach dem Sprung auf dem Rückweg rechts:Sprünge 5x mal rein und raus aus dem Reifen:Aufteilen nach Stärke
 WerBautDenHöchstenTurm;Wer baut den höchsten Turm;false;false;true;true;;10;;
-WerfenMitAnlauf_01;Werfen mit Anlauf;false;false;true;false;Bälle, Maßband, Hütchen;15;;3 Liegestützen nach jedem Wurf
-WerfenMitAnlauf_02;Werfen mit Anlauf;false;false;true;false;Bälle u.A., Maßband, Hütchen;15;;
-WerfenMitAnlauf_03;"Werfen mit Anlauf;ggf. auch stoßen";false;false;true;false;Bälle, Maßband, Hütchen, Medibälle;15;;3 Liegestützen nach jedem Wurf
-WerfenMitAnlauf_04;Werfen mit Anlauf;false;false;true;false;Alle werfbaren Gegenstände, Hütchen, Maßband;10;;Medibälle, die durch die Beine wie eine 8 geführt werden müssen (5 Durchgänge)
-WerfenMitAnlauf_05;Werfen mit Anlauf;false;false;true;false;Alle werfbaren Gegenstände, Hütchen, Maßband;10;;3 Liegesützen nach jedem Wurf
-WerfenMitAnlauf_06;Werfen mit Anlauf oder stoßen;false;false;true;false;Alle werfbaren Gegenstände, Hütchen, Maßband;10;;3 Liegesützen nach jedem Wurf
-WerfenMitAnlauf_07;Werfen mit Anlauf;false;false;true;false;Bälle, Maßband, Hütchen;15;;3 Situps nach jedem Wurf
-WerfenOhneAnlauf_01;Werfen ohne Anlauf;false;false;true;false;Bälle, Maßband, Hütchen;15;;3 Liegestützen nach jedem Wurf
-WerfenOhneAnlauf_02;Werfen ohne Anlauf;false;false;true;false;Bälle u.A., Maßband, Hütchen;15;;
-WerfenOhneAnlauf_03;Werfen ohne Anlauf, ggf. auch stoßen;false;false;true;false;Bälle, Maßband, Hütchen, Medibälle;15;;3 Liegestützen nach jedem Wurf
-WerfenOhneAnlauf_04;Werfen ohne Anlauf;false;false;true;false;Alle werfbaren Gegenstände, Hütchen, Maßband;10;;Medibälle, die durch die Beine wie eine 8 geführt werden müssen (5 Durchgänge)
-WerfenOhneAnlauf_05;Werfen ohne Anlauf;false;false;true;false;Alle werfbaren Gegenstände, Hütchen, Maßband;10;;3 Liegesützen nach jedem Wurf
-WerfenOhneAnlauf_06;Werfen ohne Anlauf oder stoßen;false;false;true;false;Alle werfbaren Gegenstände, Hütchen, Maßband;10;;3 Liegesützen nach jedem Wurf  
-WerfenOhneAnlauf_07;Werfen ohne Anlauf;false;false;true;false;Bälle, Maßband, Hütchen;15;;3 Stitups nach jedem Wurf
+WerfenMitAnlauf;Werfen mit Anlauf, ggf. auch stoßen;false;false;true;false;Alle werfbaren Gegenstände, Maßband, Hütchen, (Medibälle);15;;3 Liegestützen oder Situps nach jedem Wurf:Medibälle, die durch die Beine wie eine 8 geführt werden müssen (5 Durchgänge)
+WerfenOhneAnlauf;Werfen ohne Anlauf,  ggf. auch stoßen;false;false;true;false;Alle werfbaren Gegenstände, Maßband, Hütchen, (Medibälle);15;;3 Liegestützen oder Situps nach jedem Wurf:Medibälle, die durch die Beine wie eine 8 geführt werden müssen (5 Durchgänge)
 WerTrifftDieSonne;Wer trifft die Sonne;false;false;true;true;;10;;
 WerTrifftRollendenBall;Wer trifft den rollenden Ball;false;false;true;false;Bälle, großer Ball;15;;Zwei Kinder stehen sich immer gegenüber. Immer wenn ein Ball daneben geht machen beide Kinder 3 Liegestützen
 Zeitschätzlauf;Zeitschätzlauf;true;false;false;true;Hütchen;10;2-3 Runden;
