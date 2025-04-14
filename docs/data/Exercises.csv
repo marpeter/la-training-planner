@@ -72,10 +72,10 @@ PendelstaffelMitBloxxHürden;Pendelstaffel mit Bloxx + Hürden;false;false;true;
 PendelstaffelMitHürden;Pendelstaffel mit Hürden;false;false;true;false;Hürden, Hütchen;10;;
 Reaktionsstart_01;Reaktionsstart aus verschiedenen Lagen mit Worten;false;false;true;false;Hütchen;10;;
 Reaktionsstart_02;Reaktionsstart mit Bällen, die von hinten kommen;false;false;true;false;Bälle, Hütchen;10;;Die, die warten, machen 10 Kniebeugen
-Reaktionsstart_04;Reaktionsstart aus verschiedenen Lagen mit Worten, mit hohen Armen sprinten;false;false;true;false;Hütchen;10;;
 Reaktionsstart_03;Reaktionsstarts mit Händen schlagen;false;false;true;false;;15;;
+Reaktionsstart_04;Reaktionsstart aus verschiedenen Lagen mit Worten, mit hohen Armen sprinten;false;false;true;false;Hütchen;10;;
 ReihenfolgeErarbeiten;Reihenfolge im Reifen erarbeiten;false;false;true;false;Reifen;10;;
-ReiseNachJerusalemMitRingen;"Reise nach ""Jerusalem"" mit Ringen";false;false;true;true;;15;;
+ReiseNachJerusalemMitRingen;Reise nach Jerusalem mit Ringen;false;false;true;true;;15;;
 Rundenstaffel;Rundenstaffel;false;false;false;true;Staffelhölzer;15;1 mal;
 SauDurchsDorf;Sau durchs Dorf;false;false;true;false;Medibälle, Tennisbälle;10;;Mediball in Richtung anderer Gruppen werfen
 SauDurchsDorfLang;Sau durchs Dorf;false;false;true;false;Hütchen, Bälle, Medibälle;15;;Mediball in Richtung anderer Gruppen werfen

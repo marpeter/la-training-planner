@@ -57,7 +57,7 @@ class TrainingPlan {
       { exercise: Exercises.EinlaufenBällePrellen,        disciplines: [Disciplines.Wurf]},
       
       { exercise: Exercises.EinlaufenMitSprungseil,
-        disciplines: [Disciplines.Hochsprung, Disciplines.HochsprungOhneAnlage, Disciplines.Schnelllaufen, Disciplines.Wurf]},
+        disciplines: [Disciplines.Hochsprung, Disciplines.HochsprungOhneAnlage, Disciplines.Schnelligkeit, Disciplines.Schnelllaufen, Disciplines.Wurf]},
       
       { exercise: Exercises.FCRunde,                      disciplines: [Disciplines.Ausdauer]},
       { exercise: Exercises.FormenAblaufen,               disciplines: [Disciplines.Ausdauer]},
@@ -146,7 +146,7 @@ class TrainingPlan {
       { exercise: Exercises.Reaktionsstart_03,            disciplines: [Disciplines.Schnelligkeit, Disciplines.Schnelllaufen]}, 
       { exercise: Exercises.Reaktionsstart_04,            disciplines: [Disciplines.Schnelligkeit, Disciplines.Schnelllaufen]}, 
       { exercise: Exercises.ReihenfolgeErarbeiten,        disciplines: [Disciplines.WeitsprungMitGrube, Disciplines.WeitsprungOhneGrube]},
-      { exercises: Exercises.ReiseNachJerusalemMitRingen, disciplines: [Disciplines.Schnelligkeit, Disciplines.Schnelllaufen]},
+      { exercise: Exercises.ReiseNachJerusalemMitRingen,  disciplines: [Disciplines.Schnelligkeit, Disciplines.Schnelllaufen]},
       { exercise: Exercises.Rundenstaffel,                disciplines: [Disciplines.Staffellauf]},
       { exercise: Exercises.SauDurchsDorf,                disciplines: [Disciplines.Wurf]}, 
       { exercise: Exercises.SauDurchsDorfLang,            disciplines: [Disciplines.Wurf]},
@@ -219,7 +219,7 @@ class TrainingPlan {
       { exercise: Exercises.Zeitschätzlauf,               disciplines: [Disciplines.Ausdauer]},
     
       { exercise: Exercises.ZweiRundenRollbrett,
-        disciplines: [Disciplines.Hochsprung, Disciplines.HochsprungOhneAnlage, Disciplines.Schnelllaufen, Disciplines.Staffellauf, Disciplines.Überlaufen, Disciplines.Wurf]},
+        disciplines: [Disciplines.Hochsprung, Disciplines.HochsprungOhneAnlage, Disciplines.Schnelligkeit, Disciplines.Schnelllaufen, Disciplines.Staffellauf, Disciplines.Überlaufen, Disciplines.Wurf]},
     ];
   }
 
@@ -236,17 +236,17 @@ class TrainingPlan {
       (exercise) => forDisciplines.filter( (selected) => exercise.disciplines.includes(selected)).length > 0
       ).map( (exercise) => exercise.exercise);
 
-    // console.log("Suitable: " + JSON.stringify(suitableExercises));
+    console.log("Suitable: " + JSON.stringify(suitableExercises));
 
     let warmups = suitableExercises.filter( (exercise) => exercise.warmup );
     let runabcs = suitableExercises.filter( (exercise) => exercise.runabc );
     let mainexs = suitableExercises.filter( (exercise) => exercise.mainex );
     let endings = suitableExercises.filter( (exercise) => exercise.ending ); 
   
-    // console.log(warmups.length + " Warm-ups: " + JSON.stringify(warmups));
-    // console.log("RunABCs: " + JSON.stringify(runabcs));
-    // console.log("Main exercises: " + JSON.stringify(mainexs));
-    // console.log("Endings: " + JSON.stringify(endings));
+    console.log(warmups.length + " Warm-ups: " + JSON.stringify(warmups));
+    console.log("RunABCs: " + JSON.stringify(runabcs));
+    console.log("Main exercises: " + JSON.stringify(mainexs));
+    console.log("Endings: " + JSON.stringify(endings));
 
     let plan = new TrainingPlan(forDisciplines);
     // the following algorithm is based purely on randomly picking exercises and does
