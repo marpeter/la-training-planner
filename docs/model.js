@@ -3,6 +3,7 @@ import { loadObjectFromCSV } from "./data/utils.js";
 let Disciplines = {};
 let Exercises = {};
 class TrainingPlan {
+
   constructor(disciplines) {
     this.id = 1;
     this.disciplines = disciplines;
@@ -67,7 +68,34 @@ class TrainingPlan {
     }
     if(attempts>=10) return undefined;
     return plan;
-  };
+  }
+
+  moveExerciseUp(exerciseId) {
+    let index = this.mainex.findIndex( (exercise) => exercise.id==exerciseId )
+    let newMainex = []; 
+    for (let i=0; i<index-1; i++) {
+      newMainex.push(this.mainex[i]);
+    }
+    newMainex.push(this.mainex[index]);
+    newMainex.push(this.mainex[index-1]);
+    for (let i=index+1; i<this.mainex.length; i++) {
+      newMainex.push(this.mainex[i]);
+    }
+    this.mainex = newMainex;
+  }
+  moveExerciseDown(exerciseId) {
+    let index = this.mainex.findIndex( (exercise) => exercise.id==exerciseId )
+    let newMainex = []; 
+    for (let i=0; i<index; i++) {
+      newMainex.push(this.mainex[i]);
+    }
+    newMainex.push(this.mainex[index+1]);
+    newMainex.push(this.mainex[index]);
+    for (let i=index+2; i<this.mainex.length; i++) {
+      newMainex.push(this.mainex[i]);
+    }
+    this.mainex = newMainex;
+  }
 };
 
 function adder(total, exercise) { return total + parseInt(exercise.duration) };

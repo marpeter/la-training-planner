@@ -7,6 +7,7 @@ document.addEventListener('DOMContentLoaded', function() {
         disciplines: TrainingPlan.getAllDisciplines(),
         selectedDisciplines: [],
         duration: 70,
+        plan: undefined,
       };
       
       view.finishUi(uiModel);
@@ -56,38 +57,53 @@ const view = {
     let phaseDiv = document.getElementById(phaseName);
     // clear the current phase content, add cards for the phase exercises
     while(phaseDiv.firstChild) { phaseDiv.removeChild(phaseDiv.firstChild);};
-    exercises.forEach( (exercise) => this.addExerciseCard(exercise, phaseDiv));
+    if(phaseName==="mainex") {
+      exercises.forEach( (exercise, index) => this.addExerciseCard(exercise, phaseDiv, index>0, index<exercises.length-1) );
+    } else {
+      exercises.forEach( (exercise) => this.addExerciseCard(exercise, phaseDiv, false, false) );
+    }
   },
 
-  addExerciseCard(exercise, toElement) {
+  addExerciseCard(exercise, toElement, isNotFirst, isNotLast) {
     let exerciseDiv = document.createElement("div");
     exerciseDiv.classList.add("col", "s12", "m6");
     let exerciseCard = document.createElement("div");
     exerciseCard.classList.add("card", "red", "lighten-4");
     let exerciseContent = document.createElement("div");
     exerciseContent.classList.add("card-content");
-    exerciseContent.innerHTML = (exercise.details.length>0) ?
-       `<span class="card-title center activator">${exercise.name}<i class="material-icons right">more_vert</i></span><ul>` :
-       `<span class="card-title center">${exercise.name}</span><ul>`;
-    exerciseContent.innerHTML +=
+    let exerciseDescription = (exercise.details.length>0) ?
+       `<span class="card-title center activator">${exercise.name}<i class="material-icons right">more_vert</i></span>` :
+       `<span class="card-title center">${exercise.name}</span>`;
+    exerciseDescription +=
       `<li>Material: ${exercise.material}</li>` +
       `<li>Dauer: ${exercise.duration}min</li>`+
-      `<li>Wiederholungen: ${exercise.repeat}</li>` +
-      `</ul>`;
+      `<li>Wiederholungen: ${exercise.repeat}</li>`;
+    exerciseContent.innerHTML = exerciseDescription;
+    if(isNotFirst) {
+      let moveUpButton = document.createElement("a");
+      moveUpButton.classList.add("btn-floating", "red", "lighten-1", "left");
+      moveUpButton.onclick = () => { controller.moveUp(exercise.id); };
+      moveUpButton.innerHTML = '<i class="material-icons medium">arrow_upward</i>';
+      exerciseContent.appendChild(moveUpButton);
+    }
+    if(isNotLast) {
+      let moveDownButton = document.createElement("a");
+      moveDownButton.classList.add("btn-floating", "red", "lighten-1", "right");
+      moveDownButton.onclick = () => { controller.moveDown(exercise.id); };
+      moveDownButton.innerHTML = '<i class="material-icons medium">arrow_downward</i>';
+      exerciseContent.appendChild(moveDownButton);
+    }
     exerciseCard.appendChild(exerciseContent);
     if (exercise.details.length>0) {
       let exerciseReveal = document.createElement("div");
       exerciseReveal.classList.add("card-reveal");
       exerciseReveal.innerHTML = '<span class="card-title grey-text text-darken-4">Details<i class="material-icons right">close</i></span>';
-      exerciseReveal.innerHTML += '<ul>';
       exercise.details.forEach( (item) => exerciseReveal.innerHTML += `<li>${item}</li>`);
-      exerciseReveal.innerHTML += '</ul>'; 
       exerciseCard.appendChild(exerciseReveal);
     }
     exerciseDiv.appendChild(exerciseCard);
     toElement.appendChild(exerciseDiv);
   }
-
 };
 
 const controller = {
@@ -108,6 +124,7 @@ const controller = {
     view.fillCardsForPhase("warmup", plan.warmup);
     view.fillCardsForPhase("mainex", plan.mainex);
     view.fillCardsForPhase("ending", plan.ending);
+    view.model.plan = plan;
   },
 
   onDisciplineSelected(event) {
@@ -130,5 +147,15 @@ const controller = {
 
   onDurationChanged(event) {
     view.model.duration = event.target.value;
+  },
+
+  moveUp(exerciseId) {
+    view.model.plan.moveExerciseUp(exerciseId);
+    view.fillCardsForPhase("mainex", view.model.plan.mainex);
+  },
+
+  moveDown(exerciseId) {
+    view.model.plan.moveExerciseDown(exerciseId);
+    view.fillCardsForPhase("mainex", view.model.plan.mainex);
   }
 };
