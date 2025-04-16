@@ -126,4 +126,4 @@ WerfenOhneAnlauf;Werfen ohne Anlauf,  ggf. auch stoßen;false;false;true;false;A
 WerTrifftDieSonne;Wer trifft die Sonne;false;false;true;true;;10;;Wurf;
 WerTrifftRollendenBall;Wer trifft den rollenden Ball;false;false;true;false;Bälle, großer Ball;15;;Schnelligkeit:Schnelllaufen:Wurf;Zwei Kinder stehen sich immer gegenüber. Immer wenn ein Ball daneben geht machen beide Kinder 3 Liegestützen
 Zeitschätzlauf;Zeitschätzlauf;true;false;false;true;Hütchen;10;2-3 Runden;Ausdauer;
-ZweiRundenRollbrett;2 Runden mit Rollbrett;false;false;false;true;Rollbretter;10;1 mal;Hochsprung:HochsprungOhneAnlage:Schnelligkei:Schnelllaufen:Staffellauf:Überlaufen:Wurf;Immer ein Kind sitzt drauf und das andere zieht
+ZweiRundenRollbrett;2 Runden mit Rollbrett;false;false;false;true;Rollbretter;10;1 mal;Hochsprung:HochsprungOhneAnlage:Schnelligkeit:Schnelllaufen:Staffellauf:Überlaufen:Wurf;Immer ein Kind sitzt drauf und das andere zieht
