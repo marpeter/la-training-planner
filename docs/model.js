@@ -10,6 +10,7 @@ class TrainingPlan {
     this.warmup = []; 
     this.mainex = [];
     this.ending = [];
+    this.suitable = { warmup: [], mainex: [], ending: [], runabc: [] };
   }
 
   duration() {
@@ -19,7 +20,7 @@ class TrainingPlan {
   static async loadData() {
     Disciplines = await loadObjectFromCSV('data/Disciplines.csv');
     Exercises = await loadObjectFromCSV('data/Exercises.csv',/;/);
-    Exercises.Auslaufen = { id: "Auslaufen", name: "Auslaufen", warmup: false, runabc: false, mainex: false, ending: false, material: "", duration: "5", repeat: "2 Runden", disciplines: [], details: []};
+    Exercises.Auslaufen = { id: "Auslaufen", name: "Auslaufen", warmup: false, runabc: false, mainex: false, ending: false, sticky: true, material: "", duration: "5", repeat: "2 Runden", disciplines: [], details: []};
   }
 
   static getAllDisciplines() {
@@ -30,37 +31,39 @@ class TrainingPlan {
     if (forDisciplineIds.length==0) return null;
 
     let suitableExercises = Object.values(Exercises).filter(
-      // (exercise) => forDisciplineIds.filter( (selected) => exercise.disciplines.includes(selected) ).length > 0);
       (exercise) => forDisciplineIds.some( (selected) => exercise.disciplines.includes(selected) ));
 
     // console.log("Suitable: " + JSON.stringify(suitableExercises));
 
-    let warmups = suitableExercises.filter( (exercise) => exercise.warmup );
-    let runabcs = suitableExercises.filter( (exercise) => exercise.runabc );
-    let mainexs = suitableExercises.filter( (exercise) => exercise.mainex );
-    let endings = suitableExercises.filter( (exercise) => exercise.ending ); 
-  
-    // console.log(warmups.length + " Warm-ups: " + JSON.stringify(warmups));
-    // console.log("RunABCs: " + JSON.stringify(runabcs));
-    // console.log("Main exercises: " + JSON.stringify(mainexs));
-    // console.log("Endings: " + JSON.stringify(endings));
-
     const forDisciplines = forDisciplineIds.map( (id) => Disciplines[id]);
     let plan = new TrainingPlan(forDisciplines);
+
+    plan.suitable.warmup = suitableExercises.filter( (exercise) => exercise.warmup );
+    plan.suitable.runabc = suitableExercises.filter( (exercise) => exercise.runabc );
+    plan.suitable.mainex = suitableExercises.filter( (exercise) => exercise.mainex );
+    plan.suitable.ending = suitableExercises.filter( (exercise) => exercise.ending ); 
+  
+    // console.log(warmups.length + " Warm-ups: " + JSON.stringify(plan.suitable.warmup));
+    // console.log("RunABCs: " + JSON.stringify(plan.suitable.runabc));
+    // console.log("Main exercises: " + JSON.stringify(plan.suitable.mainex));
+    // console.log("Endings: " + JSON.stringify(plan.suitable.ending));
+
     // the following algorithm is based purely on randomly picking exercises and does
     // not consider potential dependencies between exercises
     let attempts = 0;
     while((plan.duration()!=targetDuration) && (attempts++<10)) {
       console.log("Attempt " + attempts);
       // pick a random warmup and a random runabc
-      plan.warmup = [ warmups.at(Math.floor(Math.random()*warmups.length)), runabcs.at(Math.floor(Math.random()*runabcs.length)) ];
+      plan.warmup = [ plan.suitable.warmup.at(Math.floor(Math.random()*plan.suitable.warmup.length)),
+                      plan.suitable.runabc.at(Math.floor(Math.random()*plan.suitable.runabc.length)) ];
       // pick a random ending and add the standard Auslaufen
-      plan.ending = [ endings.at(Math.floor(Math.random()*endings.length)), Exercises.Auslaufen ];
+      plan.ending = [ plan.suitable.ending.at(Math.floor(Math.random()*plan.suitable.ending.length)),
+                      Exercises.Auslaufen ];
       // pick main exercises until the target duration is reached or exceeded.
       plan.mainex = [];
       while(plan.duration()<=targetDuration-10) {
-        let index = Math.floor(Math.random()*mainexs.length);
-        let exerciseToAdd = mainexs.at(index);
+        let index = Math.floor(Math.random()*plan.suitable.mainex.length);
+        let exerciseToAdd = plan.suitable.mainex.at(index);
         if(!plan.mainex.includes(exerciseToAdd)) {
           plan.mainex.push(exerciseToAdd);
         }
@@ -71,7 +74,7 @@ class TrainingPlan {
   }
 
   moveExerciseUp(exerciseId) {
-    let index = this.mainex.findIndex( (exercise) => exercise.id==exerciseId )
+    let index = this.mainex.findIndex( (exercise) => exercise.id==exerciseId );
     let newMainex = []; 
     for (let i=0; i<index-1; i++) {
       newMainex.push(this.mainex[i]);
@@ -84,7 +87,7 @@ class TrainingPlan {
     this.mainex = newMainex;
   }
   moveExerciseDown(exerciseId) {
-    let index = this.mainex.findIndex( (exercise) => exercise.id==exerciseId )
+    let index = this.mainex.findIndex( (exercise) => exercise.id==exerciseId );
     let newMainex = []; 
     for (let i=0; i<index; i++) {
       newMainex.push(this.mainex[i]);
@@ -95,6 +98,19 @@ class TrainingPlan {
       newMainex.push(this.mainex[i]);
     }
     this.mainex = newMainex;
+  }
+  replaceExercise(phase, exerciseId) {
+    let index = this[phase].findIndex( (exercise) => exercise.id==exerciseId );
+    let newExercise = undefined;
+    // Special treatment of runabc in the warmup phase
+    let searchedPhase = phase;
+    if(phase==="warmup" && index==1) {
+      searchedPhase = "runabc";
+    }
+    do {
+      newExercise = this.suitable[searchedPhase].at(Math.floor(Math.random()*this.suitable[searchedPhase].length));
+    } while( (newExercise.id===exerciseId) || (newExercise.duration!=this[phase][index].duration));  
+    this[phase][index] = newExercise;
   }
 };
 

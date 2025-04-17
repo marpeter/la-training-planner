@@ -57,14 +57,11 @@ const view = {
     let phaseDiv = document.getElementById(phaseName);
     // clear the current phase content, add cards for the phase exercises
     while(phaseDiv.firstChild) { phaseDiv.removeChild(phaseDiv.firstChild);};
-    if(phaseName==="mainex") {
-      exercises.forEach( (exercise, index) => this.addExerciseCard(exercise, phaseDiv, index>0, index<exercises.length-1) );
-    } else {
-      exercises.forEach( (exercise) => this.addExerciseCard(exercise, phaseDiv, false, false) );
-    }
+    exercises.forEach( (exercise, index) => this.addExerciseCard(exercise, phaseName, index==0, index==exercises.length-1) );
   },
 
-  addExerciseCard(exercise, toElement, isNotFirst, isNotLast) {
+  addExerciseCard(exercise, phase, isFirst, isLast) {
+    let toElement = document.getElementById(phase);
     let exerciseDiv = document.createElement("div");
     exerciseDiv.classList.add("col", "s12", "m6");
     let exerciseCard = document.createElement("div");
@@ -79,18 +76,19 @@ const view = {
       `<li>Dauer: ${exercise.duration}min</li>`+
       `<li>Wiederholungen: ${exercise.repeat}</li>`;
     exerciseContent.innerHTML = exerciseDescription;
-    if(isNotFirst) {
-      let moveUpButton = document.createElement("a");
-      moveUpButton.classList.add("btn-floating", "red", "lighten-1", "left");
+    if(phase==="mainex") {
+      let moveUpButton = this.createFloatingButton("arrow_upward", isFirst);
       moveUpButton.onclick = () => { controller.moveUp(exercise.id); };
-      moveUpButton.innerHTML = '<i class="material-icons medium">arrow_upward</i>';
       exerciseContent.appendChild(moveUpButton);
     }
-    if(isNotLast) {
-      let moveDownButton = document.createElement("a");
-      moveDownButton.classList.add("btn-floating", "red", "lighten-1", "right");
+    if(!exercise.sticky) {
+      let replaceButton = this.createFloatingButton("change_circle");
+      replaceButton.onclick = () => { controller.replace(phase, exercise.id); };
+      exerciseContent.appendChild(replaceButton);
+    }
+    if(phase==="mainex") {
+      let moveDownButton = this.createFloatingButton("arrow_downward", isLast);
       moveDownButton.onclick = () => { controller.moveDown(exercise.id); };
-      moveDownButton.innerHTML = '<i class="material-icons medium">arrow_downward</i>';
       exerciseContent.appendChild(moveDownButton);
     }
     exerciseCard.appendChild(exerciseContent);
@@ -103,7 +101,16 @@ const view = {
     }
     exerciseDiv.appendChild(exerciseCard);
     toElement.appendChild(exerciseDiv);
+  },
+
+  createFloatingButton(icon, disabled=false) {
+    let floatingButton = document.createElement("a");
+    floatingButton.classList.add("btn-floating", "red", "lighten-1", "right");
+    if(disabled) floatingButton.classList.add("disabled");
+    floatingButton.innerHTML = `<i class="large material-icons">${icon}</i>`;
+    return floatingButton;
   }
+
 };
 
 const controller = {
@@ -157,5 +164,10 @@ const controller = {
   moveDown(exerciseId) {
     view.model.plan.moveExerciseDown(exerciseId);
     view.fillCardsForPhase("mainex", view.model.plan.mainex);
+  },
+
+  replace(phase, exerciseId) {
+    view.model.plan.replaceExercise(phase, exerciseId);
+    view.fillCardsForPhase(phase, view.model.plan[phase]);
   }
 };
