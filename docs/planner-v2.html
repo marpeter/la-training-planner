@@ -31,16 +31,17 @@
         <div class="col s4 m3 l3">Trainingsdauer:</div>
         <div class="col s8 m9 l9">
           <form name="durationForm">
+            <label><input name="duration" type="radio" value="60" class="red"/><span>60 Minuten</span></label>
             <label><input name="duration" type="radio" value="70" class="red" checked/><span>70 Minuten</span></label>
             <label><input name="duration" type="radio" value="75"/><span>75 Minuten</span></label>
             <label><input name="duration" type="radio" value="80"/><span>80 Minuten</span></label>
+            <label><input name="duration" type="radio" value="90"/><span>90 Minuten</span></label>
           </form>
         </div>
       </div>
       <div class="center">
-        <!-- <button id="prevBtn" name="prevButton" class="btn center red disabled"><i class="material-icons">arrow_back_ios</i></button> -->
         <button id="showBtn" class="btn center red">Trainingsplan erzeugen</button>
-        <!-- <button id="nextBtn" class="btn center red disabled"><i class="material-icons">arrow_forward_ios</i></button> -->
+        <div id="messages" class="red-text"></div>
       </div>
     </div>
     <div class="divider"></div>
@@ -55,7 +56,7 @@
     </div>
   </div>
   <footer class="section">
-    <div class="center grey-text">Version 0.12.1, &copy; Copyright 2025 Markus Peter</div>
+    <div class="center grey-text">Version 0.13.0, &copy; Copyright 2025 Markus Peter</div>
   </footer>
    </body>
 </html>

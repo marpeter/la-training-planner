@@ -1,8 +1,12 @@
 import { loadObjectFromCSV } from "./data/utils.js";
 
+const MAX_ATTEMPTS = 20;
+
 let Disciplines = {};
 let Exercises = {};
 class TrainingPlan {
+
+  static messages = [];
 
   constructor(disciplines) {
     this.id = 1;
@@ -14,13 +18,23 @@ class TrainingPlan {
   }
 
   duration() {
-    return this.mainex.reduce( adder, this.ending.reduce( adder, this.warmup.reduce( adder, 0 ) ) );
+    return this.mainex.reduce( durationAdder, this.ending.reduce( durationAdder, this.warmup.reduce( durationAdder, 0 ) ) );;
+  }
+
+  durationRange() {
+    const minDuration = this.mainex.reduce( minAdder, this.ending.reduce( minAdder, this.warmup.reduce( minAdder, 0 ) ) );  
+    const maxDuration = this.mainex.reduce( maxAdder, this.ending.reduce( maxAdder, this.warmup.reduce( maxAdder, 0 ) ) );
+    return [minDuration, maxDuration];
   }
 
   static async loadData() {
     Disciplines = await loadObjectFromCSV('data/Disciplines.csv');
     Exercises = await loadObjectFromCSV('data/Exercises.csv',/;/);
-    Exercises.Auslaufen = { id: "Auslaufen", name: "Auslaufen", warmup: false, runabc: false, mainex: false, ending: false, sticky: true, material: "", duration: "5", repeat: "2 Runden", disciplines: [], details: []};
+    Exercises.Auslaufen = { id: "Auslaufen", name: "Auslaufen", warmup: false, runabc: false, mainex: false, ending: false, sticky: true, material: "", duration: 5, durationmin: "5", durationmax: "5", repeat: "2 Runden", disciplines: [], details: []};
+    Object.values(Exercises).forEach( (exercise) => {
+      exercise.durationmin = parseInt(exercise.durationmin);
+      exercise.durationmax = parseInt(exercise.durationmax);
+    } );
   }
 
   static getAllDisciplines() {
@@ -28,31 +42,38 @@ class TrainingPlan {
   }
 
   static generate(forDisciplineIds, targetDuration) {
-    if (forDisciplineIds.length==0) return null;
+    this.messages = [];
+    if (forDisciplineIds.length==0) {
+      this.messages.push("Bitte wähle mindestens eine Disziplin aus.");
+      return null;
+    }
 
+    // find the exercises that are suitable for the selected disciplines
+    // and reset their duration to the minimum duration
     let suitableExercises = Object.values(Exercises).filter(
       (exercise) => forDisciplineIds.some( (selected) => exercise.disciplines.includes(selected) ));
-
+    suitableExercises.forEach( (exercise) => exercise.duration = exercise.durationmin);
     // console.log("Suitable: " + JSON.stringify(suitableExercises));
 
     const forDisciplines = forDisciplineIds.map( (id) => Disciplines[id]);
     let plan = new TrainingPlan(forDisciplines);
 
-    plan.suitable.warmup = suitableExercises.filter( (exercise) => exercise.warmup );
-    plan.suitable.runabc = suitableExercises.filter( (exercise) => exercise.runabc );
-    plan.suitable.mainex = suitableExercises.filter( (exercise) => exercise.mainex );
-    plan.suitable.ending = suitableExercises.filter( (exercise) => exercise.ending ); 
-  
-    // console.log(warmups.length + " Warm-ups: " + JSON.stringify(plan.suitable.warmup));
-    // console.log("RunABCs: " + JSON.stringify(plan.suitable.runabc));
-    // console.log("Main exercises: " + JSON.stringify(plan.suitable.mainex));
-    // console.log("Endings: " + JSON.stringify(plan.suitable.ending));
-
+    const phases = [["warmup", "Aufwärm"], ["runabc", "Lauf-ABC"], ["mainex", "Haupt"], ["ending", "Schluss"]];
+    for(let i=0; i<phases.length; i++) {
+      let phase = phases[i][0];
+      plan.suitable[phase] = suitableExercises.filter( (exercise) => exercise[phase] );
+      // console.log(`${phases[i][1]}übungen: ${JSON.stringify(plan.suitable[phase])}`);
+      if(plan.suitable[phase].length==0) {
+        TrainingPlan.messages.push(`Es gibt keine ${phases[i][1]}übungen für die ausgewählten Disziplinen.`);
+        return null;
+      }
+    }
+    
     // the following algorithm is based purely on randomly picking exercises and does
     // not consider potential dependencies between exercises
     let attempts = 0;
-    while((plan.duration()!=targetDuration) && (attempts++<10)) {
-      console.log("Attempt " + attempts);
+    while(attempts++<MAX_ATTEMPTS) {
+      // console.log("Attempt " + attempts);
       // pick a random warmup and a random runabc
       plan.warmup = [ plan.suitable.warmup.at(Math.floor(Math.random()*plan.suitable.warmup.length)),
                       plan.suitable.runabc.at(Math.floor(Math.random()*plan.suitable.runabc.length)) ];
@@ -61,59 +82,73 @@ class TrainingPlan {
                       Exercises.Auslaufen ];
       // pick main exercises until the target duration is reached or exceeded.
       plan.mainex = [];
-      while(plan.duration()<=targetDuration-10) {
+      let minDuration = 0;
+      let maxDuration = 0;
+      do {
         let index = Math.floor(Math.random()*plan.suitable.mainex.length);
         let exerciseToAdd = plan.suitable.mainex.at(index);
         if(!plan.mainex.includes(exerciseToAdd)) {
           plan.mainex.push(exerciseToAdd);
+          [minDuration, maxDuration] = plan.durationRange();
         }
+      } while(maxDuration<=targetDuration);
+      // check if the plan is good enough: 3-4 main exercises and still within the target duration
+      if(plan.mainex.length>=3 && plan.mainex.length<=4 && minDuration<=targetDuration) {
+        // set the duration of those exercises for which there is still a range, starting with the main exercises
+        let variableExercises = plan.mainex
+          .concat(plan.warmup)
+          .concat(plan.ending)
+          .filter( (exercise) => exercise.durationmin!=exercise.durationmax );
+        for(let i=0; i<variableExercises.length && plan.duration()<targetDuration; i++) {
+          variableExercises[i].duration = variableExercises[i].durationmax;
+        }
+        if(plan.duration()==targetDuration) break;
       }
     }
-    if(attempts>=10) return undefined;
+    if(attempts>=MAX_ATTEMPTS) {
+      TrainingPlan.messages.push(`Ich konnte nach ${MAX_ATTEMPTS} Versuchen keinen Plan finden, der deinen Anforderungen entspricht.`);
+      TrainingPlan.messages.push("Bitte versuche es erneut. Manchmal hilft es, eine weitere Disziplin auszuwählen.");
+      return undefined;
+    }
     return plan;
   }
 
   moveExerciseUp(exerciseId) {
     let index = this.mainex.findIndex( (exercise) => exercise.id==exerciseId );
-    let newMainex = []; 
-    for (let i=0; i<index-1; i++) {
-      newMainex.push(this.mainex[i]);
+    if(index>0) {
+      let predecessor = this.mainex[index-1];
+      this.mainex[index-1] = this.mainex[index];
+      this.mainex[index] = predecessor;
     }
-    newMainex.push(this.mainex[index]);
-    newMainex.push(this.mainex[index-1]);
-    for (let i=index+1; i<this.mainex.length; i++) {
-      newMainex.push(this.mainex[i]);
-    }
-    this.mainex = newMainex;
   }
+
   moveExerciseDown(exerciseId) {
     let index = this.mainex.findIndex( (exercise) => exercise.id==exerciseId );
-    let newMainex = []; 
-    for (let i=0; i<index; i++) {
-      newMainex.push(this.mainex[i]);
+    if(index<this.mainex.length-1) {
+      let successor = this.mainex[index+1];
+      this.mainex[index+1] = this.mainex[index];
+      this.mainex[index] = successor;
     }
-    newMainex.push(this.mainex[index+1]);
-    newMainex.push(this.mainex[index]);
-    for (let i=index+2; i<this.mainex.length; i++) {
-      newMainex.push(this.mainex[i]);
-    }
-    this.mainex = newMainex;
   }
+
   replaceExercise(phase, exerciseId) {
     let index = this[phase].findIndex( (exercise) => exercise.id==exerciseId );
     let newExercise = undefined;
     // Special treatment of runabc in the warmup phase
-    let searchedPhase = phase;
-    if(phase==="warmup" && index==1) {
-      searchedPhase = "runabc";
-    }
+    let searchedPhase = (phase==="warmup" && index==1) ? "runabc" : phase;
     do {
       newExercise = this.suitable[searchedPhase].at(Math.floor(Math.random()*this.suitable[searchedPhase].length));
-    } while( (newExercise.id===exerciseId) || (newExercise.duration!=this[phase][index].duration));  
+      if(newExercise.duration<this[phase][index].duration && newExercise.durationmax>=this[phase][index].duration) {
+        newExercise.duration = this[phase][index].duration;
+      }
+    } while( (this[phase].includes(newExercise)) || (newExercise.duration!=this[phase][index].duration));  
     this[phase][index] = newExercise;
   }
 };
 
-function adder(total, exercise) { return total + parseInt(exercise.duration) };
+function adder(field, total, exercise) { return total + exercise[field] };
+const minAdder = adder.bind(null, "durationmin");
+const maxAdder = adder.bind(null, "durationmax");
+const durationAdder = adder.bind(null, "duration");
 
 export { TrainingPlan };
