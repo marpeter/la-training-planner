@@ -1,4 +1,4 @@
-import { loadObjectFromCSV } from "./data/utils.js";
+import { dbVersion } from "./data/db.js";
 
 const MAX_ATTEMPTS = 20;
 
@@ -7,6 +7,8 @@ let Exercises = {};
 class TrainingPlan {
 
   static messages = [];
+
+  static version = {}
 
   constructor(disciplines) {
     this.id = 1;
@@ -28,13 +30,18 @@ class TrainingPlan {
   }
 
   static async loadData() {
-    Disciplines = await loadObjectFromCSV('data/Disciplines.csv');
-    Exercises = await loadObjectFromCSV('data/Exercises.csv',/;/);
-    Exercises.Auslaufen = { id: "Auslaufen", name: "Auslaufen", warmup: false, runabc: false, mainex: false, ending: false, sticky: true, material: "", duration: 5, durationmin: "5", durationmax: "5", repeat: "2 Runden", disciplines: [], details: []};
+
+    // try loading from a database
+    this.version = await dbVersion();
+    console.log("Version info: " + JSON.stringify(this.version));
+    Disciplines = await this.version.disciplineLoader();
+    Exercises = await this.version.exerciseLoader();
     Object.values(Exercises).forEach( (exercise) => {
       exercise.durationmin = parseInt(exercise.durationmin);
       exercise.durationmax = parseInt(exercise.durationmax);
     } );
+    Exercises.Auslaufen = { id: "Auslaufen", name: "Auslaufen", warmup: false, runabc: false, mainex: false, ending: false, sticky: true, material: "", duration: 5, durationmin: 5, durationmax: 5, repeat: "2 Runden", disciplines: [], details: []};
+
   }
 
   static getAllDisciplines() {

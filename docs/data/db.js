@@ -1,4 +1,6 @@
-async function loadObjectFromCSV(url, fieldSeparator=/,/) {
+let version = {};
+
+async function loadAllFromCsv(url, fieldSeparator=/,/) {
   const newLine = /\r?\n/;
   return fetch(url).then( (response) => {
     if(!response.ok) throw new Error(`HTTP error: ${response.status}`);
@@ -40,4 +42,33 @@ function convertIfBoolean(value) {
   } 
 }
 
-export { loadObjectFromCSV };
+async function dbVersion() {
+  try {
+    version = await fetch("data/db_version.php").then( (response) => {
+      if(!response.ok) throw new Error(`HTTP error accessing db_version.php: ${response.status}`);
+      return response.json();
+    });
+    version.number = version.number + " (with backend support)";
+    version.disciplineLoader = loadDisciplinesFromDbTable;
+    version.exerciseLoader = loadAllFromCsv.bind(null, 'data/Exercises.csv',/;/)
+  } catch (error) {
+    console.error("Error loading version: " + error);
+    version = {
+      number: "0.13.1 (without backend support)",
+      disciplineLoader: loadAllFromCsv.bind(null, 'data/Disciplines.csv'),
+      exerciseLoader: loadAllFromCsv.bind(null, 'data/Exercises.csv',/;/)
+    };
+  }
+  return version;
+}
+
+async function loadDisciplinesFromDbTable() {
+  return fetch("data/db_read_disciplines.php").then( (response) => {
+    if(!response.ok) throw new Error(`HTTP error: ${response.status}`);
+    return response.json();
+  }).catch( (error) => {
+    console.error("Error loading table: " + error);
+  });
+}
+
+export { dbVersion };

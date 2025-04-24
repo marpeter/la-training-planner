@@ -5,6 +5,7 @@ document.addEventListener('DOMContentLoaded', function() {
       console.log("Data loaded");
       let uiModel = {
         disciplines: TrainingPlan.getAllDisciplines(),
+        version: TrainingPlan.version.number,
         selectedDisciplines: [],
         duration: 70,
         plan: undefined,
@@ -23,6 +24,7 @@ const view = {
     this.model = model,
     this.createDisciplineCardList();
     this.updateShowButton();
+    this.updateVersion();
   },
 
   // add the list of disciplines as clickable "chips" to the UI
@@ -51,6 +53,12 @@ const view = {
     } else {
       showBtn.classList.add("disabled");
     }
+  },
+
+  // update the version number in the footer of the page
+  updateVersion() {
+    let versionElement = document.getElementById("version");
+    versionElement.innerHTML = this.model.version;
   },
 
   fillCardsForPhase(phaseName, exercises) {
