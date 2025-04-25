@@ -4,7 +4,11 @@ CREATE TABLE IF NOT EXISTS la_planner.version (
     field_val TEXT,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
-REPLACE INTO la_planner.version (field, field_val) VALUES ('version', '0.14.0');
+REPLACE INTO la_planner.version (field, field_val)
+    VALUES ('number', '0.14.1'),
+           ('date','2025-04-25'),
+           ('supportsEditing', 'false'),
+           ('supportsFavorites', 'false');
 
 CREATE TABLE IF NOT EXISTS la_planner.disciplines (
     id CHAR(30) PRIMARY KEY,

@@ -49,14 +49,18 @@ async function dbVersion() {
       return response.json();
     });
     version.number = version.number + " (with backend support)";
+    version.supportsFavorites = convertIfBoolean(version.supportsFavorites);
+    version.supportsEditing   = convertIfBoolean(version.supportsEditing);
     version.disciplineLoader = loadDisciplinesFromDbTable;
-    version.exerciseLoader = loadAllFromCsv.bind(null, 'data/Exercises.csv',/;/)
+    version.exerciseLoader   = loadAllFromCsv.bind(null, 'data/Exercises.csv',/;/);
   } catch (error) {
     console.error("Error loading version: " + error);
     version = {
       number: "0.13.1 (without backend support)",
-      disciplineLoader: loadAllFromCsv.bind(null, 'data/Disciplines.csv'),
-      exerciseLoader: loadAllFromCsv.bind(null, 'data/Exercises.csv',/;/)
+      supportsFavorites: false,
+      supportsEditing:   false,
+      disciplineLoader:  loadAllFromCsv.bind(null, 'data/Disciplines.csv'),
+      exerciseLoader:    loadAllFromCsv.bind(null, 'data/Exercises.csv',/;/)
     };
   }
   return version;

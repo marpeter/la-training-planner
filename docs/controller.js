@@ -23,7 +23,7 @@ const view = {
   finishUi(model) {
     this.model = model,
     this.createDisciplineCardList();
-    this.updateShowButton();
+    this.updatePlanButtons();
     this.updateVersion();
   },
 
@@ -46,19 +46,28 @@ const view = {
   },
   
   // the "generate training plan" button should only be active if a disciplines is selected
-  updateShowButton() {
-    let showBtn = document.getElementById("showBtn");
+  updatePlanButtons() {
+    let gnrtBtn = document.getElementById("gnrtBtn");
+    let loadBtn = document.getElementById("loadBtn");
     if(this.model.selectedDisciplines.length>0) {
-      showBtn.classList.remove("disabled");
+      gnrtBtn.classList.remove("disabled");
+      if(this.model.version.supportsFavorites) {
+        loadBtn.classList.remove("disabled");
+      }
     } else {
-      showBtn.classList.add("disabled");
+      gnrtBtn.classList.add("disabled");
+      loadBtn.classList.add("disabled");
     }
   },
 
-  // update the version number in the footer of the page
+  // update the version number in the footer of the page and enable the edit button if the version supports editing
   updateVersion() {
     let versionElement = document.getElementById("version");
     versionElement.innerHTML = this.model.version;
+    if(this.model.version.supportsEditing) {
+      let editBtn = document.getElementById("editBtn");
+      editBtn.classList.remove("disabled");
+    }
   },
 
   fillCardsForPhase(phaseName, exercises) {
@@ -135,7 +144,9 @@ const view = {
 const controller = {
 
   registerEventHandlers() {
-    document.getElementById("showBtn").addEventListener("click", this.onCreatePlanButtonPressed);
+    document.getElementById("gnrtBtn").addEventListener("click", this.onCreatePlanButtonPressed);
+    document.getElementById("loadBtn").addEventListener("click", this.onLoadPlanButtonPressed);
+    document.getElementById("editBtn").addEventListener("click", this.onEditExercisesButtonPressed);
     document.durationForm.duration.forEach( (radio) => radio.addEventListener("change", this.onDurationChanged));
   },
 
@@ -153,6 +164,9 @@ const controller = {
     view.model.plan = plan;
   },
 
+  onLoadPlanButtonPressed() {},
+  onEditExercisesButtonPressed() {},
+  
   onDisciplineSelected(event) {
     let selectedDiscipline = (event.target.localName=='img') ?
         event.target.parentElement // click was on image -> discipline element is the parent element
@@ -168,7 +182,7 @@ const controller = {
       selectedDiscipline.classList.add("lighten-2");
       view.model.selectedDisciplines.push(selectedDiscipline.id);
     }
-    view.updateShowButton();
+    view.updatePlanButtons();
   },
 
   onDurationChanged(event) {
