@@ -11,7 +11,7 @@ async function loadAllFromCsv(url, fieldSeparator=/,/) {
       .map( (field) => field.toLowerCase() )         // convert field names to lowercase
       .map( (field) => field.endsWith("[]") ?        // detect fields the values of which are lists
         { name: field.replace("[]",""), makeArray: true } : { name: field, makeArray: false }  ); 
-    let result = {};
+    let result = [];
     lines.forEach( (line) => {
       let fields = line.split(fieldSeparator);
       let id = fields[0]; // the first field must be the property name in the result object
@@ -24,7 +24,7 @@ async function loadAllFromCsv(url, fieldSeparator=/,/) {
           entry[field.name] = convertIfBoolean(value);
         }
        });
-      result[id] = entry;
+      result.push(entry);
     });
     return result;
   }).catch( (error) => {
@@ -52,7 +52,7 @@ async function dbVersion() {
     version.supportsFavorites = convertIfBoolean(version.supportsFavorites);
     version.supportsEditing   = convertIfBoolean(version.supportsEditing);
     version.disciplineLoader = loadDisciplinesFromDbTable;
-    version.exerciseLoader   = loadAllFromCsv.bind(null, 'data/Exercises.csv',/;/);
+    version.exerciseLoader   = loadExercisesFromDbTable;
   } catch (error) {
     console.error("Error loading version: " + error);
     version = {
@@ -60,7 +60,7 @@ async function dbVersion() {
       supportsFavorites: false,
       supportsEditing:   false,
       disciplineLoader:  loadAllFromCsv.bind(null, 'data/Disciplines.csv'),
-      exerciseLoader:    loadAllFromCsv.bind(null, 'data/Exercises.csv',/;/)
+      exerciseLoader:    loadExercisesFromCsv,
     };
   }
   return version;
@@ -73,6 +73,24 @@ async function loadDisciplinesFromDbTable() {
   }).catch( (error) => {
     console.error("Error loading table: " + error);
   });
+}
+
+async function loadExercisesFromDbTable() {
+  return fetch("data/db_read_exercises.php").then( (response) => {
+    if(!response.ok) throw new Error(`HTTP error: ${response.status}`);
+    return response.json();
+  }).catch( (error) => {
+    console.error("Error loading table: " + error);
+  });
+}
+
+async function loadExercisesFromCsv() {
+  let exercises = await loadAllFromCsv('data/Exercises.csv',/;/);
+  exercises.forEach( (exercise) => {
+    exercise.durationmin = parseInt(exercise.durationmin);
+    exercise.durationmax = parseInt(exercise.durationmax);
+  } );
+  return exercises;
 }
 
 export { dbVersion };

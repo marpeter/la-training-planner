@@ -29,17 +29,17 @@ const view = {
 
   // add the list of disciplines as clickable "chips" to the UI
   createDisciplineCardList() {
-    Object.keys(this.model.disciplines).forEach( (discipline) => {
+    this.model.disciplines.forEach( (discipline) => {
       let disciplineChip = document.createElement("div");
       disciplineChip.classList.add("chip", "red", "lighten-4");
-      disciplineChip.id = discipline;
-      if( this.model.disciplines[discipline].image) {
+      disciplineChip.id = discipline.id;
+      if( discipline.image) {
         let disciplineImage = document.createElement("img");
         disciplineImage.classList.add("disziplin");
-        disciplineImage.src = this.model.disciplines[discipline].image;
+        disciplineImage.src = discipline.image;
         disciplineChip.appendChild(disciplineImage);
       }
-      disciplineChip.appendChild(document.createTextNode(this.model.disciplines[discipline].name));
+      disciplineChip.appendChild(document.createTextNode(discipline.name));
       disciplineChip.addEventListener("click", controller.onDisciplineSelected);
       document.getElementById("disziplinen").appendChild(disciplineChip);
    } );
@@ -91,7 +91,7 @@ const view = {
     exerciseDescription +=
       `<li>Material: ${exercise.material}</li>` +
       `<li>Dauer: ${exercise.duration}min</li>`+
-      `<li>Wiederholungen: ${exercise.repeat}</li>`;
+      `<li>Wiederholungen: ${exercise.repeats}</li>`;
     exerciseContent.innerHTML = exerciseDescription;
     if(phase==="mainex") {
       let moveUpButton = this.createFloatingButton("arrow_upward", isFirst);

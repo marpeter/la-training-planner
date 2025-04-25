@@ -1,4 +1,4 @@
-﻿Id;Name;Warmup;RunABC;MainEx;Ending;Material;DurationMin;DurationMax;Repeat;Disciplines[];Details[]
+﻿Id;Name;Warmup;RunABC;MainEx;Ending;Material;DurationMin;DurationMax;Repeats;Disciplines[];Details[]
 AchterInKurvenLaufen;8er in Kurven laufen;false;false;true;false;Hütchen;10;10;;Hochsprung:HochsprungOhneAnlage;5 Sprünge hoch auf Sitzsteine
 AnhängerAbhängerStaffel;Anhänger - Abhänger Staffel;true;false;false;true;Seile;10;15;1 mal;Ausdauer;
 AnhängerAbhängerStaffelHürde;Anhänger - Abhängerstaffel;true;false;false;true;Hürden, Hütchen, Seile;10;15;2-3 Runden;Ausdauer:Überlaufen;

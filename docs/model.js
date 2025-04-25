@@ -30,18 +30,11 @@ class TrainingPlan {
   }
 
   static async loadData() {
-
-    // try loading from a database
     this.version = await dbVersion();
     console.log("Version info: " + JSON.stringify(this.version));
     Disciplines = await this.version.disciplineLoader();
     Exercises = await this.version.exerciseLoader();
-    Object.values(Exercises).forEach( (exercise) => {
-      exercise.durationmin = parseInt(exercise.durationmin);
-      exercise.durationmax = parseInt(exercise.durationmax);
-    } );
-    Exercises.Auslaufen = { id: "Auslaufen", name: "Auslaufen", warmup: false, runabc: false, mainex: false, ending: false, sticky: true, material: "", duration: 5, durationmin: 5, durationmax: 5, repeat: "2 Runden", disciplines: [], details: []};
-
+    Exercises.push({ id: "Auslaufen", name: "Auslaufen", warmup: false, runabc: false, mainex: false, ending: false, sticky: true, material: "", duration: 5, durationmin: 5, durationmax: 5, repeats: "2 Runden", disciplines: [], details: []});
   }
 
   static getAllDisciplines() {
@@ -57,12 +50,11 @@ class TrainingPlan {
 
     // find the exercises that are suitable for the selected disciplines
     // and reset their duration to the minimum duration
-    let suitableExercises = Object.values(Exercises).filter(
-      (exercise) => forDisciplineIds.some( (selected) => exercise.disciplines.includes(selected) ));
+    let suitableExercises = Exercises.filter(
+      (exercise) =>  forDisciplineIds.some( (selected) => exercise.disciplines.includes(selected) ));
     suitableExercises.forEach( (exercise) => exercise.duration = exercise.durationmin);
-    // console.log("Suitable: " + JSON.stringify(suitableExercises));
-
-    const forDisciplines = forDisciplineIds.map( (id) => Disciplines[id]);
+    
+    const forDisciplines = forDisciplineIds.map( (id) => Disciplines.find( (discipline) => discipline.id==id ) );
     let plan = new TrainingPlan(forDisciplines);
 
     const phases = [["warmup", "Aufwärm"], ["runabc", "Lauf-ABC"], ["mainex", "Haupt"], ["ending", "Schluss"]];
@@ -86,7 +78,7 @@ class TrainingPlan {
                       plan.suitable.runabc.at(Math.floor(Math.random()*plan.suitable.runabc.length)) ];
       // pick a random ending and add the standard Auslaufen
       plan.ending = [ plan.suitable.ending.at(Math.floor(Math.random()*plan.suitable.ending.length)),
-                      Exercises.Auslaufen ];
+                      Exercises[Exercises.length-1] ];
       // pick main exercises until the target duration is reached or exceeded.
       plan.mainex = [];
       let minDuration = 0;
