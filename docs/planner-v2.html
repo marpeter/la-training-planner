@@ -17,6 +17,16 @@
    </head>
    <body>
     <div class="container">
+      <nav class="red darken-1">
+        <div class="nav-wrapper">
+          <a href="#" class="brand-logo left"><img src="assets/tsvlogo.png" height="50px"/></a>
+          <ul id="nav-mobile" class="right">
+            <li><a href="help.html" class="btn-small red"><i class="material-icons">help_center</i></a></li>
+            <li><a href="edit.html" id="editBtn" class="btn-small red disabled"><i class="material-icons">edit</i></a></li>
+            <li><a href="admin.html" class="btn-small red"><i class="material-icons">download</i></a></li>
+          </ul>
+          </div>
+      </nav>
     <div class="section">
         <h4 class="card-panel red darken-1 center">LA Trainings-Planer</h4>
         <div class="row">
@@ -38,10 +48,13 @@
           </form>
         </div>
       </div>
-      <div class="center">
+      <div class="row center">
         <button id="gnrtBtn" class="btn center red">Trainingsplan erzeugen</button>
-        <button id="loadBtn" class="btn center red">Gespeicherten Plan laden</button>
-        <button id="editBtn" class="btn center red disabled">Übungen bearbeiten</button>
+      </div>
+      <div class="row center">
+        <button id="prevBtn" class="btn center red disabled"><i class="material-icons">arrow_back_ios</i></button>
+        <button id="loadBtn" class="btn center red">Favoriten laden</button>
+        <button id="nextBtn" class="btn center red disabled"><i class="material-icons">arrow_forward_ios</i></button>
         <div id="messages" class="red-text"></div>
       </div>
     </div>
@@ -57,7 +70,7 @@
     </div>
   </div>
   <footer class="section">
-    <div class="center grey-text">Version <span id="version">0.13.0</span>, &copy; Copyright 2025 Markus Peter</div>
+    <div class="center grey-text">Version <span id="version">0.13.0</span>,<br/>&copy; Copyright 2025 Markus Peter</div>
   </footer>
    </body>
 </html>

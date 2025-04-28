@@ -12,6 +12,8 @@
         foreach($data as $row) {
             $version[$row['field']] = $row['field_val'];
         }
+        $version['supportsEditing'] = (bool)$version['supportsEditing'];
+        $version['supportsFavorites'] = (bool)$version['supportsFavorites'];
     } else {
         $version = 'Could not connect to DB';
     }

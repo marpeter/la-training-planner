@@ -13,18 +13,19 @@ async function loadAllFromCsv(url, fieldSeparator=/,/) {
         { name: field.replace("[]",""), makeArray: true } : { name: field, makeArray: false }  ); 
     let result = [];
     lines.forEach( (line) => {
-      let fields = line.split(fieldSeparator);
-      let id = fields[0]; // the first field must be the property name in the result object
-      let entry = {};
-      header.forEach( (field, index) => {
-        let value = fields[index].replaceAll('"',''); // replaceAll to get rid if text-delimiting " characters added by MS Excel
-        if(field.makeArray) {
-          entry[field.name] = value=="" ? [] : value.split(':').map( (val) => convertIfBoolean(val) );
-        } else {
-          entry[field.name] = convertIfBoolean(value);
-        }
-       });
-      result.push(entry);
+      if(line.trim() != "") { // ignore empty lines
+        let fields = line.split(fieldSeparator);
+        let entry = {};
+        header.forEach( (field, index) => {
+          let value = fields[index].replaceAll('"',''); // replaceAll to get rid if text-delimiting " characters added by MS Excel and php
+          if(field.makeArray) {
+            entry[field.name] = value=="" ? [] : value.split(':').map( (val) => convertIfBoolean(val) );
+          } else {
+            entry[field.name] = convertIfBoolean(value);
+          }
+         });
+        result.push(entry);
+      }
     });
     return result;
   }).catch( (error) => {
@@ -48,17 +49,19 @@ async function dbVersion() {
       if(!response.ok) throw new Error(`HTTP error accessing db_version.php: ${response.status}`);
       return response.json();
     });
-    version.number = version.number + " (with backend support)";
+    version.number = version.number + " (mit Backend Datenbank)";
     version.supportsFavorites = convertIfBoolean(version.supportsFavorites);
     version.supportsEditing   = convertIfBoolean(version.supportsEditing);
+    version.supportsDownload   = true;
     version.disciplineLoader = loadDisciplinesFromDbTable;
     version.exerciseLoader   = loadExercisesFromDbTable;
   } catch (error) {
     console.error("Error loading version: " + error);
     version = {
-      number: "0.13.1 (without backend support)",
+      number: "0.13.1 (ohne Backend Datenbank)",
       supportsFavorites: false,
       supportsEditing:   false,
+      supportsDownload:  false,
       disciplineLoader:  loadAllFromCsv.bind(null, 'data/Disciplines.csv'),
       exerciseLoader:    loadExercisesFromCsv,
     };

@@ -5,7 +5,7 @@ document.addEventListener('DOMContentLoaded', function() {
       console.log("Data loaded");
       let uiModel = {
         disciplines: TrainingPlan.getAllDisciplines(),
-        version: TrainingPlan.version.number,
+        version: TrainingPlan.version,
         selectedDisciplines: [],
         duration: 70,
         plan: undefined,
@@ -63,7 +63,7 @@ const view = {
   // update the version number in the footer of the page and enable the edit button if the version supports editing
   updateVersion() {
     let versionElement = document.getElementById("version");
-    versionElement.innerHTML = this.model.version;
+    versionElement.innerHTML = this.model.version.number;
     if(this.model.version.supportsEditing) {
       let editBtn = document.getElementById("editBtn");
       editBtn.classList.remove("disabled");
