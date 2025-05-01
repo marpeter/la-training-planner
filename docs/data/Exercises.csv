@@ -75,7 +75,7 @@ Reaktionsstart_04;Reaktionsstart aus verschiedenen Lagen mit Worten, mit hohen A
 ReihenfolgeErarbeiten;Reihenfolge im Reifen erarbeiten;false;false;true;false;Reifen;10;15;;WeitsprungOhneGrube:WeitsprungMitGrube;
 ReiseNachJerusalemMitRingen;Reise nach Jerusalem mit Ringen;false;false;true;true;;15;15;;Schnelligkeit:Schnelllaufen;
 Rundenstaffel;Rundenstaffel;false;false;false;true;Staffelhölzer;15;15;1 mal;Staffellauf;
-SauDurchsDorfLang;Sau durchs Dorf;false;false;true;false;Hütchen, Bälle, Medibälle;10;15;;Wurf;Mediball in Richtung anderer Gruppen werfen
+SauDurchsDorf;Sau durchs Dorf;false;false;true;false;Hütchen, Bälle, Medibälle;10;15;;Wurf;Mediball in Richtung anderer Gruppen werfen
 Schattenlaufen;Schattenlaufen;false;false;true;false;;10;10;;Ausdauer:Koordination;
 SchereSteinPapier;Schere-Stein-Papier;false;false;false;true;;10;15;je nach Rundengröße;Ausdauer;Der Gewinner rennt eine kleine Bahn, der Verlierer eine große Bahn
 SchereSteinPapierRennen;Schere, Stein, Papier und Rennen;false;false;true;false;Hütchen, Spielkarten;10;10;;Schnelligkeit:Schnelllaufen;Verlierer macht 3 Situps

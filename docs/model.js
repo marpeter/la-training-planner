@@ -1,44 +1,66 @@
 import { dbVersion } from "./data/db.js";
 
 const MAX_ATTEMPTS = 20;
+const TEMP_PLAN_ID = "$TMP";
 
 let Disciplines = {};
 let Exercises = {};
 class TrainingPlan {
 
   static messages = [];
+  static favorites = [];
 
   static version = {}
 
-  constructor(disciplines) {
-    this.id = 1;
-    this.disciplines = disciplines;
+  constructor(id,disciplineIds,createdBy="",createdAt="",description="") {
+    this.id = id;
+    this.created_by = createdBy;
+    this.created_at = createdAt;
+    this.description = description;
+    this.disciplines = disciplineIds.map( (id) => Disciplines.find( (discipline) => discipline.id==id ) );
     this.warmup = []; 
     this.mainex = [];
     this.ending = [];
     this.suitable = { warmup: [], mainex: [], ending: [], runabc: [] };
   }
 
-  duration() {
-    return this.mainex.reduce( durationAdder, this.ending.reduce( durationAdder, this.warmup.reduce( durationAdder, 0 ) ) );;
-  }
-
-  durationRange() {
-    const minDuration = this.mainex.reduce( minAdder, this.ending.reduce( minAdder, this.warmup.reduce( minAdder, 0 ) ) );  
-    const maxDuration = this.mainex.reduce( maxAdder, this.ending.reduce( maxAdder, this.warmup.reduce( maxAdder, 0 ) ) );
-    return [minDuration, maxDuration];
-  }
-
   static async loadData() {
+    // Determine the version of the database, including the data loader function implementations
     this.version = await dbVersion();
     console.log("Version info: " + JSON.stringify(this.version));
+
+    // Load the Disciplines and Exercises from the CSV file or the database
     Disciplines = await this.version.disciplineLoader();
     Exercises = await this.version.exerciseLoader();
     Exercises.push({ id: "Auslaufen", name: "Auslaufen", warmup: false, runabc: false, mainex: false, ending: false, sticky: true, material: "", duration: 5, durationmin: 5, durationmax: 5, repeats: "2 Runden", disciplines: [], details: []});
+
+    // Load the favorites from the CSV file or the database
+    this.favorites = [];
+    let rawFavoriteData = await this.version.favoritesLoader();
+    rawFavoriteData.headers.forEach( (favorite) => {
+      let plan = new TrainingPlan(favorite.id, favorite.disciplines, favorite.created_by, favorite.created_at, favorite.description);
+      rawFavoriteData.exerciseMap.filter( (mapItem) => mapItem.id==favorite.id )
+                                 .forEach((mapItem) => {
+         // copy the exercise from the Exercises array to be able to set the duration
+         let exercise = Object.assign({},Exercises.find( (ex) => ex.id==mapItem.exercise_id ));
+         exercise.duration = parseInt(mapItem.duration);
+         plan[mapItem.phase][mapItem.position-1]= exercise;
+         // TODO: also populate the suitable arrays?
+      });
+      this.favorites.push(plan);
+    });
   }
 
   static getAllDisciplines() {
     return Disciplines;
+  }
+
+  static getAvailableFavorites(forDisciplineIds, targetDuration) {
+    let availableFavorites = this.favorites.filter( (plan) => 
+         forDisciplineIds.map( (id) => Disciplines.find( (discipline) => discipline.id==id ) )
+                         .every( (selected) => plan.disciplines.includes(selected) )
+      && plan.duration()==targetDuration);
+    return availableFavorites; 
   }
 
   static generate(forDisciplineIds, targetDuration) {
@@ -54,8 +76,7 @@ class TrainingPlan {
       (exercise) =>  forDisciplineIds.some( (selected) => exercise.disciplines.includes(selected) ));
     suitableExercises.forEach( (exercise) => exercise.duration = exercise.durationmin);
     
-    const forDisciplines = forDisciplineIds.map( (id) => Disciplines.find( (discipline) => discipline.id==id ) );
-    let plan = new TrainingPlan(forDisciplines);
+    let plan = new TrainingPlan(TEMP_PLAN_ID,forDisciplineIds);
 
     const phases = [["warmup", "Aufwärm"], ["runabc", "Lauf-ABC"], ["mainex", "Haupt"], ["ending", "Schluss"]];
     for(let i=0; i<phases.length; i++) {
@@ -72,7 +93,6 @@ class TrainingPlan {
     // not consider potential dependencies between exercises
     let attempts = 0;
     while(attempts++<MAX_ATTEMPTS) {
-      // console.log("Attempt " + attempts);
       // pick a random warmup and a random runabc
       plan.warmup = [ plan.suitable.warmup.at(Math.floor(Math.random()*plan.suitable.warmup.length)),
                       plan.suitable.runabc.at(Math.floor(Math.random()*plan.suitable.runabc.length)) ];
@@ -110,6 +130,16 @@ class TrainingPlan {
       return undefined;
     }
     return plan;
+  }
+
+  duration() {
+    return this.mainex.reduce( durationAdder, this.ending.reduce( durationAdder, this.warmup.reduce( durationAdder, 0 ) ) );;
+  }
+
+  durationRange() {
+    const minDuration = this.mainex.reduce( minAdder, this.ending.reduce( minAdder, this.warmup.reduce( minAdder, 0 ) ) );  
+    const maxDuration = this.mainex.reduce( maxAdder, this.ending.reduce( maxAdder, this.warmup.reduce( maxAdder, 0 ) ) );
+    return [minDuration, maxDuration];
   }
 
   moveExerciseUp(exerciseId) {

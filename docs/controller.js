@@ -2,13 +2,14 @@ import { TrainingPlan } from "./model.js";
 
 document.addEventListener('DOMContentLoaded', function() {
   TrainingPlan.loadData().then( (result) => {
-      console.log("Data loaded");
       let uiModel = {
         disciplines: TrainingPlan.getAllDisciplines(),
         version: TrainingPlan.version,
         selectedDisciplines: [],
         duration: 70,
-        plan: undefined,
+        plan: undefined, // the plan shown - initially undefined
+        favorites: [], // the list of available favorites matching the selected disciplines and duration
+        selectedFavorite: undefined, // index of the selected favorite if the plan was loaded from favorites
       };
       
       view.finishUi(uiModel);
@@ -23,7 +24,7 @@ const view = {
   finishUi(model) {
     this.model = model,
     this.createDisciplineCardList();
-    this.updatePlanButtons();
+    this.updateAfterCriteriaChanged();
     this.updateVersion();
   },
 
@@ -46,18 +47,34 @@ const view = {
   },
   
   // the "generate training plan" button should only be active if a disciplines is selected
-  updatePlanButtons() {
+  updateAfterCriteriaChanged() {
+    view.model.favorites = TrainingPlan.getAvailableFavorites(view.model.selectedDisciplines, view.model.duration);
+
     let gnrtBtn = document.getElementById("gnrtBtn");
     let loadBtn = document.getElementById("loadBtn");
+    let prevBtn = document.getElementById("prevBtn");
+    let nextBtn = document.getElementById("nextBtn");
     if(this.model.selectedDisciplines.length>0) {
       gnrtBtn.classList.remove("disabled");
-      if(this.model.version.supportsFavorites) {
-        loadBtn.classList.remove("disabled");
-      }
+
     } else {
       gnrtBtn.classList.add("disabled");
       loadBtn.classList.add("disabled");
     }
+    if(view.model.favorites.length>0) {
+      loadBtn.classList.remove("disabled");
+    } else {
+      loadBtn.classList.add("disabled");
+    }
+    if(this.model.selectedFavorite===undefined || view.model.favorites.length<2 ) {
+      // no favorite selected or there is only one --> paging makes no sense
+      prevBtn.classList.add("disabled");
+      nextBtn.classList.add("disabled");
+    } else { // favorite selected --> paging is possible
+      prevBtn.classList.remove("disabled");
+      nextBtn.classList.remove("disabled");
+    }
+    loadBtn.innerHTML = `Lade Favoriten (${view.model.favorites.length})`;
   },
 
   // update the version number in the footer of the page and enable the edit button if the version supports editing
@@ -68,6 +85,17 @@ const view = {
       let editBtn = document.getElementById("editBtn");
       editBtn.classList.remove("disabled");
     }
+  },
+
+  // update the plan title and the cards for each phase
+  updatePlan() {
+    if(this.model.selectedFavorite!==undefined) this.model.plan = this.model.favorites[this.model.selectedFavorite];
+    document.getElementById("plan-title").innerHTML =
+     `Plan ${this.model.plan.description} für ${this.model.plan.disciplines.map((discipline) => discipline.name ).join(" & ")}` +
+     ` (${this.model.plan.duration()}min)`;  
+    this.fillCardsForPhase("warmup", this.model.plan.warmup);
+    this.fillCardsForPhase("mainex", this.model.plan.mainex);
+    this.fillCardsForPhase("ending", this.model.plan.ending);
   },
 
   fillCardsForPhase(phaseName, exercises) {
@@ -137,7 +165,7 @@ const view = {
       messageCard.innerHTML = messages.join("<br>");
       messageDiv.appendChild(messageCard);
     }
-  }
+  },
 
 };
 
@@ -146,7 +174,8 @@ const controller = {
   registerEventHandlers() {
     document.getElementById("gnrtBtn").addEventListener("click", this.onCreatePlanButtonPressed);
     document.getElementById("loadBtn").addEventListener("click", this.onLoadPlanButtonPressed);
-    document.getElementById("editBtn").addEventListener("click", this.onEditExercisesButtonPressed);
+    document.getElementById("prevBtn").addEventListener("click", this.onPrevBtnPressed);
+    document.getElementById("nextBtn").addEventListener("click", this.onNextBtnPressed);
     document.durationForm.duration.forEach( (radio) => radio.addEventListener("change", this.onDurationChanged));
   },
 
@@ -155,18 +184,35 @@ const controller = {
     view.updateMessages(TrainingPlan.messages);
     if(!plan) {
       return;
+    } else {
+      view.model.plan = plan;
+      view.model.selectedFavorite = undefined;
+      view.updatePlan();
     }
-    document.getElementById("plan-title").innerHTML = "Plan für "
-      + plan.disciplines.map((discipline) => discipline.name ).join(" & ") + " (" + plan.duration() + "min)";  
-    view.fillCardsForPhase("warmup", plan.warmup);
-    view.fillCardsForPhase("mainex", plan.mainex);
-    view.fillCardsForPhase("ending", plan.ending);
-    view.model.plan = plan;
   },
 
-  onLoadPlanButtonPressed() {},
-  onEditExercisesButtonPressed() {},
-  
+  onLoadPlanButtonPressed() {
+    if(view.model.favorites.length>0) {
+      view.model.selectedFavorite = 0;
+      view.updateAfterCriteriaChanged();
+      view.updatePlan();
+    }
+  },
+
+  onPrevBtnPressed() {
+    if(view.model.favorites.length>0) {
+      view.model.selectedFavorite = (view.model.selectedFavorite-1 + view.model.favorites.length) % view.model.favorites.length;
+      view.updatePlan();
+    }
+  },
+
+  onNextBtnPressed() {
+    if(view.model.favorites.length>0) {
+      view.model.selectedFavorite = (view.model.selectedFavorite+1) % view.model.favorites.length;
+      view.updatePlan();
+    }
+  },
+
   onDisciplineSelected(event) {
     let selectedDiscipline = (event.target.localName=='img') ?
         event.target.parentElement // click was on image -> discipline element is the parent element
@@ -182,11 +228,13 @@ const controller = {
       selectedDiscipline.classList.add("lighten-2");
       view.model.selectedDisciplines.push(selectedDiscipline.id);
     }
-    view.updatePlanButtons();
+    view.updateAfterCriteriaChanged();
   },
 
   onDurationChanged(event) {
     view.model.duration = event.target.value;
+    view.model.selectedFavorite = undefined;
+    view.updateAfterCriteriaChanged();
   },
 
   moveUp(exerciseId) {
