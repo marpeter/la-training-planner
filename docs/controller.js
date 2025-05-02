@@ -56,10 +56,8 @@ const view = {
     let nextBtn = document.getElementById("nextBtn");
     if(this.model.selectedDisciplines.length>0) {
       gnrtBtn.classList.remove("disabled");
-
     } else {
       gnrtBtn.classList.add("disabled");
-      loadBtn.classList.add("disabled");
     }
     if(view.model.favorites.length>0) {
       loadBtn.classList.remove("disabled");
@@ -182,11 +180,10 @@ const controller = {
   onCreatePlanButtonPressed() {
     let plan = TrainingPlan.generate(view.model.selectedDisciplines, view.model.duration);
     view.updateMessages(TrainingPlan.messages);
-    if(!plan) {
-      return;
-    } else {
+    if(plan) {
       view.model.plan = plan;
       view.model.selectedFavorite = undefined;
+      view.updateAfterCriteriaChanged();
       view.updatePlan();
     }
   },
