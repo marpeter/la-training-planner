@@ -46,9 +46,9 @@ async function dbVersion() {
     version.supportsFavorites = convertIfBoolean(version.supportsFavorites);
     version.supportsEditing   = convertIfBoolean(version.supportsEditing);
     version.supportsDownload   = true;
-    version.disciplineLoader = loadDisciplinesFromDbTable;
-    version.exerciseLoader   = loadExercisesFromDbTable;
-    version.favoritesLoader  = loadFavoritesFromCsv;
+    version.disciplineLoader = loadFromDbTable.bind(null,"disciplines");
+    version.exerciseLoader   = loadFromDbTable.bind(null,"exercises");
+    version.favoritesLoader  = loadFromDbTable.bind(null,"favorites");
   } catch (error) {
     console.error("Error loading version from DB: " + error + " --> assuming there is no PHP/DB backend.");
     version = {
@@ -64,21 +64,12 @@ async function dbVersion() {
   return version;
 }
 
-async function loadDisciplinesFromDbTable() {
-  return fetch("data/db_read_disciplines.php").then( (response) => {
+async function loadFromDbTable(table) {
+  return fetch(`data/db_read_${table}.php`).then( (response) => {
     if(!response.ok) throw new Error(`HTTP error: ${response.status}`);
     return response.json();
   }).catch( (error) => {
-    console.error("Error loading table: " + error);
-  });
-}
-
-async function loadExercisesFromDbTable() {
-  return fetch("data/db_read_exercises.php").then( (response) => {
-    if(!response.ok) throw new Error(`HTTP error: ${response.status}`);
-    return response.json();
-  }).catch( (error) => {
-    console.error("Error loading table: " + error);
+    console.error(`Error loading table ${table}: ` + error);
   });
 }
 

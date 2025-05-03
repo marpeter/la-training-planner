@@ -31,6 +31,7 @@
             $exercise['ending'] = $exercise['ending']==1 ? "true" : "false";
             $exercise['durationmin'] = (int)$exercise['durationmin'];
             $exercise['durationmax'] = (int)$exercise['durationmax'];
+            $exercise['Disciplines[]'] = array();
             foreach ($exerciseDisciplines as $exerciseDiscipline) {
                 if ($exercise['id'] == $exerciseDiscipline['exercise_id']) {
                     $exercise['Disciplines[]'][] = $exerciseDiscipline['discipline_id'];
@@ -43,6 +44,9 @@
         $csv_header = array_keys($exercises[0]);
         $details_index = array_search("details", $csv_header);
         $csv_header[$details_index] = "Details[]";
+
+        header('Content-Type: text/csv');
+        header('Content-Disposition: attachment; filename="Exercises.csv"');
 
         echo implode(";", $csv_header), "\n"; 
         $handle = fopen('php://temp', 'r+');
@@ -57,8 +61,6 @@
         }
         fclose($handle);
 
-        header('Content-Type: text/csv');
-        header('Content-Disposition: attachment; filename="Exercises.csv"');
         echo $contents;
 
     } else {

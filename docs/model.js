@@ -44,7 +44,7 @@ class TrainingPlan {
     let rawFavoriteData = await this.version.favoritesLoader();
     rawFavoriteData.headers.forEach( (favorite) => {
       let plan = new TrainingPlan(favorite.id, favorite.disciplines, favorite.created_by, favorite.created_at, favorite.description);
-      rawFavoriteData.exerciseMap.filter( (mapItem) => mapItem.id==favorite.id )
+      rawFavoriteData.exerciseMap.filter( (mapItem) => mapItem.favorite_id==favorite.id )
                                  .forEach((mapItem) => {
          // copy the exercise from the Exercises array to be able to set the duration
          let exercise = Object.assign({},Exercises.find( (ex) => ex.id==mapItem.exercise_id ));

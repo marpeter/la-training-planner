@@ -37,7 +37,7 @@ Id,Created_By,Created_At,Description,Disciplines[]
 36,Anja,2025-02-14 12:00:00,Beispielplan 36,Staffellauf
 37,Anja,2025-02-14 12:00:00,Beispielplan 37,Staffellauf:Überlaufen
 
-Id,Phase,Position,Exercise_Id,Duration
+Favorite_Id,Phase,Position,Exercise_Id,Duration
 1,warmup,1,SeilspringenUndRunden,5
 1,warmup,2,LaufABC_01,10
 1,mainex,1,SeilspringenLangesSeil,10

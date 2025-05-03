@@ -27,6 +27,8 @@ document.addEventListener('DOMContentLoaded', function() {
       downloadBtn.classList.remove("disabled");
       downloadBtn = document.getElementById("downloadExercisesBtn");
       downloadBtn.classList.remove("disabled");
+      downloadBtn = document.getElementById("downloadFavoritesBtn");
+      downloadBtn.classList.remove("disabled");
     };
     if(this.model.version.supportsEditing) {
       let editBtn = document.getElementById("editBtn");
