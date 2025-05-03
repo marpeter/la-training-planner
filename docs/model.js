@@ -5,6 +5,7 @@ const TEMP_PLAN_ID = "$TMP";
 
 let Disciplines = {};
 let Exercises = {};
+let Auslaufen = {};
 class TrainingPlan {
 
   static messages = [];
@@ -29,10 +30,14 @@ class TrainingPlan {
     this.version = await dbVersion();
     console.log("Version info: " + JSON.stringify(this.version));
 
-    // Load the Disciplines and Exercises from the CSV file or the database
+    // Load the Disciplines from the CSV file or the database
     Disciplines = await this.version.disciplineLoader();
+    // Load the Exercises from the CSV or the database
     Exercises = await this.version.exerciseLoader();
-    Exercises.push({ id: "Auslaufen", name: "Auslaufen", warmup: false, runabc: false, mainex: false, ending: false, sticky: true, material: "", duration: 5, durationmin: 5, durationmax: 5, repeats: "2 Runden", disciplines: [], details: []});
+    // Make the "Auslaufen" exercise "sticky" so that it always remains the last
+    Auslaufen = Exercises.find( (exercise) => exercise.id==='Auslaufen');
+    Auslaufen.duration = 5;
+    Auslaufen.sticky = true;
 
     // Load the favorites from the CSV file or the database
     this.favorites = [];
@@ -98,7 +103,7 @@ class TrainingPlan {
                       plan.suitable.runabc.at(Math.floor(Math.random()*plan.suitable.runabc.length)) ];
       // pick a random ending and add the standard Auslaufen
       plan.ending = [ plan.suitable.ending.at(Math.floor(Math.random()*plan.suitable.ending.length)),
-                      Exercises[Exercises.length-1] ];
+                      Auslaufen ];
       // pick main exercises until the target duration is reached or exceeded.
       plan.mainex = [];
       let minDuration = 0;

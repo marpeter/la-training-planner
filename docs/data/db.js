@@ -52,7 +52,7 @@ async function dbVersion() {
   } catch (error) {
     console.error("Error loading version from DB: " + error + " --> assuming there is no PHP/DB backend.");
     version = {
-      number: "0.13.1 (ohne Backend Datenbank)",
+      number: "0.13.2 (ohne Backend Datenbank)",
       supportsFavorites: false,
       supportsEditing:   false,
       supportsDownload:  false,
@@ -93,6 +93,8 @@ async function loadExercisesFromCsv() {
       exercise.durationmin = parseInt(exercise.durationmin);
       exercise.durationmax = parseInt(exercise.durationmax);
     } );
+    // Add the "Auslaufen" exercise. It's not in the CSV to prevent it from being modified by mistake
+    exercises.push({ id: "Auslaufen", name: "Auslaufen", warmup: false, runabc: false, mainex: false, ending: false, material: "", durationmin: 5, durationmax: 5, repeats: "2 Runden", disciplines: [], details: []});
     return exercises;  
   } catch(error) {
     alert(error);
