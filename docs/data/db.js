@@ -42,13 +42,24 @@ async function dbVersion() {
       if(!response.ok) throw new Error(`HTTP error accessing db_version.php: ${response.status}`);
       return response.json();
     });
-    version.number = version.number + " (mit Backend Datenbank)";
-    version.supportsFavorites = convertIfBoolean(version.supportsFavorites);
-    version.supportsEditing   = convertIfBoolean(version.supportsEditing);
-    version.supportsDownload   = true;
-    version.disciplineLoader = loadFromDbTable.bind(null,"disciplines");
-    version.exerciseLoader   = loadFromDbTable.bind(null,"exercises");
-    version.favoritesLoader  = loadFromDbTable.bind(null,"favorites");
+    version.withDB = convertIfBoolean(version.withDB);
+    if(version.withDB) {
+      version.number = version.number + " (mit Backend Datenbank)";
+      version.supportsFavorites = convertIfBoolean(version.supportsFavorites);
+      version.supportsEditing   = convertIfBoolean(version.supportsEditing);
+      version.supportsDownload   = true;
+      version.disciplineLoader = loadFromDbTable.bind(null,"disciplines");
+      version.exerciseLoader   = loadFromDbTable.bind(null,"exercises");
+      version.favoritesLoader  = loadFromDbTable.bind(null,"favorites");
+    } else {
+      version.number = version.number + " (mit PHP Backend, aber noch ohne Datenbank)";
+      version.supportsFavorites = false;
+      version.supportsEditing   = false;
+      version.supportsDownload   = false;
+      version.disciplineLoader = loadDisciplinesFromCSV;
+      version.exerciseLoader = loadExercisesFromCsv;
+      version.favoritesLoader = loadFavoritesFromCsv;
+    }
   } catch (error) {
     console.error("Error loading version from DB: " + error + " --> assuming there is no PHP/DB backend.");
     version = {

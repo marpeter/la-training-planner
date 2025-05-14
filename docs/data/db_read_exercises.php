@@ -53,6 +53,10 @@
         $delimiter = ';';
         $enclosure = '"';
         foreach ($exercises as $line) {
+            // skip the "Auslaufen" exercise in the CSV to prevent it from being modified by mistake
+            if ($line['id']=='Auslaufen') {
+                continue;
+            }
             fputcsv($handle, $line, $delimiter, $enclosure);
         }
         rewind($handle);

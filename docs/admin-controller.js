@@ -23,22 +23,25 @@ document.addEventListener('DOMContentLoaded', function() {
     console.log("Version: " + JSON.stringify(this.model.version));
     versionElement.innerHTML = this.model.version.number;
     if(this.model.version.supportsDownload) {
-      let downloadBtn = document.getElementById("downloadDisciplinesBtn");
-      downloadBtn.classList.remove("disabled");
-      downloadBtn = document.getElementById("downloadExercisesBtn");
-      downloadBtn.classList.remove("disabled");
-      downloadBtn = document.getElementById("downloadFavoritesBtn");
-      downloadBtn.classList.remove("disabled");
+      [ "downloadDisciplinesBtn", "downloadExercisesBtn", "downloadFavoritesBtn", "uploadDataBtn" ].forEach( (element) => {
+        const elementToEnable = document.getElementById(element);
+        elementToEnable.classList.remove("disabled");
+       });
+       [ "DisciplinesFile", "ExercisesFile", "FavoritesFile"].forEach( (element) => {
+        const elementToEnable = document.getElementById(element);
+        elementToEnable.disabled=false;
+      });
     };
     if(this.model.version.supportsEditing) {
       let editBtn = document.getElementById("editBtn");
       editBtn.classList.remove("disabled");
     }
-  },      
+  },
+
 }
 
 const controller = {
     registerEventHandlers() {
-        // document.getElementById("downloadDisciplinesBtn").addEventListener("click", window.open("../data/db_read_disciplines.php?format=csv", "_blank"));
     },
+
 }

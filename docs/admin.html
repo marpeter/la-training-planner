@@ -37,20 +37,36 @@
       <div class="row">
         <div class="col s12"> <a id="downloadFavoritesBtn" href="./data/db_read_favorites.php?format=csv" class="btn center red disabled">Gespeicherte Pläne (Favoriten)</a></div> 
       </div>
-<!--       <div class="divider"></div>
+      <div class="divider"></div>
       <div class="row">
-        <div class="col s12">Upload von Daten in die Datenbank:</div>
-      </div> 
-      <div class="row">
-        <div class="col s6"> <button id="uploadDisciplinesBtn" class="btn center red disabled">Disziplinen</button></div>
-        <div class="col s6"> <button id="uploadExercisesBtn" class="btn center red disabled">Übungen</button></div>
+        <div class="col s12">Upload von Daten in die Datenbank:
+        <div class="card-panel red center">Achtung! Dies ersetzt die bereits in der Datenbank gespeicherten Daten vollständig!</div></div>
       </div>
-      <div class="row">
-        <div class="col s12"> <button id="uploadFavoritesBtn" class="btn center red disabled">Gespeicherte Pläne</button></div> 
-      </div> -->
+      <form name="uploadForm" enctype="multipart/form-data" method="POST" action="data/db_upload.php">
+        <div class="row">
+          <div class="col s6">
+            <label>Wähle eine CSV-Datei mit der Liste der Disziplinen:
+            <input disabled="disabled" type="file" id="DisciplinesFile" name="DisciplinesFile" accecpt="text/csv,text/plain">
+            </label>
+          </div>
+          <div class="col s6">
+            <label>Wähle eine CSV-Datei mit der Liste der Übungen:
+            <input disabled="disabled" type="file" id="ExercisesFile" name="ExercisesFile" accecpt="text/csv,text/plain">
+            </label>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col s6">
+            <label>Wähle eine CSV-Datei mit der Liste der Favoriten:
+            <input disabled="disabled" type="file" id="FavoritesFile" name="FavoritesFile" accecpt="text/csv,text/plain">
+            </label>
+          </div>
+          <div class="col s6"> <button id="uploadDataBtn" class="btn center red disabled">Daten hochladen</button></div> 
+        </div>
+      </form>
     </div>
     <footer class="section">
-      <div class="center grey-text">Version <span id="version">0.13.0</span>,<br/>&copy; Copyright 2025 Markus Peter</div>
+      <div class="center grey-text">Version <span id="version">0.13.0</span>,<br/>&copy; 2025 Markus Peter</div>
     </footer>
   </body>
 </html>
