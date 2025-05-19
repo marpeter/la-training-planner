@@ -11,7 +11,7 @@
         <link rel="stylesheet"
               href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css">
         <link rel="stylesheet" href="ownstyle.css">
-        <script type="module" src="help-controller.js"></script>
+        <script type="module" src="edit-controller.js"></script>
          <!-- Compiled and minified JavaScript -->
          <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
    </head>
@@ -30,8 +30,88 @@
       <div class="section">
         <h4 class="card-panel red darken-1 center">Übungen bearbeiten</h4>
       </div>
-      <div class="center">
-        Diese Seite muss noch erstellt werden.
+      <div class="row center">
+        <div class="col s4">
+          <ul class="collection with-header" id="exercise-list">
+            <li class="collection-header"><h6>Wähle die Übung aus:</h6></li>
+            <!-- wird mittels JavaScript gefüllt-->
+          </ul>
+        </div>
+        <div class="col s8">
+          <form class="col s12">
+            <div class="row">
+              <div class="input-field col s12">
+                <input disabled id="exercise-id" type="text" class="validate"/>
+                <label for="exercise-id">Übung </label>
+              </div>
+            </div>
+            <div class="row">
+              <div class="input-field col s12">
+                <input id="exercise-name" type="text" class="validate"/>
+                <label for="exercise-name">Name</label>
+              </div>
+            </div>
+            <div  class="row"> <!-- phases -->
+              <div class="input-field col s12">
+                <select id="exercise-phases" multiple>
+                  <!-- <option value="" disabled selected>Phase(n) auswählen</option> -->
+                  <option value="warmup">Aufwärmen</option>
+                  <option value="runabc">Lauf ABC</option>
+                  <option value="mainex">Hauptteil</option>
+                  <option value="ending">Schluss</option>
+                </select>
+                <label for="exercise-phases">Geeignet für Phase(n):</label>
+                <span class="helper-text">Markiere die Phasen, für die die Übung sich eignet</span>
+              </div>
+            </div>
+            <div class="row"> <!-- suitable for disciplines -->
+              <div class="input-field col s12">
+                <select id="exercise-disciplines" multiple>
+                  <!-- wird mittels JavaScript gefüllt-->
+                </select>
+                <label for="exercise-phases">Geeignet für Disziplinen:</label>
+                <span class="helper-text">Markiere die Disziplinen, für die die Übung sich eignet</span>
+              </div>
+            </div>
+            <div class="row"> <!-- material-->
+              <div class="input-field col s12">
+                <input id="exercise-material" type="text" class="validate">
+                <label for="exercise-material">Material</label>
+              </div>
+            </div>
+            <div class="row"> <!-- duration min and mix-->
+              <div class="input-field col s4">
+                <input id="exercise-duration-min" type="number" class="validate">
+                <label for="exercise-duration-min">Dauer von</label>
+                <span class="helper-text">in Minuten</span>
+              </div>
+               <div class="input-field col s4">
+                <input id="exercise-duration-max" type="number" class="validate">
+                <label for="exercise-duration-max">bis</label>
+                <span class="helper-text">in Minuten</span>
+              </div>
+              <div class="input-field col s4">
+                <input id="exercise-reps" type="text" class="validate">
+                <label for="exercise-reps">Wiederholungen</label>
+              </div>
+            </div>
+            <div class="row">
+              <div class="input-field col s12">
+                <textarea id="exercise-details" class="materialize-textarea"></textarea>
+                <label for="exercise-details">Details</label>
+              </div>
+            </div>
+            <button id="save-exercise" class="btn red darken-1 waves-effect waves-light" type="submit" name="action">Speichern
+              <i class="material-icons right">save</i>
+            </button>
+            <button id="copy-exercise" class="btn red darken-1 waves-effect waves-light" type="submit" name="action">Übung kopieren
+              <i class="material-icons right">content_copy</i>
+            </button>
+            <button id="delete-exercise" class="btn red darken-1 waves-effect waves-light" type="submit" name="action">Übung löschen
+              <i class="material-icons right">delete</i>
+            </button>
+          </form>
+        </div>
       </div>
     </div>
     <footer class="section">

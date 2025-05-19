@@ -34,6 +34,7 @@ class TrainingPlan {
     Disciplines = await this.version.disciplineLoader();
     // Load the Exercises from the CSV or the database
     Exercises = await this.version.exerciseLoader();
+    Exercises.sort( (a,b) => a.name.localeCompare(b.name) );
     // Make the "Auslaufen" exercise "sticky" so that it always remains the last
     Auslaufen = Exercises.find( (exercise) => exercise.id==='Auslaufen');
     Auslaufen.duration = 5;
@@ -185,4 +186,4 @@ const minAdder = adder.bind(null, "durationmin");
 const maxAdder = adder.bind(null, "durationmax");
 const durationAdder = adder.bind(null, "duration");
 
-export { TrainingPlan };
+export { TrainingPlan, Exercises };
