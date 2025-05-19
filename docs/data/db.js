@@ -63,7 +63,7 @@ async function dbVersion() {
   } catch (error) {
     console.error("Error loading version from DB: " + error + " --> assuming there is no PHP/DB backend.");
     version = {
-      number: "0.13.2 (ohne Backend Datenbank)",
+      number: "0.13.3 (ohne Backend Datenbank)",
       supportsFavorites: false,
       supportsEditing:   false,
       supportsDownload:  false,

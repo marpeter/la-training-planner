@@ -9,23 +9,23 @@ BallInReifenDopsen;Ball in Reifen dopsen lassen;false;false;true;false;Bälle, R
 BandKnotenHochspringen;Band schräg knoten und hochspringen lassen;false;false;true;false;Band;10;15;;Hochsprung:HochsprungOhneAnlage;
 BandSchrägHochspringen;Band schräg nach unten und hochspringen in Kurve;false;false;true;false;Band, Hütchen (?);10;15;;Hochsprung:HochsprungOhneAnlage;
 BeidbeinigeHürdensprünge;Beidbeinige Hürdensprünge;false;false;true;false;Hohe Hürden;10;10;;Ausdauer:Überlaufen;Die wartenden Kinder machen Standwagen
-BeiWortRennen;Geschichte und immer bei Wörtern wird gerannt;false;false;true;false;Hütchen;10;10;;Schnelligkeit:Schnelllaufen;
+BeiWortRennen;Geschichte und immer bei Wörtern wird gerannt;false;false;true;false;Hütchen;10;10;;Schnelligkeit;
 Biathlon;Biathlon;false;false;false;true;Bälle, Hütchen;10;15;1 mal;Ausdauer;
-Brennball;Brennball;false;false;false;true;Hütchen, Bälle;10;20;1 mal;Schnelligkeit:Schnelllaufen:Wurf;
-BundesligaSprint;Bundesliga Sprint;false;false;true;true;;15;15;;Schnelligkeit:Schnelllaufen;
-ChinesischeMauer;Chinesische Mauer;false;false;true;false;Hütchen;10;10;;Schnelligkeit:Schnelllaufen;
+Brennball;Brennball;false;false;false;true;Hütchen, Bälle;10;20;1 mal;Schnelligkeit:Wurf;
+BundesligaSprint;Bundesliga Sprint;false;false;true;true;;15;15;;Schnelligkeit;
+ChinesischeMauer;Chinesische Mauer;false;false;true;false;Hütchen;10;10;;Schnelligkeit;
 CrosslaufAufRasen;Crosslauf auf Rasen;true;false;false;true;Hürden, Hütchen;10;10;2-3 Runden;Ausdauer:Koordination:Überlaufen;
 CrosslaufAufRasenIntervalle;Crosslauf auf Rasen mit Intervallbereichen;true;false;false;true;Hürden, Hütchen;10;10;1 mal;Ausdauer:Koordination:Staffellauf:Überlaufen;
-DerFuchsGehtUm;Der Fuchs geht um;false;false;true;true;;10;10;;Schnelligkeit:Schnelllaufen;
-Doppelbett;Doppelbett;false;false;true;true;;10;10;;Schnelligkeit:Schnelllaufen;
+DerFuchsGehtUm;Der Fuchs geht um;false;false;true;true;;10;10;;Schnelligkeit;
+Doppelbett;Doppelbett;false;false;true;true;;10;10;;Schnelligkeit;
 DurchReifenHüpfen;Durch Reifen hüpfen;false;false;true;false;Reifen;10;10;;WeitsprungOhneGrube:WeitsprungMitGrube;
 EinlaufenBällePrellen;Einlaufen und Ball prellen;true;false;false;false;Bälle;10;10;2-3 Runden;Wurf;
-EinlaufenMitSprungseil;Einlaufen mit Sprungseil;true;false;false;false;Sprungseil;10;10;2-3 Runden;Hochsprung:HochsprungOhneAnlage:Schnelligkeit:Schnelllaufen:Wurf;
+EinlaufenMitSprungseil;Einlaufen mit Sprungseil;true;false;false;false;Sprungseil;10;10;2-3 Runden;Hochsprung:HochsprungOhneAnlage:Schnelligkeit:Wurf;
 FCRunde;FC Runde;true;false;false;true;;10;10;;Ausdauer;
 FormenAblaufen;Formen ablaufen;true;false;false;true;Hütchen;10;15;je nach Rundengröße;Ausdauer;
 FormenAblaufenAufRasen;Formen ablaufen auf Rasen;true;false;false;true;Hütchen;10;15;2-3 Runden;Ausdauer;
 GeradeNachHintenFallenLassen;Gerade nach hinten fallen lassen auf Matte ;false;false;true;true;;5;5;;Hochsprung:HochsprungOhneAnlage;
-HabichtUndHenne;Habicht und Henne;false;false;true;true;;10;10;;Schnelligkeit:Schnelllaufen;
+HabichtUndHenne;Habicht und Henne;false;false;true;true;;10;10;;Schnelligkeit;
 HochsprungAnAnlage;Hochsprung an Anlage mit Hütchen als Absperrung, ggf. im Schersprung;false;false;true;false;Hütchen;10;10;;Hochsprung;5 Sprünge hoch auf Sitzsteine
 Hunderunde;Hunderunde;true;false;false;true;;10;10;;Ausdauer;
 HüpfenderTausendfüßler;Der hüpfende Tausendfüßler;false;false;true;false;Hütchen;10;10;;Stabweitsprung:WeitsprungOhneGrube:WeitsprungMitGrube;
@@ -39,25 +39,25 @@ Klammerlauf_01;Klammerlauf;true;false;false;true;Klammern;10;15;1 mal;Ausdauer;
 Klammerlauf_02;Klammerlauf;true;false;false;true;Klammern;10;15;2-3 Runden;Ausdauer;Wir verteilen uns auf der Bahn, damit jeder mehr Klammern bekommt
 Klammerlauf_03;Klammerlauf mit Intervallbereichen;true;false;false;true;Klammern;10;15;1 mal;Ausdauer;Wir verteilen uns auf der Bahn, damit jeder mehr Klammern bekommt
 KoordinationsLeiter;Koordinationsleiter;false;false;true;false;Koordinationsleiter;10;10;;Ausdauer:Koordination:Staffellauf:Überlaufen;Die wartenden Kinder machen Standwagen
-LaufABC_01;Lauf ABC;false;true;false;false;Hütchen;10;10; - ;Ausdauer:Schnelligkeit:Schnelllaufen:WeitsprungOhneGrube:WeitsprungMitGrube;Froschsprünge:Hopserlauf:Anversen:Knieheberlauf:Steps:Sprungläufe:Steigerung
+LaufABC_01;Lauf ABC;false;true;false;false;Hütchen;10;10; - ;Ausdauer:Schnelligkeit:WeitsprungOhneGrube:WeitsprungMitGrube;Froschsprünge:Hopserlauf:Anversen:Knieheberlauf:Steps:Sprungläufe:Steigerung
 LaufABC_02;Lauf ABC;false;true;false;false;Hütchen;10;10; - ;Ausdauer:WeitsprungOhneGrube:WeitsprungMitGrube:Wurf;Hopserlauf:Seitgalopp:Seitkreuzschritte:Schlagläufe:Rückwärtslauf:Steigerung
 LaufABC_03;Lauf ABC;false;true;false;false;Hütchen;10;10; - ;Ausdauer:WeitsprungOhneGrube:WeitsprungMitGrube:Wurf;Hopserlauf:Anversen:Knieheberlauf:Schlagläufe:Auf einem Bein hüpfen und links 1 Kontakt, rechts 2 Kontakte:Steps:Steigerung
 LaufABC_04;Lauf ABC;false;true;false;false;Hütchen;10;10; - ;Ausdauer:Hochsprung:HochsprungOhneAnlage;Hopserlauf:Anversen:Knieheberlauf:Steps:Sprungläufe:Steigerung
-LaufABC_05;Lauf ABC;false;true;false;false;Hütchen;10;10; - ;Ausdauer:Hochsprung:HochsprungOhneAnlage:Schnelligkeit:Schnelllaufen:Überlaufen:Wurf;Hopserlauf:Anversen:Knieheberlauf:Skippings:Steps:Seitkreuzschritte:Steigerung
-LaufABC_06;Lauf ABC;false;true;false;false;Hütchen;10;10; - ;Hochsprung:HochsprungOhneAnlage:Schnelligkeit:Schnelllaufen;Hopserlauf:Anversen:Knieheberlauf:Skippings:Steps:Seitgalopp:Steigerung
-LaufABC_07;Lauf ABC;false;true;false;false;Hütchen;10;10; - ;Ausdauer:Hochsprung:HochsprungOhneAnlage:Schnelligkeit:Schnelllaufen:Überlaufen:Wurf;Schlagläufe:Anversen:Skippings:Knieheberlauf:Steps:B Steps:Steigerung
-LaufABC_08;Lauf ABC;false;true;false;false;Hütchen;10;10; - ;Schnelligkeit:Schnelllaufen:Überlaufen;Hopserlauf:Anversen:Knieheberlauf:Skippings:Steps:Seitkreuzschritte:Seitgalopp:Steigerung
-LaufABC_09;Lauf ABC;false;true;false;false;Hütchen;10;10; - ;Schnelligkeit:Schnelllaufen:Wurf;Hopserlauf:Anversen:Schlagläufe:Auf einem Bein hüpfen und links 1 Kontakt, rechts 2 Kontakte:Steps:Steigerung
+LaufABC_05;Lauf ABC;false;true;false;false;Hütchen;10;10; - ;Ausdauer:Hochsprung:HochsprungOhneAnlage:Schnelligkeit:Überlaufen:Wurf;Hopserlauf:Anversen:Knieheberlauf:Skippings:Steps:Seitkreuzschritte:Steigerung
+LaufABC_06;Lauf ABC;false;true;false;false;Hütchen;10;10; - ;Hochsprung:HochsprungOhneAnlage:Schnelligkeit;Hopserlauf:Anversen:Knieheberlauf:Skippings:Steps:Seitgalopp:Steigerung
+LaufABC_07;Lauf ABC;false;true;false;false;Hütchen;10;10; - ;Ausdauer:Hochsprung:HochsprungOhneAnlage:Schnelligkeit:Überlaufen:Wurf;Schlagläufe:Anversen:Skippings:Knieheberlauf:Steps:B Steps:Steigerung
+LaufABC_08;Lauf ABC;false;true;false;false;Hütchen;10;10; - ;Schnelligkeit:Überlaufen;Hopserlauf:Anversen:Knieheberlauf:Skippings:Steps:Seitkreuzschritte:Seitgalopp:Steigerung
+LaufABC_09;Lauf ABC;false;true;false;false;Hütchen;10;10; - ;Schnelligkeit:Wurf;Hopserlauf:Anversen:Schlagläufe:Auf einem Bein hüpfen und links 1 Kontakt, rechts 2 Kontakte:Steps:Steigerung
 LaufABC_10;Lauf ABC;false;true;false;false;Hütchen;10;10; - ;Überlaufen:Wurf;Hopserlauf:Anversen:Knieheberlauf:Schlagläufe:Auf einem Bein hüpfen und links 1 Kontakt, rechts 2 Kontakte:Steps:Steigerung
 LaufABC_11;Lauf ABC;false;true;false;false;Hütchen;10;10; - ;Ausdauer:Koordination;Hampelmannsprünge:Grätschsprünge:seitliche Sprünge:Einbeinsprünge:Sprung mit Anziehen der Knie:Einbeinsprünge mit Beinwechsel
 LaufABC_12;Lauf ABC;false;true;false;false;Hütchen;10;10; - ;Ausdauer:Stabweitsprung;Froschsprünge:Hopserlauf über Hütchen:Anversen:Knieheberlauf:Steps:Sprungläufe:Steigerung
 LaufABC_13;Lauf ABC;false;true;false;false;Hütchen;10;10; - ;Ausdauer:Koordination;Hopserlauf:Anversen:Knieheberlauf über Hütchen:Skippings über Hütchen:Seitkreuzschritte:Steigerung
-LaufABC_14;Lauf ABC;false;true;false;false;Hütchen;10;10; - ;Hochsprung:HochsprungOhneAnlage:Schnelligkeit:Schnelllaufen;Hopserlauf:Anversen:Knieheber mit hohen Armen:Skippings:Steps:Seitgalopp mit Schwungarmen:Steigerung
-LaufABC_15;Lauf ABC;false;true;false;false;Hütchen;10;10; - ;Schnelligkeit:Schnelllaufen:Wurf;Schlagläufe:Anversen:Skippings mit hohen Armen:Knieheber mit hohen Armen:Steps:B Steps:Schubkarre:Steigerung
+LaufABC_14;Lauf ABC;false;true;false;false;Hütchen;10;10; - ;Hochsprung:HochsprungOhneAnlage:Schnelligkeit;Hopserlauf:Anversen:Knieheber mit hohen Armen:Skippings:Steps:Seitgalopp mit Schwungarmen:Steigerung
+LaufABC_15;Lauf ABC;false;true;false;false;Hütchen;10;10; - ;Schnelligkeit:Wurf;Schlagläufe:Anversen:Skippings mit hohen Armen:Knieheber mit hohen Armen:Steps:B Steps:Schubkarre:Steigerung
 LaufABC_16;Lauf ABC;false;true;false;false;Hütchen;10;10; - ;Ausdauer:Überlaufen;Hopserlauf:Anversen:Knieheber mit hohen Armen:Skippings mit hohen Armen:Steps:Seitkreuzschritte:Steigerung
 LaufABC_17;Lauf ABC;false;true;false;false;Hütchen;10;10; - ;Ausdauer:Überlaufen;Hopserlauf:Anversen:Knieheber mit hohen Armen:Skippings mit hohen Armen:Steps:Seitkreuzschritte:Schubkarre:Steigerung
-LaufABC_18;Lauf ABC;false;true;false;false;Hütchen;10;10; - ;Schnelligkeit:Schnelllaufen:Staffellauf:Wurf;Schlagläufe:Anversen:Knieheber:Skippings:Steps:B Steps:Schubkarre:Steigerung
-LaufABC_19;Lauf ABC;false;true;false;false;Hütchen;10;10; - ;Schnelligkeit:Schnelllaufen:Überlaufen;Hopserlauf:Anversen:Knieheberlauf:Skippings:Steps:Seitkreuzschritte:Schubkarre:Steigerung
+LaufABC_18;Lauf ABC;false;true;false;false;Hütchen;10;10; - ;Schnelligkeit:Staffellauf:Wurf;Schlagläufe:Anversen:Knieheber:Skippings:Steps:B Steps:Schubkarre:Steigerung
+LaufABC_19;Lauf ABC;false;true;false;false;Hütchen;10;10; - ;Schnelligkeit:Überlaufen;Hopserlauf:Anversen:Knieheberlauf:Skippings:Steps:Seitkreuzschritte:Schubkarre:Steigerung
 LaufenZuMusik;Verschiedene Laufstile zur Musik;true;false;false;false;Musik;10;10;;Ausdauer:Koordination;Vorwärts:Rückwärts:Seitlich:Krabbeln:Hüpfen
 LäuferGegenWerfer;Läufer gegen Werfer im Kreis;false;false;true;false;Ball, Hütchen;10;15;;Ausdauer;
 MattenbergHochkommen;Mattenberg und im Sitzen hochkommen;false;false;true;false;Matte;10;10;;Hochsprung:HochsprungOhneAnlage;
@@ -65,20 +65,20 @@ MattenbergRückenAufkommen;Mattenberg und mit dem Rücken aufkommen;false;false;
 MedibälleHinHerWerfen;Medibälle hin und her werfen;false;false;true;false;Medibälle;10;10;;Ausdauer:Überlaufen;
 MitSeilFangen;Mit Seil fangen spielen;false;false;true;false;Hütchen, Seil;10;10;;HochsprungOhneAnlage:Wurf;
 Nummernwettläufe;Nummernwettläufe;false;false;true;false;Bananenkisten, Hütchen;10;15;;Ausdauer:Koordination;Immer eine Nummer wird aufgerufen und darf laufen
-Pendelstaffel;Pendelstaffel;false;false;true;false;Bloxx, Hütchen;10;10;;Ausdauer:Hochsprung:HochsprungOhneAnlage:Schnelligkeit:Schnelllaufen:Wurf;
+Pendelstaffel;Pendelstaffel;false;false;true;false;Bloxx, Hütchen;10;10;;Ausdauer:Hochsprung:HochsprungOhneAnlage:Schnelligkeit:Wurf;
 PendelstaffelMitBloxxHürden;Pendelstaffel mit Bloxx + Hürden;false;false;true;false;Bloxx, Hürden;10;10;;Ausdauer:Koordination;
 PendelstaffelMitHürden;Pendelstaffel mit Hürden;false;false;true;false;Hürden, Hütchen;10;10;;Ausdauer:Staffellauf:Überlaufen:Wurf;
-Reaktionsstart_01;Reaktionsstart aus verschiedenen Lagen mit Worten;false;false;true;false;Hütchen;10;10;;Schnelligkeit:Schnelllaufen;
-Reaktionsstart_02;Reaktionsstart mit Bällen, die von hinten kommen;false;false;true;false;Bälle, Hütchen;10;10;;Schnelligkeit:Schnelllaufen;Die, die warten, machen 10 Kniebeugen
-Reaktionsstart_03;Reaktionsstarts mit Händen schlagen;false;false;true;false;;15;15;;Schnelligkeit:Schnelllaufen;
-Reaktionsstart_04;Reaktionsstart aus verschiedenen Lagen mit Worten, mit hohen Armen sprinten;false;false;true;false;Hütchen;10;10;;Schnelligkeit:Schnelllaufen;
+Reaktionsstart_01;Reaktionsstart aus verschiedenen Lagen mit Worten;false;false;true;false;Hütchen;10;10;;Schnelligkeit;
+Reaktionsstart_02;Reaktionsstart mit Bällen, die von hinten kommen;false;false;true;false;Bälle, Hütchen;10;10;;Schnelligkeit;Die, die warten, machen 10 Kniebeugen
+Reaktionsstart_03;Reaktionsstarts mit Händen schlagen;false;false;true;false;;15;15;;Schnelligkeit;
+Reaktionsstart_04;Reaktionsstart aus verschiedenen Lagen mit Worten, mit hohen Armen sprinten;false;false;true;false;Hütchen;10;10;;Schnelligkeit;
 ReihenfolgeErarbeiten;Reihenfolge im Reifen erarbeiten;false;false;true;false;Reifen;10;15;;WeitsprungOhneGrube:WeitsprungMitGrube;
-ReiseNachJerusalemMitRingen;Reise nach Jerusalem mit Ringen;false;false;true;true;;15;15;;Schnelligkeit:Schnelllaufen;
+ReiseNachJerusalemMitRingen;Reise nach Jerusalem mit Ringen;false;false;true;true;;15;15;;Schnelligkeit;
 Rundenstaffel;Rundenstaffel;false;false;false;true;Staffelhölzer;15;15;1 mal;Staffellauf;
 SauDurchsDorf;Sau durchs Dorf;false;false;true;false;Hütchen, Bälle, Medibälle;10;15;;Wurf;Mediball in Richtung anderer Gruppen werfen
 Schattenlaufen;Schattenlaufen;false;false;true;false;;10;10;;Ausdauer:Koordination;
 SchereSteinPapier;Schere-Stein-Papier;false;false;false;true;;10;15;je nach Rundengröße;Ausdauer;Der Gewinner rennt eine kleine Bahn, der Verlierer eine große Bahn
-SchereSteinPapierRennen;Schere, Stein, Papier und Rennen;false;false;true;false;Hütchen, Spielkarten;10;10;;Schnelligkeit:Schnelllaufen;Verlierer macht 3 Situps
+SchereSteinPapierRennen;Schere, Stein, Papier und Rennen;false;false;true;false;Hütchen, Spielkarten;10;10;;Schnelligkeit;Verlierer macht 3 Situps
 SchersprungAufMatte;Im Schersprung auf die Matte;false;false;true;true;;10;10;;Hochsprung:HochsprungOhneAnlage;
 SechsTageRennen;6 Tage Rennen;false;false;false;true;Hütchen;10;15;1 mal;Ausdauer;
 SeilDannRennen;Seil und dann losrennen;false;false;true;false;Hütchen, Spielkarten (?);10;10;;Ausdauer:Koordination;Verlierer macht 3 Situps
@@ -89,36 +89,36 @@ SeilspringenUndRunden;Seilspringen und Runden laufen;true;false;false;false;Spru
 SpringenAmReifen;Springen am Reifen und Koordinationsleiter;false;false;true;false;Reifen, Koordinationsleiter;10;15;;Stabweitsprung:WeitsprungMitGrube:WeitsprungOhneGrube;
 Stabweitsprung;Stabweitsprung in Sprunggrube mit oder ohne Bananenkisten;false;false;true;false;Besen, Rechen, Reifen, (Bananenkisten);10;10;;Hochsprung:HochsprungOhneAnlage:Stabweitsprung:WeitsprungMitGrube:WeitsprungOhneGrube;Sprünge die Treppenstufen hoch  → jedes Kind nach dem Sprung auf dem Rückweg rechts:Sprünge 5x mal rein und raus aus dem Reifen:Aufteilen nach Stärke
 StaffelMitEinholen;Staffel mit Einholen;false;false;false;true;Hürden, Hütchen;10;15;1 mal;Ausdauer:Koordination;Großes Feld
-Staffelrennen;Staffelrennen;false;false;true;false;Hütchen;10;15;;Schnelligkeit:Schnelllaufen;
-StaffelrennenMitHürden;Staffelrennen mit Hürden;false;false;true;false;Hürden, Hütchen;10;15;;Schnelligkeit:Schnelllaufen;
-StaffelrennenMitKarten;Staffelrennen mit Karten holen;false;false;true;false;Hütchen, Spielkarten;10;15;;Schnelligkeit:Schnelllaufen;
-StaffelrennenMitTransport;Staffelrennen und Sachen hin und her tragen;false;false;true;false;Boxen, Sachen zum Transport;10;15;;Schnelligkeit:Schnelllaufen;
-StartAusVerschPositionen;Start aus verschiedenen Positionen;false;false;true;false;Hütchen;10;10;;Schnelligkeit:Schnelllaufen;Die, die warten, machen 3 Liegestützen
-StarWars;Star Wars;false;false;true;false;Bloxx oder Hütchen;10;10;;Schnelligkeit:Schnelllaufen;
+Staffelrennen;Staffelrennen;false;false;true;false;Hütchen;10;15;;Schnelligkeit;
+StaffelrennenMitHürden;Staffelrennen mit Hürden;false;false;true;false;Hürden, Hütchen;10;15;;Schnelligkeit;
+StaffelrennenMitKarten;Staffelrennen mit Karten holen;false;false;true;false;Hütchen, Spielkarten;10;15;;Schnelligkeit;
+StaffelrennenMitTransport;Staffelrennen und Sachen hin und her tragen;false;false;true;false;Boxen, Sachen zum Transport;10;15;;Schnelligkeit;
+StartAusVerschPositionen;Start aus verschiedenen Positionen;false;false;true;false;Hütchen;10;10;;Schnelligkeit;Die, die warten, machen 3 Liegestützen
+StarWars;Star Wars;false;false;true;false;Bloxx oder Hütchen;10;10;;Schnelligkeit;
 StationenMitWerfen;Stationen mit Werfen;false;false;true;true;;15;15;;Wurf;
 SteigesprüngeAufBahn;Steigesprünge auf der Bahn;false;false;true;false;Bananenkisten, Hütchen;10;10;;WeitsprungOhneGrube:WeitsprungMitGrube;
 SteigesprüngeÜberBahn;Steigesprünge über die Bahn;false;false;true;false;Bananenkisten;10;10;;WeitsprungOhneGrube:WeitsprungMitGrube;
 TheorieStaffelübergabe;Theorie Staffelübergabe;false;false;true;false;Staffelhölzer;10;10;;Staffellauf;
-TicTacToe;Tic Tac Toe;false;false;true;true;;15;15;;Schnelligkeit:Schnelllaufen;
+TicTacToe;Tic Tac Toe;false;false;true;true;;15;15;;Schnelligkeit;
 Transportlauf_01;Transportlauf;true;false;false;true;Tennisbälle,Bananenkisten;5;15;2-3 Runden;Ausdauer;
 Transportlauf_02;Transportlauf;true;false;false;true;Hütchen, etwas zu transportieren;10;15;1 mal;Ausdauer;
 Transportlauf_03;Transportlauf;true;false;false;true;Klammern;10;15;1 mal;Ausdauer;
-TransportSprint;Transportsprint;false;false;true;false;Hütchen, etwas zum Transportieren;10;15;;Schnelligkeit:Schnelllaufen:Wurf;
-TransportSprintArme;Transportsprint mit Armen seitlich halten;false;false;true;false;Hütchen, etwas zum Transportieren;10;10;;Schnelligkeit:Schnelllaufen:Wurf;
+TransportSprint;Transportsprint;false;false;true;false;Hütchen, etwas zum Transportieren;10;15;;Schnelligkeit:Wurf;
+TransportSprintArme;Transportsprint mit Armen seitlich halten;false;false;true;false;Hütchen, etwas zum Transportieren;10;10;;Schnelligkeit:Wurf;
 TransportSprintHürde;Transportsprint mit Hürden;false;false;true;false;Hütchen, etwas zum Transportieren;10;10;;Überlaufen:Wurf;
-TurnenAufHochsprungMatte;Turnen auf der Hochsprungmatte;false;false;true;false;Hochsprungmatte;15;15;;Schnelligkeit:Schnelllaufen:Staffellauf:Wurf;Rollen, Räder
+TurnenAufHochsprungMatte;Turnen auf der Hochsprungmatte;false;false;true;false;Hochsprungmatte;15;15;;Schnelligkeit:Staffellauf:Wurf;Rollen, Räder
 TurnenAufMatte;Turnen auf der Matte;false;false;true;false;Hütchen;10;10;Purzelbäume, Räder;Hochsprung:HochsprungOhneAnlage;5 Sprünge hoch auf Sitzsteine
 ÜberBananenkistenSpringenInBahn;Über Bananenkisten springen in der Bahn;false;false;true;true;;10;10;;WeitsprungOhneGrube:WeitsprungMitGrube;
 ÜberBloxxLaufen;Über Bloxx laufen;false;false;true;false;Bloxx, Hütchen;10;10;;WeitsprungOhneGrube:WeitsprungMitGrube;
 Überholstaffel;Überholstaffel;false;false;false;true; - ;5;15;2-3 Runden;Ausdauer;Selbst mitlaufen bei schwacher Gruppe
-VerschiedeneStartformen;Verschiedene Startformen;false;false;true;true;;10;10;;Schnelligkeit:Schnelllaufen;
+VerschiedeneStartformen;Verschiedene Startformen;false;false;true;true;;10;10;;Schnelligkeit;
 VonInselZuInselSpringenMitReifen;Von Insel zu Insel springen mit Reifen;false;false;true;true;;5;5;;WeitsprungOhneGrube:WeitsprungMitGrube;
 WeitsprungInGrube;Weitsprung in Sprunggrube ohne Bananenkisten;false;false;true;false;Bananenkiste, Besen, Rechen, Reifen;10;10;;WeitsprungMitGrube;Sprünge die Treppenstufen hoch → jedes Kind nach dem Sprung auf dem Rückweg rechts:Sprünge 5x mal rein und raus aus dem Reifen:Aufteilen nach Stärke
 WeitsprungInGrubeMitBananenKiste;Weitsprung in Sprunggrube mit Bananenkisten;false;false;true;false;Bananenkiste, Besen, Rechen, Reifen;10;10;;WeitsprungMitGrube;Sprünge die Treppenstufen hoch → jedes Kind nach dem Sprung auf dem Rückweg rechts:Sprünge 5x mal rein und raus aus dem Reifen:Aufteilen nach Stärke
-WerBautDenHöchstenTurm;Wer baut den höchsten Turm;false;false;true;true;;10;10;;Schnelligkeit:Schnelllaufen;
+WerBautDenHöchstenTurm;Wer baut den höchsten Turm;false;false;true;true;;10;10;;Schnelligkeit;
 WerfenMitAnlauf;Werfen mit Anlauf, ggf. auch stoßen;false;false;true;false;Alle werfbaren Gegenstände, Maßband, Hütchen, (Medibälle);15;15;;Wurf;3 Liegestützen oder Situps nach jedem Wurf:Medibälle, die durch die Beine wie eine 8 geführt werden müssen (5 Durchgänge)
 WerfenOhneAnlauf;Werfen ohne Anlauf,  ggf. auch stoßen;false;false;true;false;Alle werfbaren Gegenstände, Maßband, Hütchen, (Medibälle);15;15;;Wurf;3 Liegestützen oder Situps nach jedem Wurf:Medibälle, die durch die Beine wie eine 8 geführt werden müssen (5 Durchgänge)
 WerTrifftDieSonne;Wer trifft die Sonne;false;false;true;true;;10;10;;Wurf;
-WerTrifftRollendenBall;Wer trifft den rollenden Ball;false;false;true;false;Bälle, großer Ball;15;15;;Schnelligkeit:Schnelllaufen:Wurf;Zwei Kinder stehen sich immer gegenüber. Immer wenn ein Ball daneben geht machen beide Kinder 3 Liegestützen
+WerTrifftRollendenBall;Wer trifft den rollenden Ball;false;false;true;false;Bälle, großer Ball;15;15;;Schnelligkeit:Wurf;Zwei Kinder stehen sich immer gegenüber. Immer wenn ein Ball daneben geht machen beide Kinder 3 Liegestützen
 Zeitschätzlauf;Zeitschätzlauf;true;false;false;true;Hütchen;10;15;2-3 Runden;Ausdauer;
-ZweiRundenRollbrett;2 Runden mit Rollbrett;false;false;false;true;Rollbretter;10;10;1 mal;Hochsprung:HochsprungOhneAnlage:Schnelligkeit:Schnelllaufen:Staffellauf:Überlaufen:Wurf;Immer ein Kind sitzt drauf und das andere zieht
+ZweiRundenRollbrett;2 Runden mit Rollbrett;false;false;false;true;Rollbretter;10;10;1 mal;Hochsprung:HochsprungOhneAnlage:Schnelligkeit:Staffellauf:Überlaufen:Wurf;Immer ein Kind sitzt drauf und das andere zieht
