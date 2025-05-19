@@ -6,6 +6,7 @@ document.addEventListener('DOMContentLoaded', function() {
           version: TrainingPlan.version,
           disciplines: TrainingPlan.getAllDisciplines(),
           selectedExercise: undefined, 
+          exerciseListFilter: "",
           // selectedExercise: Exercises.find( (exercise) => exercise.id==='AnhängerAbhängerStaffelHürde'),
         };
         view.finishUi(uiModel);
@@ -26,11 +27,17 @@ const view = {
   // fill the exercise list with the exercises from the model
   fillExerciseList() {
     let exerciseList = document.getElementById("exercise-list");
+    // clear the list, keeping the header
+    let children = Array.from(exerciseList.children);
+    for (let i = 1; i< children.length; i++) {
+      exerciseList.removeChild(children[i]);
+    }
+
     Exercises.forEach( (exercise) => {
       // skip the "Auslaufen" exercise, it is always the last one
-      if (!exercise.sticky) {
+      if (!exercise.sticky && exercise.name.startsWith(this.model.exerciseListFilter)) {
         let item = document.createElement("li");
-        item.classList.add("collection-item");
+        item.classList.add("collection-item", "left-align");
         let anchor = document.createElement("a");
         anchor.classList.add("red-text");
         anchor.innerHTML = exercise.name; // + " (" + exercise.id + ")";
@@ -114,6 +121,7 @@ const view = {
     M.FormSelect.init(document.getElementById("exercise-disciplines"));
     M.FormSelect.init(document.getElementById("exercise-phases"));
   },
+
   // update the version number in the footer of the page and enable the edit button if the version supports editing
   updateVersion() {
     let versionElement = document.getElementById("version");
@@ -123,10 +131,20 @@ const view = {
 
 const controller = {
     registerEventHandlers() {
+      document.getElementById("exercise-filter").addEventListener("input", this.onExcerciseFilterChanged);
+      document.getElementById("exercise-duration-min").addEventListener("change", this.checkExerciseDuration);
+      document.getElementById("exercise-duration-max").addEventListener("change", this.checkExerciseDuration);
+      document.getElementById("exercise-edit").addEventListener("change", this.checkExerciseEditForm);
+      document.getElementById("save-exercise").addEventListener("submit", this.onSaveExercise);
       // initialize the static select elements
       M.FormSelect.init(document.querySelectorAll('select'));
       // initialize the dynamic select elements
       M.FormSelect.init(document.getElementById("exercise-disciplines"));
+    },
+
+    onExcerciseFilterChanged(event) {
+      view.model.exerciseListFilter = event.target.value;
+      view.fillExerciseList();
     },
 
     onExerciseSelected(exerciseId) {
@@ -134,4 +152,35 @@ const controller = {
       view.model.selectedExercise = exercise;
       view.updateExerciseForm();
     },
+
+    checkExerciseDuration(event) {
+      let min = document.getElementById("exercise-duration-min");
+      let max = document.getElementById("exercise-duration-max");
+      if (min.value > max.value) {
+        event.target.setCustomValidity("Die minimale Dauer muss kleiner sein als die maximale Dauer.");
+      } else {
+        event.target.setCustomValidity("");
+      }
+    },
+
+    checkExerciseEditForm(event) {
+      let phases = document.getElementById("exercise-phases");
+      let helper = document.getElementById("exercise-phases-helper"); 
+      if(phases.value === "") {
+        helper.classList.add("red-text");
+      } else {
+        helper.classList.remove("red-text");
+      } 
+      let disciplines = document.getElementById("exercise-disciplines");
+      helper = document.getElementById("exercise-disciplines-helper");
+      if(disciplines.value === "") {
+        helper.classList.add("red-text");
+      } else {
+        helper.classList.remove("red-text");
+      }
+    },
+
+    onSaveExercise(event) { 
+      console.log("onSaveExercise");
+    }
 }

@@ -30,63 +30,69 @@
       <div class="section">
         <h4 class="card-panel red darken-1 center">Übungen bearbeiten</h4>
       </div>
-      <div class="row center">
+      <div class="row">
         <div class="col s4">
           <ul class="collection with-header" id="exercise-list">
-            <li class="collection-header"><h6>Wähle die Übung aus:</h6></li>
+            <li class="collection-header"><h6>Wähle die Übung aus:</h6>
+            <form class="col s12" id="exercise-list-form">
+                <div class="input-field col s12">
+                  <i class="material-icons prefix">search</i>
+                  <input id="exercise-filter" type="text" class="validate"/>
+                </div>
+            </form>
+            </li>
             <!-- wird mittels JavaScript gefüllt-->
           </ul>
         </div>
         <div class="col s8">
-          <form class="col s12">
+          <form id="exercise-edit" class="col s12">
             <div class="row">
               <div class="input-field col s12">
-                <input disabled id="exercise-id" type="text" class="validate"/>
+                <input id="exercise-id" type="text" class="validate" disabled required/>
                 <label for="exercise-id">Übung </label>
               </div>
             </div>
             <div class="row">
               <div class="input-field col s12">
-                <input id="exercise-name" type="text" class="validate"/>
+                <input id="exercise-name" type="text" maxlength="255" />
                 <label for="exercise-name">Name</label>
               </div>
             </div>
-            <div  class="row"> <!-- phases -->
+            <div  class="row">
               <div class="input-field col s12">
                 <select id="exercise-phases" multiple>
-                  <!-- <option value="" disabled selected>Phase(n) auswählen</option> -->
                   <option value="warmup">Aufwärmen</option>
                   <option value="runabc">Lauf ABC</option>
                   <option value="mainex">Hauptteil</option>
                   <option value="ending">Schluss</option>
                 </select>
                 <label for="exercise-phases">Geeignet für Phase(n):</label>
-                <span class="helper-text">Markiere die Phasen, für die die Übung sich eignet</span>
+                <span id="exercise-phases-helper" class="helper-text">Markiere mindestens eine Phase</span>
               </div>
             </div>
-            <div class="row"> <!-- suitable for disciplines -->
+            <div class="row">
               <div class="input-field col s12">
                 <select id="exercise-disciplines" multiple>
                   <!-- wird mittels JavaScript gefüllt-->
                 </select>
-                <label for="exercise-phases">Geeignet für Disziplinen:</label>
-                <span class="helper-text">Markiere die Disziplinen, für die die Übung sich eignet</span>
+                <label for="exercise-disciplines">Geeignet für Disziplinen:</label>
+                <span id="exercise-disciplines-helper" class="helper-text">Markiere mindestens eine Disziplin</span>
               </div>
             </div>
-            <div class="row"> <!-- material-->
+            <div class="row">
               <div class="input-field col s12">
                 <input id="exercise-material" type="text" class="validate">
                 <label for="exercise-material">Material</label>
               </div>
             </div>
-            <div class="row"> <!-- duration min and mix-->
+            <div class="row">
               <div class="input-field col s4">
-                <input id="exercise-duration-min" type="number" class="validate">
+                <input id="exercise-duration-min" type="number" min="5" max="30" class="validate" required>
                 <label for="exercise-duration-min">Dauer von</label>
                 <span class="helper-text">in Minuten</span>
               </div>
                <div class="input-field col s4">
-                <input id="exercise-duration-max" type="number" class="validate">
+                <input id="exercise-duration-max" type="number" min="5" max="30" class="validate" required>
                 <label for="exercise-duration-max">bis</label>
                 <span class="helper-text">in Minuten</span>
               </div>
