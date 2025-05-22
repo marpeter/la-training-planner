@@ -10,3 +10,20 @@
     background-color: #e51c23 !important; /* materialize-red*/
     border: 2px solid #e51c23 !important;
 }
+
+/* label focus color */
+input[type=text]:focus + label, input[type=number]:focus + label, textarea:focus + label, select:focus + label {
+  color: #000 !important;
+}
+
+/* input field underline color */
+.input-field input.valid[type=text], input.valid[type=number], textarea.valid {
+  border-bottom: 1px solid #9e9e9e !important;
+  box-shadow: 0 1px 0 0 #9e9e9e !important;
+}
+
+/* input field underline focus color */
+.input-field input[type=text]:focus, input[type=number]:focus, textarea:focus {
+  border-bottom: 1px solid #000 !important;
+  box-shadow: 0 1px 0 0 #000 !important;
+}

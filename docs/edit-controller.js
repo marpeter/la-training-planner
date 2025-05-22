@@ -7,7 +7,6 @@ document.addEventListener('DOMContentLoaded', function() {
           disciplines: TrainingPlan.getAllDisciplines(),
           selectedExercise: undefined, 
           exerciseListFilter: "",
-          // selectedExercise: Exercises.find( (exercise) => exercise.id==='AnhängerAbhängerStaffelHürde'),
         };
         view.finishUi(uiModel);
         controller.registerEventHandlers();    
@@ -41,7 +40,7 @@ const view = {
         let anchor = document.createElement("a");
         anchor.classList.add("red-text");
         anchor.innerHTML = exercise.name; // + " (" + exercise.id + ")";
-        anchor.setAttribute("href", "#");
+        anchor.setAttribute("href", "#!");
         anchor.setAttribute("data-id", exercise.id);
         anchor.onclick = () => controller.onExerciseSelected(exercise.id);
         item.appendChild(anchor);
@@ -135,7 +134,7 @@ const controller = {
       document.getElementById("exercise-duration-min").addEventListener("change", this.checkExerciseDuration);
       document.getElementById("exercise-duration-max").addEventListener("change", this.checkExerciseDuration);
       document.getElementById("exercise-edit").addEventListener("change", this.checkExerciseEditForm);
-      document.getElementById("save-exercise").addEventListener("submit", this.onSaveExercise);
+      document.getElementById("save-exercise").addEventListener("click", this.onSaveExercise);
       // initialize the static select elements
       M.FormSelect.init(document.querySelectorAll('select'));
       // initialize the dynamic select elements
@@ -156,18 +155,23 @@ const controller = {
     checkExerciseDuration(event) {
       let min = document.getElementById("exercise-duration-min");
       let max = document.getElementById("exercise-duration-max");
+      console.log("checkExerciseDuration: " + min.value + " - " + max.value);
       if (min.value > max.value) {
-        event.target.setCustomValidity("Die minimale Dauer muss kleiner sein als die maximale Dauer.");
+        min.setCustomValidity("Die minimale Dauer muss kleiner sein als die maximale Dauer.");
+        return false;
       } else {
-        event.target.setCustomValidity("");
+        min.setCustomValidity("");
+        return true;
       }
     },
 
     checkExerciseEditForm(event) {
+      let okay = true;
       let phases = document.getElementById("exercise-phases");
       let helper = document.getElementById("exercise-phases-helper"); 
       if(phases.value === "") {
         helper.classList.add("red-text");
+        okay = false;
       } else {
         helper.classList.remove("red-text");
       } 
@@ -175,12 +179,22 @@ const controller = {
       helper = document.getElementById("exercise-disciplines-helper");
       if(disciplines.value === "") {
         helper.classList.add("red-text");
+        okay = false;
       } else {
         helper.classList.remove("red-text");
       }
+      return okay;
     },
 
     onSaveExercise(event) { 
-      console.log("onSaveExercise");
+      let okay = document.forms["exercise-edit"].checkValidity() &&
+                 controller.checkExerciseDuration(event) &&
+                 controller.checkExerciseEditForm(event);
+      console.log("onSaveExercise: " + okay);
+      if(!okay) {
+        M.toast({html: "Bitte fülle alle Felder korrekt aus.", classes: "red accent-3 rounded"});
+      } else {
+        // TODO: save the exercise
+      }
     }
 }
