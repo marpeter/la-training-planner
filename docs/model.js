@@ -25,9 +25,9 @@ class TrainingPlan {
     this.suitable = { warmup: [], mainex: [], ending: [], runabc: [] };
   }
 
-  static async loadData() {
+  static async loadData(pathPrefix="") {
     // Determine the version of the database, including the data loader function implementations
-    this.version = await dbVersion();
+    this.version = await dbVersion(pathPrefix);
     console.log("Version info: " + JSON.stringify(this.version));
 
     // Load the Disciplines from the CSV file or the database

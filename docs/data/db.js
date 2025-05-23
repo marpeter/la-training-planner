@@ -48,17 +48,17 @@ async function dbVersion(pathPrefix="") {
       version.supportsFavorites = convertIfBoolean(version.supportsFavorites);
       version.supportsEditing   = convertIfBoolean(version.supportsEditing);
       version.supportsDownload   = true;
-      version.disciplineLoader = loadFromDbTable.bind(null,"disciplines");
-      version.exerciseLoader   = loadFromDbTable.bind(null,"exercises");
-      version.favoritesLoader  = loadFromDbTable.bind(null,"favorites");
+      version.disciplineLoader = loadFromDbTable.bind(null,pathPrefix,"disciplines");
+      version.exerciseLoader   = loadFromDbTable.bind(null,pathPrefix,"exercises");
+      version.favoritesLoader  = loadFromDbTable.bind(null,pathPrefix,"favorites");
     } else {
       version.number = version.number + " (mit PHP Backend, aber noch ohne Datenbank)";
       version.supportsFavorites = false;
       version.supportsEditing   = false;
       version.supportsDownload   = false;
-      version.disciplineLoader = loadDisciplinesFromCSV;
-      version.exerciseLoader = loadExercisesFromCsv;
-      version.favoritesLoader = loadFavoritesFromCsv;
+      version.disciplineLoader = loadDisciplinesFromCSV.bind(null,pathPrefix);
+      version.exerciseLoader = loadExercisesFromCsv.bind(null,pathPrefix);
+      version.favoritesLoader = loadFavoritesFromCsv.bind(null,pathPrefix);
     }
   } catch (error) {
     console.error("Error loading version from DB: " + error + " --> assuming there is no PHP/DB backend.");
@@ -67,16 +67,16 @@ async function dbVersion(pathPrefix="") {
       supportsFavorites: false,
       supportsEditing:   false,
       supportsDownload:  false,
-      disciplineLoader:  loadDisciplinesFromCSV,
-      exerciseLoader:    loadExercisesFromCsv,
-      favoritesLoader:   loadFavoritesFromCsv,
+      disciplineLoader:  loadDisciplinesFromCSV.bind(null,pathPrefix),
+      exerciseLoader:    loadExercisesFromCsv.bind(null,pathPrefix),
+      favoritesLoader:   loadFavoritesFromCsv.bind(null,pathPrefix),
     };
   }
   return version;
 }
 
-async function loadFromDbTable(table) {
-  return fetch(`data/db_read_${table}.php`).then( (response) => {
+async function loadFromDbTable(pathPrefix,table) {
+  return fetch(`${pathPrefix}data/db_read_${table}.php`).then( (response) => {
     if(!response.ok) throw new Error(`HTTP error: ${response.status}`);
     return response.json();
   }).catch( (error) => {
@@ -84,9 +84,9 @@ async function loadFromDbTable(table) {
   });
 }
 
-async function loadExercisesFromCsv() {
+async function loadExercisesFromCsv(pathPrefix) {
   try {
-    let csv = await fetch('data/Exercises.csv').then( (response) => {
+    let csv = await fetch(pathPrefix + 'data/Exercises.csv').then( (response) => {
       if(!response.ok) throw new Error(`HTTP error accessing db_version.php: ${response.status}`);
       return response.text();
     });
@@ -103,9 +103,9 @@ async function loadExercisesFromCsv() {
   };
 }
 
-async function loadDisciplinesFromCSV() {
+async function loadDisciplinesFromCSV(pathPrefix) {
   try {
-    let csv = await fetch('data/Disciplines.csv').then( (response) => {
+    let csv = await fetch(pathPrefix + 'data/Disciplines.csv').then( (response) => {
       if(!response.ok) throw new Error(`HTTP error accessing db_version.php: ${response.status}`);
       return response.text();
     });
@@ -116,9 +116,9 @@ async function loadDisciplinesFromCSV() {
   };
 }
 
-async function loadFavoritesFromCsv() {
+async function loadFavoritesFromCsv(pathPrefix) {
   try {
-    let csv = await fetch('data/Favorites.csv').then( (response) => {
+    let csv = await fetch(pathPrefix + 'data/Favorites.csv').then( (response) => {
       if(!response.ok) throw new Error(`HTTP error accessing db_version.php: ${response.status}`);
       return response.text();
     });

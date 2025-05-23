@@ -1,7 +1,7 @@
-import { TrainingPlan, Exercises } from "./model.js";
+import { TrainingPlan, Exercises } from "../model.js";
 
 document.addEventListener('DOMContentLoaded', function() {
-    TrainingPlan.loadData().then( (result) => {
+    TrainingPlan.loadData("../").then( (result) => {
         let uiModel = {
           version: TrainingPlan.version,
           disciplines: TrainingPlan.getAllDisciplines(),
