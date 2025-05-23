@@ -1,5 +1,6 @@
 <?php
-
+  namespace LaPlanner;
+  
   function loadExercises($data, &$messages) {
 
     $headerFields = array('id','name','warmup','runabc','mainex','ending','material','durationmin','durationmax','repeats','disciplines[]','details[]');

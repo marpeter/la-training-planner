@@ -1,3 +1,11 @@
+<?php
+  namespace LaPlanner;
+
+  include('db_connect.php');
+  include('db_load_disciplines.php');
+  include('db_load_exercises.php');
+  include('db_load_favorites.php');
+?>
 <!DOCTYPE html>
 <html>
   <head>
@@ -24,11 +32,6 @@
         </div>
       </nav>
 <?php
-
-  include('db_connect.php');
-  include('db_load_disciplines.php');
-  include('db_load_exercises.php');
-  include('db_load_favorites.php');
  
   $messages = [];
   $uploadedFiles = 0;
@@ -118,8 +121,8 @@
         </div>
       </div>
       <div class="row center">
-        <div class="col s6"><a class="red-text" href="../index.html">Zurück zur Trainingsplaner-Seite</a></div>
-        <div class="col s6"><a class="red-text" href="../admin.html">Zurück zur Admin-Seite</a></div>
+        <div class="col s6"><a class="red-text" href="../">Zurück zur Trainingsplaner-Seite</a></div>
+        <div class="col s6"><a class="red-text" href="../admin/">Zurück zur Admin-Seite</a></div>
       </div>
     </div>
     <footer class="section">

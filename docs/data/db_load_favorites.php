@@ -1,5 +1,6 @@
 <?php
-
+  namespace LaPlanner;
+  
   function loadFavorites($data, &$messages) {
 
     // first check the header data of the favorites

@@ -1,4 +1,5 @@
 <?php
+  namespace LaPlanner;
 
   function explode_line($line, $separator=',') {
     $data = explode($separator,$line);

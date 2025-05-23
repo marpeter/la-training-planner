@@ -31,18 +31,18 @@
         <div class="col s12">Download der Daten aus der Datenbank:</div>
       </div> 
       <div class="row">
-        <div class="col s6"> <a id="downloadDisciplinesBtn" href="./data/db_read_disciplines.php?format=csv" class="btn center red disabled">Disziplinen</a></div>
-        <div class="col s6"> <a id="downloadExercisesBtn" href="./data/db_read_exercises.php?format=csv" class="btn center red disabled">Übungen</a></div>
+        <div class="col s6"> <a id="downloadDisciplinesBtn" href="../data/db_read_disciplines.php?format=csv" class="btn center red disabled">Disziplinen</a></div>
+        <div class="col s6"> <a id="downloadExercisesBtn" href="../data/db_read_exercises.php?format=csv" class="btn center red disabled">Übungen</a></div>
       </div>
       <div class="row">
-        <div class="col s12"> <a id="downloadFavoritesBtn" href="./data/db_read_favorites.php?format=csv" class="btn center red disabled">Gespeicherte Pläne (Favoriten)</a></div> 
+        <div class="col s12"> <a id="downloadFavoritesBtn" href="../data/db_read_favorites.php?format=csv" class="btn center red disabled">Gespeicherte Pläne (Favoriten)</a></div> 
       </div>
       <div class="divider"></div>
       <div class="row">
         <div class="col s12">Upload von Daten in die Datenbank:
         <div class="card-panel red center">Achtung! Dies ersetzt die bereits in der Datenbank gespeicherten Daten vollständig!</div></div>
       </div>
-      <form name="uploadForm" enctype="multipart/form-data" method="POST" action="data/db_upload.php">
+      <form name="uploadForm" enctype="multipart/form-data" method="POST" action="../data/db_upload.php">
         <div class="row">
           <div class="col s6">
             <label>Wähle eine CSV-Datei mit der Liste der Disziplinen:
