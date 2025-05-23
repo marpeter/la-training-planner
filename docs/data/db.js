@@ -36,9 +36,9 @@ function convertIfBoolean(value) {
   } 
 }
 
-async function dbVersion() {
+async function dbVersion(pathPrefix="") {
   try {
-    version = await fetch("data/db_version.php").then( (response) => {
+    version = await fetch(pathPrefix + "data/db_version.php").then( (response) => {
       if(!response.ok) throw new Error(`HTTP error accessing db_version.php: ${response.status}`);
       return response.json();
     });
