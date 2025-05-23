@@ -20,7 +20,6 @@ document.addEventListener('DOMContentLoaded', function() {
   // update the version number in the footer of the page and enable the edit button if the version supports editing
   updateVersion() {
     let versionElement = document.getElementById("version");
-    console.log("Version: " + JSON.stringify(this.model.version));
     versionElement.innerHTML = this.model.version.number;
     if(this.model.version.supportsDownload) {
       [ "downloadDisciplinesBtn", "downloadExercisesBtn", "downloadFavoritesBtn", "uploadDataBtn" ].forEach( (element) => {

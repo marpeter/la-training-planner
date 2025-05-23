@@ -85,50 +85,41 @@ async function loadFromDbTable(pathPrefix,table) {
 }
 
 async function loadExercisesFromCsv(pathPrefix) {
-  try {
-    let csv = await fetch(pathPrefix + 'data/Exercises.csv').then( (response) => {
-      if(!response.ok) throw new Error(`HTTP error accessing db_version.php: ${response.status}`);
-      return response.text();
-    });
-    let exercises = convertCsv(csv, /;/);
-    exercises.forEach( (exercise) => {
-      exercise.durationmin = parseInt(exercise.durationmin);
-      exercise.durationmax = parseInt(exercise.durationmax);
-    } );
-    // Add the "Auslaufen" exercise. It's not in the CSV to prevent it from being modified by mistake
-    exercises.push({ id: "Auslaufen", name: "Auslaufen", warmup: false, runabc: false, mainex: false, ending: false, material: "", durationmin: 5, durationmax: 5, repeats: "2 Runden", disciplines: [], details: []});
-    return exercises;  
-  } catch(error) {
-    alert(error);
-  };
-}
+  let csv = await loadCsvFile(pathPrefix + 'data/Exercises.csv');
+  let exercises = convertCsv(csv, /;/);
+  exercises.forEach( (exercise) => {
+    exercise.durationmin = parseInt(exercise.durationmin);
+    exercise.durationmax = parseInt(exercise.durationmax);
+  } );
+  // Add the "Auslaufen" exercise. It's not in the CSV to prevent it from being modified by mistake
+  exercises.push({ id: "Auslaufen", name: "Auslaufen", warmup: false, runabc: false, mainex: false, ending: false, material: "", durationmin: 5, durationmax: 5, repeats: "2 Runden", disciplines: [], details: []});
+  return exercises;  
+};
 
 async function loadDisciplinesFromCSV(pathPrefix) {
-  try {
-    let csv = await fetch(pathPrefix + 'data/Disciplines.csv').then( (response) => {
-      if(!response.ok) throw new Error(`HTTP error accessing db_version.php: ${response.status}`);
-      return response.text();
-    });
-    let disciplines = convertCsv(csv);
-    return disciplines;  
-  } catch(error) {
-    alert(error);
-  };
+  let csv = await loadCsvFile(pathPrefix + 'data/Disciplines.csv');
+  let disciplines = convertCsv(csv);
+  return disciplines;  
 }
 
 async function loadFavoritesFromCsv(pathPrefix) {
+  let csv = await loadCsvFile(pathPrefix + 'data/Favorites.csv');
+  let parts = csv.split(/\r?\n\r?\n/); // split on double newlines = empty lines
+  let headers = convertCsv(parts[0]);
+  let exerciseMap = convertCsv(parts[1]);
+  return {headers, exerciseMap};  
+}
+
+async function loadCsvFile(fileName) {
   try {
-    let csv = await fetch(pathPrefix + 'data/Favorites.csv').then( (response) => {
-      if(!response.ok) throw new Error(`HTTP error accessing db_version.php: ${response.status}`);
+    let csv = await fetch(fileName).then( (response) => {
+      if(!response.ok) throw new Error(`HTTP error accessing ${fileName}: ${response.status}`);
       return response.text();
     });
-    let parts = csv.split(/\r?\n\r?\n/); // split on double newlines = empty lines
-    let headers = convertCsv(parts[0]);
-    let exerciseMap = convertCsv(parts[1]);
-    return {headers, exerciseMap};  
+    return csv;  
   } catch(error) {
     alert(error);
-  };
+  };  
 }
 
 export { dbVersion };
