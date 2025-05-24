@@ -1,38 +1,40 @@
 <?php
   namespace LaPlanner;
   
-  $error = "";
   include('db_connect.php');
-  
-  $dbConnection = connectDB();
-  
-  $sql = "SELECT id, name, image FROM DISCIPLINES";
-  $result = $dbConnection->query($sql);
-  if($result->num_rows > 0) {
-      $data = $result->fetch_all(MYSQLI_ASSOC);
-  } else {
-      $data = [];
+
+  class DisciplineReader extends AbstractTableReader {
+      protected $tableNames = ['DISCIPLINES'];
+      protected function convert() {
+        return json_encode($this->data['DISCIPLINES']);
+      }
   }
-  $dbConnection->close();
-  
-  if(isset($_GET['format']) && $_GET['format'] == 'csv') {
+
+  class DisciplineReaderCSV extends DisciplineReader {
+
+    use TableReaderCSV;
+
+    protected function setHeader() {
       header('Content-Type: text/csv');
       header('Content-Disposition: attachment; filename="Disciplines.csv"');
-      echo "Id,Name,Image\n";
-      $handle = fopen('php://temp', 'r+');
-      $delimiter = ',';
-      $enclosure = '"';
-      foreach ($data as $line) {
-          fputcsv($handle, $line, $delimiter, $enclosure);
+    }
+
+    public function convert() {
+      foreach($this->data['DISCIPLINES'] as &$discipline) {
+        unset($discipline['created_at']);
       }
-      rewind($handle);
-      while (!feof($handle)) {
-          $contents .= fread($handle, 8192);
-      }
-      fclose($handle);
-      echo $contents;
-  } else {        
-      header('Content-Type: application/json');
-      echo json_encode($data);
+      $csv_header = array_keys($this->data['DISCIPLINES'][0]);
+      $contents = implode(",", $csv_header) . "\n";
+      $contents .= $this->convertToCsv($this->data['DISCIPLINES']);
+      return $contents;
+    }
+  }
+
+  if(isset($_GET['format']) && $_GET['format'] == 'csv') {
+    $reader = new DisciplineReaderCSV();
+    $reader->echo();
+  } else {
+    $reader = new DisciplineReader();
+    $reader->echo();
   }
 ?>

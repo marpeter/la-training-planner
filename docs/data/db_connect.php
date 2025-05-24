@@ -51,4 +51,50 @@
     }
   }
 
+  abstract class AbstractTableReader {
+    protected $tableNames = [];
+    protected $data = null;
+
+    protected function readFromDb() {
+      $dbConnection = connectDB();
+      foreach ($this->tableNames as $tableName) {
+        $sql = "SELECT * FROM $tableName";
+        $result = $dbConnection->query($sql);
+        if ($result->num_rows > 0) {
+          $this->data[$tableName] = $result->fetch_all(MYSQLI_ASSOC);
+        } else {
+          $this->data[$tableName] =  [];
+        }
+      }
+      $dbConnection->close();
+    }
+    protected function setHeader() {
+      header('Content-Type: application/json');
+    }
+    abstract protected function convert();
+
+    public function echo() {
+      $this->readFromDb();
+      $this->setHeader();
+      echo $this->convert();
+    }
+  }
+
+  trait TableReaderCSV {
+    public function convertToCsv($data,$separator = ',') {
+      $handle = fopen('php://temp', 'r+');
+      foreach($data as $line) {
+        fputcsv($handle, $line, $separator, '"');
+      }
+      rewind($handle);
+      $contents = '';
+      while (!feof($handle)) {
+          $contents .= fread($handle, 8192);
+      }
+      fclose($handle);
+      return $contents;
+    }
+
+  }
+
 ?>

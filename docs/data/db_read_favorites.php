@@ -1,94 +1,61 @@
 <?php
   namespace LaPlanner;
 
-  $error = "";
   include('db_connect.php');
+     
+  class FavoriteReader extends AbstractTableReader {
+      protected $tableNames = ['FAVORITE_HEADERS', 'FAVORITE_DISCIPLINES', 'FAVORITE_EXERCISES'];
 
-  $dbConnection = connectDB();
-
-  $sql = "SELECT * FROM FAVORITE_HEADERS";
-  $result = $dbConnection->query($sql);
-  if($result->num_rows > 0) {
-      $favorites = $result->fetch_all(MYSQLI_ASSOC);
-  } else {
-      $favorites = [];
+      protected function convert() {
+          foreach ($this->data['FAVORITE_HEADERS'] as &$favorite) {
+              $favorite['disciplines'] = [];
+              foreach ($this->data['FAVORITE_DISCIPLINES'] as $favoriteDiscipline) {
+                  if ($favorite['id'] == $favoriteDiscipline['favorite_id']) {
+                      $favorite['disciplines'][] = $favoriteDiscipline['discipline_id'];
+                  }
+              }
+          }
+          return json_encode(['headers' => $this->data['FAVORITE_HEADERS'], 'exerciseMap' => $this->data['FAVORITE_EXERCISES']]);
+      }
   }
 
-  $sql = "SELECT * FROM FAVORITE_DISCIPLINES";
-  $result = $dbConnection->query($sql);
-  if($result->num_rows > 0) {
-      $favoritesDisciplines = $result->fetch_all(MYSQLI_ASSOC);
-  } else {
-      $favoritesDisciplines = [];
+class FavoriteReaderCSV extends FavoriteReader {
+    use TableReaderCSV;
+
+    protected function setHeader() {
+        header('Content-Type: text/csv');
+        header('Content-Disposition: attachment; filename="Favorites.csv"');
+    }
+
+    public function convert() {
+        foreach ($this->data['FAVORITE_HEADERS'] as &$favorite) {
+            $favorite['Disciplines[]'] = array();
+            foreach ($this->data['FAVORITE_DISCIPLINES'] as $favoriteDiscipline) {
+                if ($favorite['id'] == $favoriteDiscipline['favorite_id']) {
+                    $favorite['Disciplines[]'][] = $favoriteDiscipline['discipline_id'];
+                }
+            }
+            $favorite['Disciplines[]'] = implode(":", $favorite['Disciplines[]']);
+            //unset($favorite['created_at']);
+        }
+        $csv_header = array_keys($this->data['FAVORITE_HEADERS'][0]);
+        $contents = implode(",", $csv_header) . "\n";
+        $contents .= $this->convertToCsv($this->data['FAVORITE_HEADERS']);
+        $contents .= "\n";
+        $csv_header = array_keys($this->data['FAVORITE_EXERCISES'][0]);
+        $contents .= implode(",", $csv_header) . "\n";
+        $contents .= $this->convertToCsv($this->data['FAVORITE_EXERCISES']);
+        
+        return $contents;
+    }
   }
- 
-  $sql = "SELECT * FROM FAVORITE_EXERCISES";
-  $result = $dbConnection->query($sql);
-  if($result->num_rows > 0) {
-      $exerciseMap = $result->fetch_all(MYSQLI_ASSOC);
-  } else {
-      $exerciseMap = [];
-  }
-  $dbConnection->close();
  
   if(isset($_GET['format']) && $_GET['format'] == 'csv') {
-      // convert into CSV file as used by the non-php version of the app
-      foreach ($favorites as &$favorite) {
-          $favorite['Disciplines[]'] = array();
-          foreach ($favoritesDisciplines as $favoriteDiscipline) {
-              if ($favorite['id'] == $favoriteDiscipline['favorite_id']) {
-                  $favorite['Disciplines[]'][] = $favoriteDiscipline['discipline_id'];
-              }
-          }
-          $favorite['Disciplines[]'] = implode(":", $favorite['Disciplines[]']);       
-      }
-
-      header('Content-Type: text/csv');
-      header('Content-Disposition: attachment; filename="Favorites.csv"');
-
-      $csv_header = array_keys($favorites[0]);
-      echo implode(",", $csv_header), "\n"; 
-      $handle = fopen('php://temp', 'r+');
-      $delimiter = ',';
-      $enclosure = '"';
-      foreach ($favorites as $line) {
-          fputcsv($handle, $line, $delimiter, $enclosure);
-      }
-      rewind($handle);
-      while (!feof($handle)) {
-          $contents .= fread($handle, 8192);
-      }
-      fclose($handle);
-      echo $contents, "\n";
-      $contents = "";
-
-      $csv_header = array_keys($exerciseMap[0]);
-      echo implode(",", $csv_header), "\n";
-      $handle = fopen('php://temp', 'r+');
-      foreach($exerciseMap as $line) {
-          fputcsv($handle, $line, $delimiter, $enclosure);
-      }
-      rewind($handle);
-      while (!feof($handle)) {
-          $contents .= fread($handle, 8192);
-      }
-      fclose($handle);
-      echo $contents;
-
+        $reader = new FavoriteReaderCSV();
+        $reader->echo();
   } else {
-      // convert into JSON format
-      foreach ($favorites as &$favorite) {
-          $favorite['disciplines'] = [];
-          foreach ($favoritesDisciplines as $favoriteDiscipline) {
-              if ($favorite['id'] == $favoriteDiscipline['favorite_id']) {
-                  $favorite['disciplines'][] = $favoriteDiscipline['discipline_id'];
-              }
-          }
-      }
-
-      $contents = array('headers' => $favorites, 'exerciseMap' => $exerciseMap);
-      header('Content-Type: application/json');
-      echo json_encode($contents);
+        $reader = new FavoriteReader();
+        $reader->echo();
   }
 
 ?>

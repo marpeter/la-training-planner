@@ -49,12 +49,12 @@
                                   'description' => $descr, 'disciplines[]' => $disciplines]) {
       try {
         if(!$stmt_header->execute()) {
-          $messages[] =  'Einfügen der Zeile $id, $created_by, $created_at, $descr ist fehlgeschlagen.';
+          $messages[] =  "Einfügen der Zeile $id, $created_by, $created_at, $descr ist fehlgeschlagen.";
           $rollback = true;
         } else {
           foreach($disciplines as $discipline_id) {
             if(!$stmt_dscplns->execute()) {
-              $messages[] = 'Hinzufügen der Disziplin $discipline_id zu Favorit $id ist fehlgeschlagen.';
+              $messages[] = "Hinzufügen der Disziplin $discipline_id zu Favorit $id ist fehlgeschlagen.";
               $rollback = true;
             }
           }
@@ -74,7 +74,7 @@
                                     'exercise_id' => $exercise_id, 'duration' => $duration]) {
       try {
         if(!$stmt_exmap->execute()) {
-          $messages[] = 'Übung $exercise_id zu Favorit $favorite_id (Phase $phase, Pos. $position, Dauer $duration) ist fehlgeschlagen.';
+          $messages[] = "Übung $exercise_id zu Favorit $favorite_id (Phase $phase, Pos. $position, Dauer $duration) ist fehlgeschlagen.";
           $rollback = true;
         }          
       } catch( mysqli_sql_exception $ex) {

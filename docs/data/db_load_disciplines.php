@@ -13,7 +13,7 @@
       if(str_ends_with($field,'[]')) {
         $fields[$field] = explode(':', trim($values[$fieldMap[$field]]));
       } else {
-        $fields[$field] = trim($values[$fieldMap[$field]]);
+        $fields[$field] = trim($values[$fieldMap[$field]]," \"\n\r\t\v\x00");
       }
     }
     return $fields;
