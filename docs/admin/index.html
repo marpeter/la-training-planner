@@ -27,43 +27,11 @@
       <div class="section">
         <h4 class="card-panel red darken-1 center">Hilfsfunktionen für den LA Trainings-Planer</h4>    
       </div>
-      <div class="row">
-        <div class="col s12">Download der Daten aus der Datenbank:</div>
-      </div> 
-      <div class="row">
-        <div class="col s6"> <a id="downloadDisciplinesBtn" href="db_download.php?entity=Disciplines" class="btn center red disabled">Disziplinen</a></div>
-        <div class="col s6"> <a id="downloadExercisesBtn" href="db_download.php?entity=Exercises" class="btn center red disabled">Übungen</a></div>
+      <div class="center">
+        <p>Hilfs-Funktionen werden nur unterstützt, wenn der Leichtathletik Trainings-Planer mit einer Backend Datenbank installiert ist.</p>
+        <p>Diese Leichtathletik Trainings-Planer Installation ist ohne solches Backend installiert und unterstützt damit keine Hilfsfunktionen.</p>
+        <p><a class="red-text" href="../">Zürück zur Hauptseite des Leichtathletik Trainings-Planers</a>.</p>
       </div>
-      <div class="row">
-        <div class="col s12"> <a id="downloadFavoritesBtn" href="db_download.php?entity=Favorites" class="btn center red disabled">Gespeicherte Pläne (Favoriten)</a></div> 
-      </div>
-      <div class="divider"></div>
-      <div class="row">
-        <div class="col s12">Upload von Daten in die Datenbank:
-        <div class="card-panel red center">Achtung! Dies ersetzt die bereits in der Datenbank gespeicherten Daten vollständig!</div></div>
-      </div>
-      <form name="uploadForm" enctype="multipart/form-data" method="POST" action="db_upload.php">
-        <div class="row">
-          <div class="col s6">
-            <label>Wähle eine CSV-Datei mit der Liste der Disziplinen:
-            <input disabled="disabled" type="file" id="DisciplinesFile" name="DisciplinesFile" accecpt="text/csv,text/plain">
-            </label>
-          </div>
-          <div class="col s6">
-            <label>Wähle eine CSV-Datei mit der Liste der Übungen:
-            <input disabled="disabled" type="file" id="ExercisesFile" name="ExercisesFile" accecpt="text/csv,text/plain">
-            </label>
-          </div>
-        </div>
-        <div class="row">
-          <div class="col s6">
-            <label>Wähle eine CSV-Datei mit der Liste der Favoriten:
-            <input disabled="disabled" type="file" id="FavoritesFile" name="FavoritesFile" accecpt="text/csv,text/plain">
-            </label>
-          </div>
-          <div class="col s6"> <button id="uploadDataBtn" class="btn center red disabled">Daten hochladen</button></div> 
-        </div>
-      </form>
     </div>
     <footer class="section">
       <div class="center grey-text">Version <span id="version">0.13.0</span>,<br/>&copy; 2025 Markus Peter</div>
