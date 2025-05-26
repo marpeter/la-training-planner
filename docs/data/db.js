@@ -76,7 +76,7 @@ async function dbVersion(pathPrefix="") {
 }
 
 async function loadFromDbTable(pathPrefix,table) {
-  return fetch(`${pathPrefix}data/db_read_${table}.php`).then( (response) => {
+  return fetch(`${pathPrefix}data/db_read.php?entity=${table}`).then( (response) => {
     if(!response.ok) throw new Error(`HTTP error: ${response.status}`);
     return response.json();
   }).catch( (error) => {

@@ -1,10 +1,8 @@
 <?php
   namespace LaPlanner;
 
-  include('db_connect.php');
-  include('db_load_disciplines.php');
-  include('db_load_exercises.php');
-  include('db_load_favorites.php');
+  include('../data/db_common.php');
+  include('db_upload_loaders.php');
 ?>
 <!DOCTYPE html>
 <html>
@@ -57,21 +55,23 @@
               fclose($handle);
               switch ($file) {
                 case 'DisciplinesFile':
-                  $uploadedFiles += loadDisciplines($content, $messages);  
+                  $loader = new DisciplineLoader();
                   break;
 
                 case 'ExercisesFile':
-                  $uploadedFiles += loadExercises($content, $messages);
+                  $loader = new ExerciseLoader();
                   break;
 
                 case 'FavoritesFile':
-                  $uploadedFiles += loadFavorites($content, $messages);
+                  $loader = new FavoriteLoader();
                   break;
 
                 default:
                   $messages[] = "Unbekannte Art von Daten {$file} übermittelt.";
+                  $loader = null;
                   break;
               }
+              if($loader!=null) { $uploadedFiles += $loader->load($content, $messages); }
             } else {
               $messages[] = "Die hochgeladene Datei {$data['name']} kann nicht geöffnet werden.";
             }

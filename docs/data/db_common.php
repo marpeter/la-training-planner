@@ -80,7 +80,12 @@
     }
   }
 
-  trait TableReaderCSV {
+  abstract class AbstractTableReaderCSV extends AbstractTableReader {
+    protected $fileName;
+    protected function setHeader() {
+      header('Content-Type: text/csv');
+      header('Content-Disposition: attachment; filename="' . $this->fileName . '"');
+    }
     public function convertToCsv($data,$separator = ',') {
       $handle = fopen('php://temp', 'r+');
       foreach($data as $line) {
@@ -96,5 +101,4 @@
     }
 
   }
-
 ?>
