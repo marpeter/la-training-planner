@@ -3,9 +3,49 @@ import { dbVersion } from "./data/db.js";
 const MAX_ATTEMPTS = 20;
 const TEMP_PLAN_ID = "$TMP";
 
-let Disciplines = {};
-let Exercises = {};
-let Auslaufen = {};
+let Disciplines = [];
+let Exercises = [];
+
+class Exercise {
+  constructor(id, name, disciplines, durationmin=0, durationmax=0, warmup=false, runabc=false, mainex=false, ending=false,
+     repeats='', material='', details='') {
+    this.id = id;
+    this.name = name;
+    this.disciplines = disciplines;
+    this.durationmin = durationmin;
+    this.durationmax = durationmax;
+    this.repeats = repeats;
+    this.material = material;
+    this.details = details;
+    this.warmup = warmup;
+    this.runabc = runabc;
+    this.mainex = mainex;
+    this.ending = ending;
+    this.duration = durationmin; // default to minimum duration
+  }
+
+  static Auslaufen = undefined;
+
+  static buildArray(rawData) {
+    rawData.forEach( (exercise) => {
+      let newExercise = new Exercise(exercise.id, exercise.name, exercise.disciplines, exercise.durationmin, exercise.durationmax,
+        exercise.warmup, exercise.runabc, exercise.mainex, exercise.ending, exercise.repeats, exercise.material, exercise.details);
+      Exercises.push(newExercise);
+      if(newExercise.id==='Auslaufen') {
+        newExercise.duration = 5; // Auslaufen always has a fixed duration of 5 minutes
+        newExercise.sticky = true; // Auslaufen is a sticky exercise, always at the end of the plan
+        Exercise.Auslaufen = newExercise;
+      }
+    });
+    Exercises.sort( (a,b) => a.name.localeCompare(b.name) );
+  }
+
+  static getAll() {
+    return Exercises;
+  }
+}
+
+
 class TrainingPlan {
 
   static messages = [];
@@ -33,12 +73,7 @@ class TrainingPlan {
     // Load the Disciplines from the CSV file or the database
     Disciplines = await this.version.disciplineLoader();
     // Load the Exercises from the CSV or the database
-    Exercises = await this.version.exerciseLoader();
-    Exercises.sort( (a,b) => a.name.localeCompare(b.name) );
-    // Make the "Auslaufen" exercise "sticky" so that it always remains the last
-    Auslaufen = Exercises.find( (exercise) => exercise.id==='Auslaufen');
-    Auslaufen.duration = 5;
-    Auslaufen.sticky = true;
+    Exercise.buildArray(await this.version.exerciseLoader());
 
     // Load the favorites from the CSV file or the database
     this.favorites = [];
@@ -104,7 +139,7 @@ class TrainingPlan {
                       plan.suitable.runabc.at(Math.floor(Math.random()*plan.suitable.runabc.length)) ];
       // pick a random ending and add the standard Auslaufen
       plan.ending = [ plan.suitable.ending.at(Math.floor(Math.random()*plan.suitable.ending.length)),
-                      Auslaufen ];
+                      Exercise.Auslaufen ];
       // pick main exercises until the target duration is reached or exceeded.
       plan.mainex = [];
       let minDuration = 0;
@@ -186,4 +221,4 @@ const minAdder = adder.bind(null, "durationmin");
 const maxAdder = adder.bind(null, "durationmax");
 const durationAdder = adder.bind(null, "duration");
 
-export { TrainingPlan, Exercises };
+export { TrainingPlan, Exercise };

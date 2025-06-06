@@ -1,4 +1,4 @@
-import { TrainingPlan, Exercises } from "../model.js";
+import { TrainingPlan, Exercise } from "../model.js";
 
 document.addEventListener('DOMContentLoaded', function() {
     TrainingPlan.loadData("../").then( (result) => {
@@ -32,7 +32,7 @@ const view = {
       exerciseList.removeChild(children[i]);
     }
 
-    Exercises.forEach( (exercise) => {
+    Exercise.getAll().forEach( (exercise) => {
       // skip the "Auslaufen" exercise, it is always the last one
       if (!exercise.sticky && exercise.name.startsWith(this.model.exerciseListFilter)) {
         let item = document.createElement("li");
@@ -112,8 +112,8 @@ const view = {
       exerciseDetails.disabled = false;
       if(this.model.version.supportsEditing) {
         document.getElementById("save-exercise").classList.remove("disabled");
-        document.getElementById("copy-exercise").classList.remove("disabled");
-        document.getElementById("delete-exercise").classList.remove("disabled");
+        // document.getElementById("copy-exercise").classList.remove("disabled");
+        // document.getElementById("delete-exercise").classList.remove("disabled");
       }
     }
     M.updateTextFields();
@@ -135,6 +135,7 @@ const controller = {
       document.getElementById("exercise-duration-max").addEventListener("change", this.checkExerciseDuration);
       document.getElementById("exercise-edit").addEventListener("change", this.checkExerciseEditForm);
       document.getElementById("save-exercise").addEventListener("click", this.onSaveExercise);
+      document.getElementById("save-exercise").addEventListener("click", this.onDeleteExercise);
       // initialize the static select elements
       M.FormSelect.init(document.querySelectorAll('select'));
       // initialize the dynamic select elements
@@ -155,7 +156,6 @@ const controller = {
     checkExerciseDuration(event) {
       let min = document.getElementById("exercise-duration-min");
       let max = document.getElementById("exercise-duration-max");
-      console.log("checkExerciseDuration: " + min.value + " - " + max.value);
       if (min.value > max.value) {
         min.setCustomValidity("Die minimale Dauer muss kleiner sein als die maximale Dauer.");
         return false;
@@ -190,11 +190,56 @@ const controller = {
       let okay = document.forms["exercise-edit"].checkValidity() &&
                  controller.checkExerciseDuration(event) &&
                  controller.checkExerciseEditForm(event);
-      console.log("onSaveExercise: " + okay);
       if(!okay) {
         M.toast({html: "Bitte fülle alle Felder korrekt aus.", classes: "red accent-3 rounded"});
       } else {
-        // TODO: save the exercise
+        let phases = Array.from(document.getElementById("exercise-phases").selectedOptions).map(option => option.value);
+        let modifiedExercise = {
+          id: view.model.selectedExercise.id,
+          name: document.getElementById("exercise-name").value,
+          warmup: phases.includes("warmup"),
+          runabc: phases.includes("runabc"),
+          mainex: phases.includes("mainex"),
+          ending: phases.includes("ending"),
+          sticky: view.model.selectedExercise.sticky,
+          material: document.getElementById("exercise-material").value,
+          durationmin: parseInt(document.getElementById("exercise-duration-min").value, 10),
+          durationmax: parseInt(document.getElementById("exercise-duration-max").value, 10),
+          repeats: document.getElementById("exercise-reps").value,
+          details: document.getElementById("exercise-details").value,
+          disciplines: Array.from(document.getElementById("exercise-disciplines").selectedOptions).map(option => option.value),
+        };
+        let request = new Request("db_update.php", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/x-www-form-urlencoded"
+          },
+          body: "update=" + JSON.stringify(modifiedExercise)
+        });
+        fetch(request)
+          .then(response => response.json())
+          .then(data => {
+            if (data.success) {
+              M.toast({html: "Übung erfolgreich gespeichert.", classes: "green accent-3 rounded"});
+              // update the exercise in the model
+              let index = Exercises.findIndex(exercise => exercise.id === view.model.selectedExercise.id);
+              if (index !== -1) {
+                Exercises[index] = modifiedExercise;
+                view.model.selectedExercise = modifiedExercise; // update the selected exercise
+                view.fillExerciseList();
+                view.updateExerciseForm();
+              }
+            } else {
+              M.toast({html: "Fehler beim Speichern der Übung: " + data.message, classes: "red accent-3 rounded"});
+            }
+          })
+          .catch(error => {
+            console.error("Error saving exercise:", error);
+            M.toast({html: "Fehler beim Speichern der Übung.", classes: "red accent-3 rounded"});
+          }); 
       }
+    },
+
+    onDeleteExercise(event) { 
     }
 }
