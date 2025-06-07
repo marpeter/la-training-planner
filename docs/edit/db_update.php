@@ -58,6 +58,43 @@ if(isset($_POST['update'])) {
         'message' => $message,
       ]);
     }
+} elseif(isset($_POST['delete'])) {
+    $exerciseId = json_decode($_POST['delete'],true);
+    try {
+        $dbConnection = connectDB();
+        $dbConnection->autocommit(false);
+        $stmt = $dbConnection->prepare('DELETE FROM EXERCISES WHERE id = ?');
+        $stmt->bind_param('s', $exerciseId);
+        if(!$stmt->execute()) {
+            throw new mysqli_sql_exception('Fehler beim Löschen der Übung: ' . $stmt->error);
+        }
+        $stmt->close();
+        $stmt = $dbConnection->prepare('DELETE FROM EXERCISES_DISCIPLINES WHERE exercise_id=?');
+        $stmt->bind_param('s', $exerciseId);
+        if(!$stmt->execute()) {
+            throw new mysqli_sql_exception('Fehler beim Löschen der Übung: ' . $stmt->error);
+        }
+        $stmt->close();
+        $stmt = $dbConnection->prepare('DELETE FROM FAVORITE_EXERCISES WHERE exercise_id=?');
+        $stmt->bind_param('s', $exerciseId);
+        if(!$stmt->execute()) {
+            throw new mysqli_sql_exception('Fehler beim Löschen der Übung: ' . $stmt->error);
+        }
+        $stmt->close();       
+        $dbConnection->commit();
+        echo json_encode([
+            'success' => true,
+            'message' => 'Übung erfolgreich gelöscht',
+        ]);
+    } catch (mysqli_sql_exception $ex) {
+        $dbConnection->rollback();
+        echo json_encode([
+            'success' => false,
+            'message' => 'Fehler beim Löschen der Übung: ' . $ex->getMessage(),
+        ]);
+    } finally {
+        $dbConnection->close();
+    }
 } else {
     echo json_encode([
         'success' => false,

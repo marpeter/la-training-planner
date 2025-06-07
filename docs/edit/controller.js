@@ -113,7 +113,7 @@ const view = {
       if(this.model.version.supportsEditing) {
         document.getElementById("save-exercise").classList.remove("disabled");
         // document.getElementById("copy-exercise").classList.remove("disabled");
-        // document.getElementById("delete-exercise").classList.remove("disabled");
+        document.getElementById("delete-exercise").classList.remove("disabled");
       }
     }
     M.updateTextFields();
@@ -135,11 +135,15 @@ const controller = {
       document.getElementById("exercise-duration-max").addEventListener("change", this.checkExerciseDuration);
       document.getElementById("exercise-edit").addEventListener("change", this.checkExerciseEditForm);
       document.getElementById("save-exercise").addEventListener("click", this.onSaveExercise);
-      document.getElementById("save-exercise").addEventListener("click", this.onDeleteExercise);
+      document.getElementById("delete-exercise").addEventListener("click", this.onDeleteExercise);
       // initialize the static select elements
       M.FormSelect.init(document.querySelectorAll('select'));
       // initialize the dynamic select elements
       M.FormSelect.init(document.getElementById("exercise-disciplines"));
+      // initialize the modal for the delete confirmation and TODO the copy exercise dialog
+      M.Modal.init(document.querySelectorAll('.modal'));
+      document.getElementById("confirm-delete-yes").addEventListener("click", this.onDeleteExerciseConfirmed);
+      document.getElementById("confirm-delete-no").addEventListener("click", this.onDeleteExerciseCancelled);
     },
 
     onExcerciseFilterChanged(event) {
@@ -148,7 +152,7 @@ const controller = {
     },
 
     onExerciseSelected(exerciseId) {
-      let exercise = Exercises.find( (exercise) => exercise.id==exerciseId );
+      let exercise = Exercise.getAll().find( (exercise) => exercise.id==exerciseId );
       view.model.selectedExercise = exercise;
       view.updateExerciseForm();
     },
@@ -217,29 +221,77 @@ const controller = {
           body: "update=" + JSON.stringify(modifiedExercise)
         });
         fetch(request)
-          .then(response => response.json())
-          .then(data => {
-            if (data.success) {
-              M.toast({html: "Übung erfolgreich gespeichert.", classes: "green accent-3 rounded"});
-              // update the exercise in the model
-              let index = Exercises.findIndex(exercise => exercise.id === view.model.selectedExercise.id);
-              if (index !== -1) {
-                Exercises[index] = modifiedExercise;
-                view.model.selectedExercise = modifiedExercise; // update the selected exercise
-                view.fillExerciseList();
-                view.updateExerciseForm();
-              }
-            } else {
-              M.toast({html: "Fehler beim Speichern der Übung: " + data.message, classes: "red accent-3 rounded"});
+        .then(response => response.json())
+        .then(data => {
+          if(data.success) {
+            M.toast({html: "Übung erfolgreich gespeichert.", classes: "green accent-3 rounded"});
+            // update the exercise in the model
+            let index = Exercise.getAll().findIndex(exercise => exercise.id === view.model.selectedExercise.id);
+            if (index !== -1) {
+              Exercise.getAll()[index] = modifiedExercise;
+              view.model.selectedExercise = modifiedExercise; // update the selected exercise
+              view.fillExerciseList();
+              view.updateExerciseForm();
             }
-          })
-          .catch(error => {
-            console.error("Error saving exercise:", error);
-            M.toast({html: "Fehler beim Speichern der Übung.", classes: "red accent-3 rounded"});
-          }); 
+          } else {
+            M.toast({html: "Fehler beim Speichern der Übung: " + data.message, classes: "red accent-3 rounded"});
+          }
+        }).catch(error => {
+          console.error("Error saving exercise:", error);
+          M.toast({html: "Fehler beim Speichern der Übung.", classes: "red accent-3 rounded"});
+        }); 
       }
     },
 
-    onDeleteExercise(event) { 
-    }
+    onDeleteExercise() {
+      let confirmDialog = M.Modal.getInstance(document.getElementById("confirm-delete"));
+      confirmDialog.options.dismissible = false;
+      // Determine the favorite plans the exercise is part of
+      let favoritePlans = TrainingPlan.favorites.filter(plan => 
+        plan.warmup.filter( exercise => exercise.id === view.model.selectedExercise.id ).length>0 ||
+        plan.mainex.filter( exercise => exercise.id === view.model.selectedExercise.id ).length>0 ||
+        plan.ending.filter( exercise => exercise.id === view.model.selectedExercise.id ).length>0
+      );
+      let content = document.getElementById("confirm-delete-content");
+      content.innerHTML = `<h4>Übung löschen.</h4><p>Soll die Übung <strong>${view.model.selectedExercise.name}</strong> wirklich gelöscht werden?</p>`;
+      if( favoritePlans.length === 0) {
+        content.innerHTML += "<p>Die Übung ist in keinem Favoriten-Trainingsplan enthalten.</p>";
+      }
+      else {
+        content.innerHTML += `<p>Die Übung ist in ${favoritePlans.length} Favoriten-Trainingsplänen enthalten: `
+          + favoritePlans.map( plan => plan.description ).join(', ') + "</p>";
+      }
+      confirmDialog.open();
+    },
+    onDeleteExerciseConfirmed() {
+      let confirmDialog = M.Modal.getInstance(document.getElementById("confirm-delete"));
+      confirmDialog.close();
+      let request = new Request("db_update.php", {
+        method: "POST",
+        headers: { "Content-Type": "application/x-www-form-urlencoded"},
+        body: "delete=" + JSON.stringify(view.model.selectedExercise.id)
+      });
+      fetch(request)
+      .then(response => response.json())
+      .then(data => {
+        if(data.success) {
+          M.toast({html: "Übung erfolgreich gelöscht.", classes: "green accent-3 rounded"});
+          // delete the exercise in the model
+          TrainingPlan.loadData("../").then( (result) => {  
+            view.model.selectedExercise = undefined; // clear the selected exercise
+            view.fillExerciseList();
+            view.updateExerciseForm();
+          });
+        } else {
+          M.toast({html: "Fehler beim Löschen der Übung: " + data.message, classes: "red accent-3 rounded"});
+        }
+      }).catch(error => {
+        console.error("Error saving exercise:", error);
+        M.toast({html: "Fehler beim Löschen der Übung.", classes: "red accent-3 rounded"});
+      }); 
+    },
+    onDeleteExerciseCancelled() {
+      let confirmDialog = M.Modal.getInstance(document.getElementById("confirm-delete"));
+      confirmDialog.close();
+    },
 }

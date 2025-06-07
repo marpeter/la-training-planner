@@ -27,6 +27,7 @@ class Exercise {
   static Auslaufen = undefined;
 
   static buildArray(rawData) {
+    Exercises = [];
     rawData.forEach( (exercise) => {
       let newExercise = new Exercise(exercise.id, exercise.name, exercise.disciplines, exercise.durationmin, exercise.durationmax,
         exercise.warmup, exercise.runabc, exercise.mainex, exercise.ending, exercise.repeats, exercise.material, exercise.details);
