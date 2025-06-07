@@ -7,6 +7,7 @@ document.addEventListener('DOMContentLoaded', function() {
           disciplines: TrainingPlan.getAllDisciplines(),
           selectedExercise: undefined, 
           exerciseListFilter: "",
+          copying: false,
         };
         view.finishUi(uiModel);
         controller.registerEventHandlers();    
@@ -94,6 +95,7 @@ const view = {
       document.getElementById("delete-exercise").classList.add("disabled");
     } else {
       exerciseId.value = exercise.id;
+      exerciseId.disabled = !this.model.copying;
       exerciseName.value = exercise.name;
       exerciseName.disabled = false;
       exercisePhases.disabled = false;
@@ -112,8 +114,13 @@ const view = {
       exerciseDetails.disabled = false;
       if(this.model.version.supportsEditing) {
         document.getElementById("save-exercise").classList.remove("disabled");
-        // document.getElementById("copy-exercise").classList.remove("disabled");
-        document.getElementById("delete-exercise").classList.remove("disabled");
+        if( this.model.copying) {
+          document.getElementById("copy-exercise").classList.add("disabled");
+          document.getElementById("delete-exercise").classList.add("disabled");
+        } else {
+          document.getElementById("copy-exercise").classList.remove("disabled");
+          document.getElementById("delete-exercise").classList.remove("disabled")
+        }
       }
     }
     M.updateTextFields();
@@ -135,6 +142,7 @@ const controller = {
       document.getElementById("exercise-duration-max").addEventListener("change", this.checkExerciseDuration);
       document.getElementById("exercise-edit").addEventListener("change", this.checkExerciseEditForm);
       document.getElementById("save-exercise").addEventListener("click", this.onSaveExercise);
+      document.getElementById("copy-exercise").addEventListener("click", this.onCopyExercise);
       document.getElementById("delete-exercise").addEventListener("click", this.onDeleteExercise);
       // initialize the static select elements
       M.FormSelect.init(document.querySelectorAll('select'));
@@ -154,17 +162,19 @@ const controller = {
     onExerciseSelected(exerciseId) {
       let exercise = Exercise.getAll().find( (exercise) => exercise.id==exerciseId );
       view.model.selectedExercise = exercise;
+      view.model.copying = false; // reset the copying flag
       view.updateExerciseForm();
     },
 
     checkExerciseDuration(event) {
-      let min = document.getElementById("exercise-duration-min");
-      let max = document.getElementById("exercise-duration-max");
-      if (min.value > max.value) {
-        min.setCustomValidity("Die minimale Dauer muss kleiner sein als die maximale Dauer.");
+      let minInput = document.getElementById("exercise-duration-min");
+      let min = parseInt(minInput.value, 10);
+      let max = parseInt(document.getElementById("exercise-duration-max").value, 10);
+      if (min > max) {
+        minInput.setCustomValidity("Die minimale Dauer muss kleiner sein als die maximale Dauer.");
         return false;
       } else {
-        min.setCustomValidity("");
+        minInput.setCustomValidity("");
         return true;
       }
     },
@@ -190,7 +200,7 @@ const controller = {
       return okay;
     },
 
-    onSaveExercise(event) { 
+    onSaveExercise(event) {
       let okay = document.forms["exercise-edit"].checkValidity() &&
                  controller.checkExerciseDuration(event) &&
                  controller.checkExerciseEditForm(event);
@@ -199,7 +209,7 @@ const controller = {
       } else {
         let phases = Array.from(document.getElementById("exercise-phases").selectedOptions).map(option => option.value);
         let modifiedExercise = {
-          id: view.model.selectedExercise.id,
+          id: document.getElementById("exercise-id").value,
           name: document.getElementById("exercise-name").value,
           warmup: phases.includes("warmup"),
           runabc: phases.includes("runabc"),
@@ -218,31 +228,43 @@ const controller = {
           headers: {
             "Content-Type": "application/x-www-form-urlencoded"
           },
-          body: "update=" + JSON.stringify(modifiedExercise)
+          body: (view.model.copying ? "create=" : "update=") + JSON.stringify(modifiedExercise)
         });
         fetch(request)
         .then(response => response.json())
         .then(data => {
           if(data.success) {
             M.toast({html: "Übung erfolgreich gespeichert.", classes: "green accent-3 rounded"});
-            // update the exercise in the model
-            let index = Exercise.getAll().findIndex(exercise => exercise.id === view.model.selectedExercise.id);
-            if (index !== -1) {
-              Exercise.getAll()[index] = modifiedExercise;
-              view.model.selectedExercise = modifiedExercise; // update the selected exercise
-              view.fillExerciseList();
-              view.updateExerciseForm();
-            }
           } else {
+            console.error("Error saving exercise:", data);
             M.toast({html: "Fehler beim Speichern der Übung: " + data.message, classes: "red accent-3 rounded"});
           }
-        }).catch(error => {
+        })
+        .then(() => TrainingPlan.loadData("../")) // reload the training plans to ensure the data in the browser is up-to-date
+        .then( (result) => {
+          view.model.copying = false; // reset the copying flag
+          // update the selected exercise
+          view.model.selectedExercise = Exercise.getAll().find(exercise => exercise.id === modifiedExercise.id);
+          view.fillExerciseList();
+          view.updateExerciseForm(); // update the form to reflect the changes 
+        })
+        .catch(error => {
           console.error("Error saving exercise:", error);
           M.toast({html: "Fehler beim Speichern der Übung.", classes: "red accent-3 rounded"});
-        }); 
+        });
       }
     },
 
+    onCopyExercise(event) {
+      if (view.model.selectedExercise === undefined) { return; }
+      let exercise = Object.assign({},view.model.selectedExercise);
+      view.model.copying = true; // set the copying flag to true
+      exercise.id += "_COPY"; // TODO: generate a better new unique ID
+      exercise.name += " (Kopie)";
+      view.model.selectedExercise = exercise; // set the copied exercise as the selected exercise
+      view.updateExerciseForm();
+    },
+      
     onDeleteExercise() {
       let confirmDialog = M.Modal.getInstance(document.getElementById("confirm-delete"));
       confirmDialog.options.dismissible = false;

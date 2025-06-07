@@ -8,8 +8,8 @@ CREATE TABLE la_planner.version (
 );
 INSERT INTO la_planner.version (field, field_val)
     VALUES ('number', '0.14.4'),
-           ('date', '2025-06-06'),
-           ('supportsEditing', FALSE),
+           ('date', '2025-06-07'),
+           ('supportsEditing', TRUE),
            ('supportsFavorites', FALSE);
 
 -- Drop dependent tables first
