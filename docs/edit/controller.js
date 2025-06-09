@@ -259,7 +259,17 @@ const controller = {
       if (view.model.selectedExercise === undefined) { return; }
       let exercise = Object.assign({},view.model.selectedExercise);
       view.model.copying = true; // set the copying flag to true
-      exercise.id += "_COPY"; // TODO: generate a better new unique ID
+      // generate a new id based on the id of the copy source
+      let idParts = exercise.id.split(/_\d+$/);
+      let sameStartIds = Exercise.getAll().filter( ex => ex.id.startsWith(idParts[0]));
+      if( sameStartIds.length === 1) { // at least the selected exercise's Id should be in the array
+        exercise.id += '_01';
+      } else { // there are more ids starting with the same sequence -> get the one with highest number
+        sameStartIds.sort( (a,b) => a.id.localeCompare(b.id) ); // sort by id
+        let lastSameStartIdParts = sameStartIds.pop().id.split(/_(\d+)$/);
+        let newNum = parseInt(lastSameStartIdParts[1],10) + 1;
+        exercise.id = idParts[0] + '_' + ( newNum < 10 ? '0' + newNum : newNum );
+      }
       exercise.name += " (Kopie)";
       view.model.selectedExercise = exercise; // set the copied exercise as the selected exercise
       view.updateExerciseForm();

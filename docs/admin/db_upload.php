@@ -24,7 +24,7 @@
           <a href="#" class="brand-logo left"><img src="../assets/tsvlogo.png" height="50px"/></a>
           <ul id="nav-mobile" class="right">
             <li><a href="../help/" class="btn-small red"><i class="material-icons">help_center</i></a></li>
-            <li><a href="../edit/" id="editBtn" class="btn-small red disabled"><i class="material-icons">edit</i></a></li>
+            <li><a href="../edit/" class="btn-small red"><i class="material-icons">edit</i></a></li>
             <li><a href="../" class="btn-small red"><i class="material-icons">home</i></a></li>
           </ul>
         </div>
