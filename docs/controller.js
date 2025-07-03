@@ -1,19 +1,17 @@
-import { TrainingPlan } from "./model.js";
+import { App, Discipline, TrainingPlan } from "./model.js";
 
 document.addEventListener('DOMContentLoaded', function() {
-  TrainingPlan.loadData().then( (result) => {
-      let uiModel = {
-        disciplines: TrainingPlan.getAllDisciplines(),
-        version: TrainingPlan.version,
-        selectedDisciplines: [],
-        duration: 70,
-        plan: undefined, // the plan shown - initially undefined
-        favorites: [], // the list of available favorites matching the selected disciplines and duration
-        selectedFavorite: undefined, // index of the selected favorite if the plan was loaded from favorites
-      };
-      
-      view.finishUi(uiModel);
-      controller.registerEventHandlers();    
+  App.loadData().then( (result) => {
+    view.finishUi({
+      disciplines: Discipline.getAll(),
+      version: App.version,
+      selectedDisciplines: [],
+      duration: 70,
+      plan: undefined, // the plan shown - initially undefined
+      favorites: [], // the list of available favorites matching the selected disciplines and duration
+      selectedFavorite: undefined, // index of the selected favorite if the plan was loaded from favorites
+    });
+    controller.registerEventHandlers();    
   });
 });
 

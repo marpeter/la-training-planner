@@ -1,15 +1,14 @@
-import { TrainingPlan, Exercise } from "../model.js";
+import { App, Discipline, Exercise, TrainingPlan } from "../model.js";
 
 document.addEventListener('DOMContentLoaded', function() {
-    TrainingPlan.loadData("../").then( (result) => {
-        let uiModel = {
-          version: TrainingPlan.version,
-          disciplines: TrainingPlan.getAllDisciplines(),
+    App.loadData("../").then( (result) => {
+        view.finishUi({
+          version: App.version,
+          disciplines: Discipline.getAll(),
           selectedExercise: undefined, 
           exerciseListFilter: "",
           copying: false,
-        };
-        view.finishUi(uiModel);
+        });
         controller.registerEventHandlers();    
     });
  });
@@ -18,11 +17,28 @@ const view = {
   model: undefined,
   finishUi(model) {
       this.model = model;
-      this.fillExerciseList();
+      this.setVersionInfo();
       this.fillDisciplineSelect();
+      
+      this.fillExerciseList();
       this.updateExerciseForm();
-      this.updateVersion();
+    },
+
+   // fill the discipline select with the disciplines from the model
+  fillDisciplineSelect() {
+    let disciplineSelect = document.getElementById("exercise-disciplines");
+    this.model.disciplines.forEach( (discipline) => {
+      let option = document.createElement("option");
+      option.value = discipline.id;
+      option.innerHTML = discipline.name;
+      disciplineSelect.appendChild(option);
+    });
   },
+
+  // update the version number in the footer of the page and enable the edit button if the version supports editing
+  setVersionInfo() {
+    document.getElementById("version").innerHTML = this.model.version.number;
+  }, 
 
   // fill the exercise list with the exercises from the model
   fillExerciseList() {
@@ -47,18 +63,6 @@ const view = {
         item.appendChild(anchor);
         exerciseList.appendChild(item);
       }
-    });
-  },
-
-  // fill the discipline select with the disciplines from the model
-  fillDisciplineSelect() {
-    let disciplineSelect = document.getElementById("exercise-disciplines");
-    this.model.disciplines.forEach( (discipline) => {
-      let option = document.createElement("option");
-      option.value = discipline.id;
-      option.innerHTML = discipline.name;
-      // option.setAttribute("data-icon",discipline.image);
-      disciplineSelect.appendChild(option);
     });
   },
 
@@ -126,32 +130,26 @@ const view = {
     M.updateTextFields();
     M.FormSelect.init(document.getElementById("exercise-disciplines"));
     M.FormSelect.init(document.getElementById("exercise-phases"));
-  },
-
-  // update the version number in the footer of the page and enable the edit button if the version supports editing
-  updateVersion() {
-    let versionElement = document.getElementById("version");
-    versionElement.innerHTML = this.model.version.number;
-  },      
+  },     
 }
 
 const controller = {
     registerEventHandlers() {
-      document.getElementById("exercise-filter").addEventListener("input", this.onExcerciseFilterChanged);
-      document.getElementById("exercise-duration-min").addEventListener("change", this.checkExerciseDuration);
-      document.getElementById("exercise-duration-max").addEventListener("change", this.checkExerciseDuration);
-      document.getElementById("exercise-edit").addEventListener("change", this.checkExerciseEditForm);
-      document.getElementById("save-exercise").addEventListener("click", this.onSaveExercise);
-      document.getElementById("copy-exercise").addEventListener("click", this.onCopyExercise);
-      document.getElementById("delete-exercise").addEventListener("click", this.onDeleteExercise);
+      document.getElementById("exercise-filter").oninput = this.onExcerciseFilterChanged;
+      document.getElementById("exercise-duration-min").onchange = this.checkExerciseDuration;
+      document.getElementById("exercise-duration-max").onchange = this.checkExerciseDuration;
+      document.getElementById("exercise-edit").onchange = this.checkExerciseEditForm;
+      document.getElementById("save-exercise").onclick = this.onSaveExercise;
+      document.getElementById("copy-exercise").onclick = this.onCopyExercise;
+      document.getElementById("delete-exercise").onclick = this.onDeleteExercise;
       // initialize the static select elements
       M.FormSelect.init(document.querySelectorAll('select'));
       // initialize the dynamic select elements
       M.FormSelect.init(document.getElementById("exercise-disciplines"));
-      // initialize the modal for the delete confirmation and TODO the copy exercise dialog
+      // initialize the modal for the delete confirmation
       M.Modal.init(document.querySelectorAll('.modal'));
-      document.getElementById("confirm-delete-yes").addEventListener("click", this.onDeleteExerciseConfirmed);
-      document.getElementById("confirm-delete-no").addEventListener("click", this.onDeleteExerciseCancelled);
+      document.getElementById("confirm-delete-yes").onclick = this.onDeleteExerciseConfirmed;
+      document.getElementById("confirm-delete-no").onclick = this.onDeleteExerciseCancelled;
     },
 
     onExcerciseFilterChanged(event) {
@@ -181,17 +179,15 @@ const controller = {
 
     checkExerciseEditForm(event) {
       let okay = true;
-      let phases = document.getElementById("exercise-phases");
       let helper = document.getElementById("exercise-phases-helper"); 
-      if(phases.value === "") {
+      if(document.getElementById("exercise-phases").value === "") {
         helper.classList.add("red-text");
         okay = false;
       } else {
         helper.classList.remove("red-text");
-      } 
-      let disciplines = document.getElementById("exercise-disciplines");
+      }
       helper = document.getElementById("exercise-disciplines-helper");
-      if(disciplines.value === "") {
+      if(document.getElementById("exercise-disciplines").value === "") {
         helper.classList.add("red-text");
         okay = false;
       } else {
@@ -240,7 +236,7 @@ const controller = {
             M.toast({html: "Fehler beim Speichern der Übung: " + data.message, classes: "red accent-3 rounded"});
           }
         })
-        .then(() => TrainingPlan.loadData("../")) // reload the training plans to ensure the data in the browser is up-to-date
+        .then(() => App.loadData("../")) // reload data to ensure the data in the browser is up-to-date
         .then( (result) => {
           view.model.copying = false; // reset the copying flag
           // update the selected exercise
@@ -262,13 +258,14 @@ const controller = {
       // generate a new id based on the id of the copy source
       let idParts = exercise.id.split(/_\d+$/);
       let sameStartIds = Exercise.getAll().filter( ex => ex.id.startsWith(idParts[0]));
+      console.log("Found " + sameStartIds.length + " exercises with the same start id: " + idParts[0]);
       if( sameStartIds.length === 1) { // at least the selected exercise's Id should be in the array
         exercise.id += '_01';
       } else { // there are more ids starting with the same sequence -> get the one with highest number
         sameStartIds.sort( (a,b) => a.id.localeCompare(b.id) ); // sort by id
         let lastSameStartIdParts = sameStartIds.pop().id.split(/_(\d+)$/);
         let newNum = parseInt(lastSameStartIdParts[1],10) + 1;
-        exercise.id = idParts[0] + '_' + ( newNum < 10 ? '0' + newNum : newNum );
+        exercise.id = idParts[0] + '_' + ( isNaN(newNum) ? '01' : (newNum < 10 ? '0' + newNum : newNum ));
       }
       exercise.name += " (Kopie)";
       view.model.selectedExercise = exercise; // set the copied exercise as the selected exercise
@@ -279,7 +276,7 @@ const controller = {
       let confirmDialog = M.Modal.getInstance(document.getElementById("confirm-delete"));
       confirmDialog.options.dismissible = false;
       // Determine the favorite plans the exercise is part of
-      let favoritePlans = TrainingPlan.favorites.filter(plan => 
+      let favoritePlans = TrainingPlan.Favorites.filter(plan => 
         plan.warmup.filter( exercise => exercise.id === view.model.selectedExercise.id ).length>0 ||
         plan.mainex.filter( exercise => exercise.id === view.model.selectedExercise.id ).length>0 ||
         plan.ending.filter( exercise => exercise.id === view.model.selectedExercise.id ).length>0
@@ -295,6 +292,7 @@ const controller = {
       }
       confirmDialog.open();
     },
+
     onDeleteExerciseConfirmed() {
       let confirmDialog = M.Modal.getInstance(document.getElementById("confirm-delete"));
       confirmDialog.close();
@@ -309,7 +307,7 @@ const controller = {
         if(data.success) {
           M.toast({html: "Übung erfolgreich gelöscht.", classes: "green accent-3 rounded"});
           // delete the exercise in the model
-          TrainingPlan.loadData("../").then( (result) => {  
+          App.loadData("../").then( (result) => {  
             view.model.selectedExercise = undefined; // clear the selected exercise
             view.fillExerciseList();
             view.updateExerciseForm();
@@ -322,6 +320,7 @@ const controller = {
         M.toast({html: "Fehler beim Löschen der Übung.", classes: "red accent-3 rounded"});
       }); 
     },
+
     onDeleteExerciseCancelled() {
       let confirmDialog = M.Modal.getInstance(document.getElementById("confirm-delete"));
       confirmDialog.close();

@@ -1,12 +1,11 @@
-import { dbVersion } from "../data/db.js";
+import { App } from "../model.js";
 
 document.addEventListener('DOMContentLoaded', function() {
-  dbVersion("../").then( (result) => {
-    if( result.supportsDownload) {
+  App.getVersion("../").then( (version) => {
+    if( version.supportsUpload) {
       window.location = "db_upload.php";
     } else {
-      let versionElement = document.getElementById("version");
-       versionElement.innerHTML = result.number;
+      document.getElementById("version").innerHTML = version.number;
     }
   });
 });

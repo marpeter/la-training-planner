@@ -3,12 +3,38 @@ import { dbVersion } from "./data/db.js";
 const MAX_ATTEMPTS = 20;
 const TEMP_PLAN_ID = "$TMP";
 
-let Disciplines = [];
-let Exercises = [];
+const App = {
+  version: undefined,
 
+  async getVersion(pathPrefix="") {
+    if( !this.version) {
+      this.version = await dbVersion(pathPrefix);
+      console.log("App version info: " + JSON.stringify(this.version));
+    }
+    return this.version;
+  },
+
+  async loadData(pathPrefix="") {
+    await this.getVersion(pathPrefix);
+    // Load the Disciplines from the CSV file or the database
+    Discipline.Instances = await this.version.disciplineLoader();
+    // Load the Exercises from the CSV or the database
+    Exercise.createInstances(await this.version.exerciseLoader());
+    // Load the saved (favorite) training plans from the CSV or database
+    TrainingPlan.createFavorites(await this.version.favoritesLoader());
+  }
+}
+
+const Discipline = {
+  Instances: [],
+  getAll() {
+    this.Instances.sort( (a,b) => a.name.localeCompare(b.name) );
+    return this.Instances; 
+  }
+}
 class Exercise {
-  constructor(id, name, disciplines, durationmin=0, durationmax=0, warmup=false, runabc=false, mainex=false, ending=false,
-     repeats='', material='', details='') {
+  constructor(id, name, disciplines, durationmin=0, durationmax=0, warmup=false, 
+      runabc=false, mainex=false, ending=false, repeats='', material='', details='') {
     this.id = id;
     this.name = name;
     this.disciplines = disciplines;
@@ -25,82 +51,66 @@ class Exercise {
   }
 
   static Auslaufen = undefined;
+  static Instances = [];
 
-  static buildArray(rawData) {
-    Exercises = [];
+  static createInstances(rawData) {
+    this.Instances = [];
     rawData.forEach( (exercise) => {
       let newExercise = new Exercise(exercise.id, exercise.name, exercise.disciplines, exercise.durationmin, exercise.durationmax,
         exercise.warmup, exercise.runabc, exercise.mainex, exercise.ending, exercise.repeats, exercise.material, exercise.details);
-      Exercises.push(newExercise);
       if(newExercise.id==='Auslaufen') {
         newExercise.duration = 5; // Auslaufen always has a fixed duration of 5 minutes
-        newExercise.sticky = true; // Auslaufen is a sticky exercise, always at the end of the plan
+        newExercise.sticky = true; // Auslaufen is a "sticky" exercise, always at the end of the plan
         Exercise.Auslaufen = newExercise;
       }
+      this.Instances.push(newExercise);
     });
-    Exercises.sort( (a,b) => a.name.localeCompare(b.name) );
+    this.Instances.sort( (a,b) => a.name.localeCompare(b.name) );
   }
 
   static getAll() {
-    return Exercises;
+    return this.Instances;
   }
 }
-
 
 class TrainingPlan {
 
   static messages = [];
-  static favorites = [];
-
-  static version = {}
+  static Favorites = [];
 
   constructor(id,disciplineIds,createdBy="",createdAt="",description="") {
     this.id = id;
     this.created_by = createdBy;
     this.created_at = createdAt;
     this.description = description;
-    this.disciplines = disciplineIds.map( (id) => Disciplines.find( (discipline) => discipline.id==id ) );
+    this.disciplines = disciplineIds.map( (id) => Discipline.getAll().find( (discipline) => discipline.id==id ) );
     this.warmup = []; 
     this.mainex = [];
     this.ending = [];
     this.suitable = { warmup: [], mainex: [], ending: [], runabc: [] };
   }
 
-  static async loadData(pathPrefix="") {
-    // Determine the version of the database, including the data loader function implementations
-    this.version = await dbVersion(pathPrefix);
-    console.log("Version info: " + JSON.stringify(this.version));
-
-    // Load the Disciplines from the CSV file or the database
-    Disciplines = await this.version.disciplineLoader();
-    // Load the Exercises from the CSV or the database
-    Exercise.buildArray(await this.version.exerciseLoader());
-
-    // Load the favorites from the CSV file or the database
-    this.favorites = [];
-    let rawFavoriteData = await this.version.favoritesLoader();
-    rawFavoriteData.headers.forEach( (favorite) => {
+  static createFavorites(rawData) {
+    this.Favorites = [];
+    rawData.headers.forEach( (favorite) => {
       let plan = new TrainingPlan(favorite.id, favorite.disciplines, favorite.created_by, favorite.created_at, favorite.description);
-      rawFavoriteData.exerciseMap.filter( (mapItem) => mapItem.favorite_id==favorite.id )
-                                 .forEach((mapItem) => {
+      rawData.exerciseMap.filter( (mapItem) => mapItem.favorite_id==favorite.id )
+                         .forEach((mapItem) => {
          // copy the exercise from the Exercises array to be able to set the duration
-         let exercise = Object.assign({},Exercises.find( (ex) => ex.id==mapItem.exercise_id ));
+         let exercise = Object.assign({},Exercise.getAll().find( (ex) => ex.id==mapItem.exercise_id ));
          exercise.duration = parseInt(mapItem.duration);
          plan[mapItem.phase][mapItem.position-1]= exercise;
-         // TODO: also populate the suitable arrays?
       });
-      this.favorites.push(plan);
+      plan.setSuitableExercises(favorite.disciplines);
+      this.Favorites.push(plan);
     });
   }
 
-  static getAllDisciplines() {
-    return Disciplines;
-  }
-
   static getAvailableFavorites(forDisciplineIds, targetDuration) {
-    let availableFavorites = this.favorites.filter( (plan) => 
-         forDisciplineIds.map( (id) => Disciplines.find( (discipline) => discipline.id==id ) )
-                         .every( (selected) => plan.disciplines.includes(selected) )
+    const disciplines = Discipline.getAll();
+    let availableFavorites = this.Favorites.filter( (plan) => 
+      forDisciplineIds.map( (id) => disciplines.find( (discipline) => discipline.id==id ) )
+                      .every( (selected) => plan.disciplines.includes(selected) )
       && plan.duration()==targetDuration);
     return availableFavorites; 
   }
@@ -112,25 +122,8 @@ class TrainingPlan {
       return null;
     }
 
-    // find the exercises that are suitable for the selected disciplines
-    // and reset their duration to the minimum duration
-    let suitableExercises = Exercises.filter(
-      (exercise) =>  forDisciplineIds.some( (selected) => exercise.disciplines.includes(selected) ));
-    suitableExercises.forEach( (exercise) => exercise.duration = exercise.durationmin);
-    
-    let plan = new TrainingPlan(TEMP_PLAN_ID,forDisciplineIds);
-
-    const phases = [["warmup", "Aufwärm"], ["runabc", "Lauf-ABC"], ["mainex", "Haupt"], ["ending", "Schluss"]];
-    for(let i=0; i<phases.length; i++) {
-      let phase = phases[i][0];
-      plan.suitable[phase] = suitableExercises.filter( (exercise) => exercise[phase] );
-      // console.log(`${phases[i][1]}übungen: ${JSON.stringify(plan.suitable[phase])}`);
-      if(plan.suitable[phase].length==0) {
-        TrainingPlan.messages.push(`Es gibt keine ${phases[i][1]}übungen für die ausgewählten Disziplinen.`);
-        return null;
-      }
-    }
-    
+    let plan = new TrainingPlan(TEMP_PLAN_ID, forDisciplineIds);
+    plan.setSuitableExercises(forDisciplineIds);    
     // the following algorithm is based purely on randomly picking exercises and does
     // not consider potential dependencies between exercises
     let attempts = 0;
@@ -172,6 +165,23 @@ class TrainingPlan {
       return undefined;
     }
     return plan;
+  }
+
+  setSuitableExercises(forDisciplineIds) {
+    let suitableExercises = Exercise.getAll().filter(
+      (exercise) =>  forDisciplineIds.some( (selected) => exercise.disciplines.includes(selected) ));
+    suitableExercises.forEach( (exercise) => exercise.duration = exercise.durationmin);
+    
+    const phases = [["warmup", "Aufwärm"], ["runabc", "Lauf-ABC"], ["mainex", "Haupt"], ["ending", "Schluss"]];
+    for(let i=0; i<phases.length; i++) {
+      let phase = phases[i][0];
+      this.suitable[phase] = suitableExercises.filter( (exercise) => exercise[phase] );
+      // console.log(`${phases[i][1]}übungen: ${JSON.stringify(plan.suitable[phase])}`);
+      if(this.suitable[phase].length==0) {
+        TrainingPlan.messages.push(`Es gibt keine ${phases[i][1]}übungen für die ausgewählten Disziplinen.`);
+        return null;
+      }
+    }    
   }
 
   duration() {
@@ -222,4 +232,4 @@ const minAdder = adder.bind(null, "durationmin");
 const maxAdder = adder.bind(null, "durationmax");
 const durationAdder = adder.bind(null, "duration");
 
-export { TrainingPlan, Exercise };
+export { App, Discipline, Exercise, TrainingPlan };
