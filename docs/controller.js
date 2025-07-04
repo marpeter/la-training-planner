@@ -48,11 +48,9 @@ const view = {
 
   // update the version number in the footer of the page and enable the edit button if the version supports editing
   setVersionInfo() {
-    let versionElement = document.getElementById("version");
-    versionElement.innerHTML = this.model.version.number;
+    document.getElementById("version").innerHTML = this.model.version.number;
     if(this.model.version.supportsEditing) {
-      let editBtn = document.getElementById("editBtn");
-      editBtn.classList.remove("disabled");
+      document.getElementById("editBtn").classList.remove("disabled");
     }
   },
 

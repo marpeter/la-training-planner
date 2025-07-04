@@ -71,6 +71,31 @@ class Exercise {
   static getAll() {
     return this.Instances;
   }
+
+  copy() {
+    let theCopy = Object.assign({},this);
+    // generate a new id based on the id of the copy source
+    let idParts = theCopy.id.split(/_\d+$/);
+    let sameStartIds = Exercise.Instances.filter( ex => ex.id.startsWith(idParts[0]));
+    if( sameStartIds.length === 1) { // at least the selected exercise's Id should be in the array
+      theCopy.id += '_01';
+    } else { // there are more ids starting with the same sequence -> get the one with highest number
+      sameStartIds.sort( (a,b) => a.id.localeCompare(b.id) ); // sort by id
+      let lastSameStartIdParts = sameStartIds.pop().id.split(/_(\d+)$/);
+      let newNum = parseInt(lastSameStartIdParts[1],10) + 1;
+      theCopy.id = idParts[0] + '_' + ( isNaN(newNum) ? '01' : (newNum < 10 ? '0' + newNum : newNum ));
+    }
+    theCopy.name += " (Kopie)";
+    return theCopy;    
+  }
+
+  containedInFavoritePlans() {
+    return TrainingPlan.Favorites.filter( (plan) => 
+      plan.mainex.some( (exercise) => exercise.id==this.id ) ||
+      plan.warmup.some( (exercise) => exercise.id==this.id ) ||
+      plan.ending.some( (exercise) => exercise.id==this.id )
+    );
+  }
 }
 
 class TrainingPlan {

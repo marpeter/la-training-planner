@@ -1,6 +1,6 @@
 import { App } from "../model.js";
 
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', () => {
   App.getVersion("../").then( (version) => {
     if( version.supportsUpload) {
       window.location = "db_upload.php";

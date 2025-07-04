@@ -1,6 +1,6 @@
 import { App, Discipline, Exercise, TrainingPlan } from "../model.js";
 
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', () => {
     App.loadData("../").then( (result) => {
         view.finishUi({
           version: App.version,
@@ -13,16 +13,39 @@ document.addEventListener('DOMContentLoaded', function() {
     });
  });
 
+const NULL_EXERCISE = new Exercise("", "", []);
+
 const view = {
   model: undefined,
+  // properties to remember elements of the exercise form
+  exerciseId: undefined,
+  exerciseName: undefined,
+  exercisePhases: undefined,
+  exerciseDisciplines: undefined,
+  exerciseMaterial: undefined,
+  exerciseDurationMin: undefined,
+  exerciseDurationMax: undefined,
+  exerciseReps: undefined,
+  exerciseDetails: undefined,
+
   finishUi(model) {
-      this.model = model;
-      this.setVersionInfo();
-      this.fillDisciplineSelect();
+    this.model = model;
+    this.setVersionInfo();
+    this.fillDisciplineSelect();
       
-      this.fillExerciseList();
-      this.updateExerciseForm();
-    },
+    this.exerciseId = document.getElementById("exercise-id");
+    this.exerciseName = document.getElementById("exercise-name");
+    this.exercisePhases = document.getElementById("exercise-phases");
+    this.exerciseDisciplines = document.getElementById("exercise-disciplines");
+    this.exerciseMaterial = document.getElementById("exercise-material");
+    this.exerciseDurationMin = document.getElementById("exercise-duration-min");
+    this.exerciseDurationMax = document.getElementById("exercise-duration-max");
+    this.exerciseReps = document.getElementById("exercise-reps");
+    this.exerciseDetails = document.getElementById("exercise-details");
+
+    this.fillExerciseList();
+    this.updateExerciseForm();
+  },
 
    // fill the discipline select with the disciplines from the model
   fillDisciplineSelect() {
@@ -43,11 +66,8 @@ const view = {
   // fill the exercise list with the exercises from the model
   fillExerciseList() {
     let exerciseList = document.getElementById("exercise-list");
-    // clear the list, keeping the header
-    let children = Array.from(exerciseList.children);
-    for (let i = 1; i< children.length; i++) {
-      exerciseList.removeChild(children[i]);
-    }
+    // clear the list, keeping the header (first child)
+    while(exerciseList.childElementCount > 1) { exerciseList.removeChild(exerciseList.lastChild);}
 
     Exercise.getAll().forEach( (exercise) => {
       // skip the "Auslaufen" exercise, it is always the last one
@@ -56,7 +76,7 @@ const view = {
         item.classList.add("collection-item", "left-align");
         let anchor = document.createElement("a");
         anchor.classList.add("red-text");
-        anchor.innerHTML = exercise.name; // + " (" + exercise.id + ")";
+        anchor.innerHTML = exercise.name;
         anchor.setAttribute("href", "#!");
         anchor.setAttribute("data-id", exercise.id);
         anchor.onclick = () => controller.onExerciseSelected(exercise.id);
@@ -68,69 +88,57 @@ const view = {
 
   // update the exerise form with the selected exercise
   updateExerciseForm() {
+    let enable;
     let exercise = this.model.selectedExercise;
-    let exerciseId = document.getElementById("exercise-id");
-    let exerciseName = document.getElementById("exercise-name");
-    let exercisePhases = document.getElementById("exercise-phases");
-    let exerciseDisciplines = document.getElementById("exercise-disciplines");
-    let exerciseMaterial = document.getElementById("exercise-material");
-    let exerciseDurationMin = document.getElementById("exercise-duration-min");
-    let exerciseDurationMax = document.getElementById("exercise-duration-max");
-    let exerciseReps = document.getElementById("exercise-reps");
-    let exerciseDetails = document.getElementById("exercise-details");
     if (exercise === undefined) {
-      exerciseId.value = "";
-      exerciseName.value = "";
-      exerciseName.disabled = true;
-      exercisePhases.disabled = true;
-      exerciseDisciplines.disabled = true;
-      exerciseMaterial.value = "";
-      exerciseMaterial.disabled = true;
-      exerciseDurationMin.value = "";
-      exerciseDurationMin.disabled = true;
-      exerciseDurationMax.value = "";
-      exerciseDurationMax.disabled = true;
-      exerciseReps.value = "";
-      exerciseReps.disabled = true;
-      exerciseDetails.value = "";
-      exerciseDetails.disabled = true;
+      enable = false;
+      exercise = NULL_EXERCISE;
+    } else {
+      // enable the form only if the app version supports editing
+      enable = this.model.version.supportsEditing;
+    }
+
+    this.exerciseId.value = exercise.id;
+    this.exerciseName.value = exercise.name;
+    this.exerciseMaterial.value = exercise.material;
+    this.exerciseDurationMin.value = exercise.durationmin;
+    this.exerciseDurationMax.value = exercise.durationmax;
+    this.exerciseReps.value = exercise.repeats;
+    this.exerciseDetails.value = exercise.details;
+    Array.from(this.exercisePhases.children)
+         .forEach( (option) => option.selected = exercise[option.value] );
+    Array.from(this.exerciseDisciplines.children)
+         .forEach( (option) => option.selected = exercise.disciplines.includes(option.value) );
+    
+    this.exerciseId.disabled = !this.model.copying;
+    this.exerciseName.disabled =
+    this.exercisePhases.disabled =
+    this.exerciseDisciplines.disabled =
+    this.exerciseMaterial.disabled =
+    this.exerciseDurationMin.disabled =
+    this.exerciseDurationMax.disabled =
+    this.exerciseReps.disabled =
+    this.exerciseDetails.disabled = !enable;
+    
+    if (enable) {
+      document.getElementById("save-exercise").classList.remove("disabled");
+      if( this.model.copying) {
+        document.getElementById("copy-exercise").classList.add("disabled");
+        document.getElementById("delete-exercise").classList.add("disabled");
+      } else {
+        document.getElementById("copy-exercise").classList.remove("disabled");
+        document.getElementById("delete-exercise").classList.remove("disabled")
+      }
+    } else {
       document.getElementById("save-exercise").classList.add("disabled");
       document.getElementById("copy-exercise").classList.add("disabled");
       document.getElementById("delete-exercise").classList.add("disabled");
-    } else {
-      exerciseId.value = exercise.id;
-      exerciseId.disabled = !this.model.copying;
-      exerciseName.value = exercise.name;
-      exerciseName.disabled = false;
-      exercisePhases.disabled = false;
-      Array.from(exercisePhases.children).forEach( (option) => option.selected = exercise[option.value] );
-      exerciseDisciplines.disabled = false;
-      Array.from(exerciseDisciplines.children).forEach( (option) => option.selected = exercise.disciplines.includes(option.value) );
-      exerciseMaterial.value = exercise.material;
-      exerciseMaterial.disabled = false;
-      exerciseDurationMin.value = exercise.durationmin;
-      exerciseDurationMin.disabled = false;
-      exerciseDurationMax.value = exercise.durationmax;
-      exerciseDurationMax.disabled = false;
-      exerciseReps.value = exercise.repeats;
-      exerciseReps.disabled = false;
-      exerciseDetails.value = exercise.details;
-      exerciseDetails.disabled = false;
-      if(this.model.version.supportsEditing) {
-        document.getElementById("save-exercise").classList.remove("disabled");
-        if( this.model.copying) {
-          document.getElementById("copy-exercise").classList.add("disabled");
-          document.getElementById("delete-exercise").classList.add("disabled");
-        } else {
-          document.getElementById("copy-exercise").classList.remove("disabled");
-          document.getElementById("delete-exercise").classList.remove("disabled")
-        }
-      }
     }
+
     M.updateTextFields();
     M.FormSelect.init(document.getElementById("exercise-disciplines"));
     M.FormSelect.init(document.getElementById("exercise-phases"));
-  },     
+  },
 }
 
 const controller = {
@@ -165,14 +173,11 @@ const controller = {
     },
 
     checkExerciseDuration(event) {
-      let minInput = document.getElementById("exercise-duration-min");
-      let min = parseInt(minInput.value, 10);
-      let max = parseInt(document.getElementById("exercise-duration-max").value, 10);
-      if (min > max) {
-        minInput.setCustomValidity("Die minimale Dauer muss kleiner sein als die maximale Dauer.");
+      if (parseInt(view.exerciseDurationMin.value, 10) > parseInt(view.exerciseDurationMax.value, 10)) {
+        view.exerciseDurationMin.setCustomValidity("Die minimale Dauer muss kleiner sein als die maximale Dauer.");
         return false;
       } else {
-        minInput.setCustomValidity("");
+        view.exerciseDurationMin.setCustomValidity("");
         return true;
       }
     },
@@ -203,21 +208,21 @@ const controller = {
       if(!okay) {
         M.toast({html: "Bitte fülle alle Felder korrekt aus.", classes: "red accent-3 rounded"});
       } else {
-        let phases = Array.from(document.getElementById("exercise-phases").selectedOptions).map(option => option.value);
+        let phases = Array.from(view.exercisePhases.selectedOptions).map(option => option.value);
         let modifiedExercise = {
-          id: document.getElementById("exercise-id").value,
-          name: document.getElementById("exercise-name").value,
+          id: view.exerciseId.value,
+          name: view.exerciseName.value,
           warmup: phases.includes("warmup"),
           runabc: phases.includes("runabc"),
           mainex: phases.includes("mainex"),
           ending: phases.includes("ending"),
           sticky: view.model.selectedExercise.sticky,
-          material: document.getElementById("exercise-material").value,
-          durationmin: parseInt(document.getElementById("exercise-duration-min").value, 10),
-          durationmax: parseInt(document.getElementById("exercise-duration-max").value, 10),
-          repeats: document.getElementById("exercise-reps").value,
-          details: document.getElementById("exercise-details").value,
-          disciplines: Array.from(document.getElementById("exercise-disciplines").selectedOptions).map(option => option.value),
+          material: view.exerciseMaterial.value,
+          durationmin: parseInt(view.exerciseDurationMin.value, 10),
+          durationmax: parseInt(view.exerciseDurationMax.value, 10),
+          repeats: view.exerciseReps.value,
+          details: view.exerciseDetails.value,
+          disciplines: Array.from(view.exerciseDisciplines.selectedOptions).map(option => option.value),
         };
         let request = new Request("db_update.php", {
           method: "POST",
@@ -253,22 +258,8 @@ const controller = {
 
     onCopyExercise(event) {
       if (view.model.selectedExercise === undefined) { return; }
-      let exercise = Object.assign({},view.model.selectedExercise);
       view.model.copying = true; // set the copying flag to true
-      // generate a new id based on the id of the copy source
-      let idParts = exercise.id.split(/_\d+$/);
-      let sameStartIds = Exercise.getAll().filter( ex => ex.id.startsWith(idParts[0]));
-      console.log("Found " + sameStartIds.length + " exercises with the same start id: " + idParts[0]);
-      if( sameStartIds.length === 1) { // at least the selected exercise's Id should be in the array
-        exercise.id += '_01';
-      } else { // there are more ids starting with the same sequence -> get the one with highest number
-        sameStartIds.sort( (a,b) => a.id.localeCompare(b.id) ); // sort by id
-        let lastSameStartIdParts = sameStartIds.pop().id.split(/_(\d+)$/);
-        let newNum = parseInt(lastSameStartIdParts[1],10) + 1;
-        exercise.id = idParts[0] + '_' + ( isNaN(newNum) ? '01' : (newNum < 10 ? '0' + newNum : newNum ));
-      }
-      exercise.name += " (Kopie)";
-      view.model.selectedExercise = exercise; // set the copied exercise as the selected exercise
+      view.model.selectedExercise = view.model.selectedExercise.copy(); // set the copied exercise as the selected exercise
       view.updateExerciseForm();
     },
       
@@ -276,20 +267,13 @@ const controller = {
       let confirmDialog = M.Modal.getInstance(document.getElementById("confirm-delete"));
       confirmDialog.options.dismissible = false;
       // Determine the favorite plans the exercise is part of
-      let favoritePlans = TrainingPlan.Favorites.filter(plan => 
-        plan.warmup.filter( exercise => exercise.id === view.model.selectedExercise.id ).length>0 ||
-        plan.mainex.filter( exercise => exercise.id === view.model.selectedExercise.id ).length>0 ||
-        plan.ending.filter( exercise => exercise.id === view.model.selectedExercise.id ).length>0
-      );
-      let content = document.getElementById("confirm-delete-content");
-      content.innerHTML = `<h4>Übung löschen.</h4><p>Soll die Übung <strong>${view.model.selectedExercise.name}</strong> wirklich gelöscht werden?</p>`;
-      if( favoritePlans.length === 0) {
-        content.innerHTML += "<p>Die Übung ist in keinem Favoriten-Trainingsplan enthalten.</p>";
-      }
-      else {
-        content.innerHTML += `<p>Die Übung ist in ${favoritePlans.length} Favoriten-Trainingsplänen enthalten: `
-          + favoritePlans.map( plan => plan.description ).join(', ') + "</p>";
-      }
+      let favoritePlans = view.model.selectedExercise.containedInFavoritePlans();
+      document.getElementById("confirm-delete-content").innerHTML = 
+        `<h4>Übung löschen.</h4><p>Soll die Übung <strong>${view.model.selectedExercise.name}</strong> wirklich gelöscht werden?</p>`
+        + ( favoritePlans.length === 0 ? 
+            "<p>Die Übung ist in keinem Favoriten-Trainingsplan enthalten.</p>" :
+            `<p class="red-text">Die Übung ist in Favoriten-Trainingsplänen enthalten:</br>${favoritePlans.map( plan => plan.description ).join(', ')}</p>`
+          );
       confirmDialog.open();
     },
 
@@ -322,7 +306,7 @@ const controller = {
     },
 
     onDeleteExerciseCancelled() {
-      let confirmDialog = M.Modal.getInstance(document.getElementById("confirm-delete"));
-      confirmDialog.close();
+      M.Modal.getInstance(document.getElementById("confirm-delete"))
+             .close();
     },
 }
