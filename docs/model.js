@@ -89,6 +89,21 @@ class Exercise {
     return theCopy;    
   }
 
+  equals(that) {
+    return this.id === that.id &&
+           this.name === that.name &&
+           this.disciplines.join(",") === that.disciplines.join(",") &&
+           this.durationmin === that.durationmin &&
+           this.durationmax === that.durationmax &&
+           this.warmup === that.warmup &&
+           this.runabc === that.runabc &&
+           this.mainex === that.mainex &&
+           this.ending === that.ending &&
+           this.repeats === that.repeats &&
+           this.material === that.material &&
+           this.details.join(':') === that.details.join(':');
+  }
+
   containedInFavoritePlans() {
     return TrainingPlan.Favorites.filter( (plan) => 
       plan.mainex.some( (exercise) => exercise.id==this.id ) ||

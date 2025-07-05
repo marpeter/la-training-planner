@@ -105,6 +105,7 @@
               <div class="input-field col s12">
                 <textarea id="exercise-details" class="materialize-textarea"></textarea>
                 <label for="exercise-details">Details</label>
+                <span id="exercise-details-helper" class="helper-text">Trenne unterschiedliche Details mit einen :</span>
               </div>
             </div>
             <button id="save-exercise" class="btn red darken-1" name="save-exercise" type="button">Speichern
@@ -127,7 +128,19 @@
               <button id="confirm-delete-yes" class="btn red darken-1 modal-close">Ja</button>
               <button id="confirm-delete-no" class="btn red darken-1 modal-close">Nein</button>
             </div>
-        </div>
+          </div>
+          <div id="save-edits" class="modal">
+            <div id="save-edits-content" class="modal-content">
+              <h4>Übung speichern?</h4>
+              <p>Du hast Daten verändert. Soll die angezeigte Übung gespeichert werden?</p>
+              <div id="save-edits-exercise-name" class="red-text"></div>
+            </div>
+            <div class="modal-footer">
+              <button id="confirm-save-yes" class="btn red darken-1 modal-close">Speichern</button>
+              <button id="confirm-save-no" class="btn red darken-1 modal-close">Änderungen verwerfen</button>
+            </div>
+          </div>
+        </div>  
       </div>
     </div>
     <footer class="section">

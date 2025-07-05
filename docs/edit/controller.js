@@ -5,7 +5,8 @@ document.addEventListener('DOMContentLoaded', () => {
         view.finishUi({
           version: App.version,
           disciplines: Discipline.getAll(),
-          selectedExercise: undefined, 
+          selectedExercise: undefined,
+          gotoExercise: undefined, 
           exerciseListFilter: "",
           copying: false,
         });
@@ -158,6 +159,8 @@ const controller = {
       M.Modal.init(document.querySelectorAll('.modal'));
       document.getElementById("confirm-delete-yes").onclick = this.onDeleteExerciseConfirmed;
       document.getElementById("confirm-delete-no").onclick = this.onDeleteExerciseCancelled;
+      document.getElementById("confirm-save-yes").onclick = this.onSaveChanges;
+      document.getElementById("confirm-save-no").onclick = this.onDiscardChanges;
     },
 
     onExcerciseFilterChanged(event) {
@@ -166,10 +169,66 @@ const controller = {
     },
 
     onExerciseSelected(exerciseId) {
-      let exercise = Exercise.getAll().find( (exercise) => exercise.id==exerciseId );
-      view.model.selectedExercise = exercise;
+      console.log("Switching to exercise selected?", exerciseId);
+      view.model.gotoExercise = Exercise.getAll().find( (exercise) => exercise.id==exerciseId );
+      // check if there are unsaved changes and if so, ask the user if they want to save them
+      if(controller.unsavedChanges()) {
+        let confirmDialog = M.Modal.getInstance(document.getElementById("save-edits"));
+        confirmDialog.options.dismissible = false;
+        confirmDialog.open();
+      } else {
+        controller.switchToExerciseSelected();
+      }
+    },
+
+    unsavedChanges() {
+      if (view.model.selectedExercise === undefined) {
+        return false; // no exercise selected, no unsaved changes
+      } else {
+        // check if the exercise data on the form is different from the original (selected) exercise
+        // note that validity of the form is checked only before saving
+        let exerciseOnForm = controller.getExerciseFromForm();
+        return view.model.copying || !view.model.selectedExercise.equals(exerciseOnForm)
+      }
+    },
+
+    switchToExerciseSelected() {
+      view.model.selectedExercise = view.model.gotoExercise;
       view.model.copying = false; // reset the copying flag
       view.updateExerciseForm();
+    },
+
+    getExerciseFromForm() {
+      let phases = Array.from(view.exercisePhases.selectedOptions).map(option => option.value);
+      let exerciseOnForm = {
+        id: view.exerciseId.value,
+        name: view.exerciseName.value,
+        warmup: phases.includes("warmup"),
+        runabc: phases.includes("runabc"),
+        mainex: phases.includes("mainex"),
+        ending: phases.includes("ending"),
+        sticky: view.model.selectedExercise.sticky,
+        material: view.exerciseMaterial.value,
+        durationmin: parseInt(view.exerciseDurationMin.value, 10),
+        durationmax: parseInt(view.exerciseDurationMax.value, 10),
+        repeats: view.exerciseReps.value,
+        details: Array.from(view.exerciseDetails.value.split(':')),
+        disciplines: Array.from(view.exerciseDisciplines.selectedOptions).map(option => option.value),
+      };
+      return exerciseOnForm;
+    },
+
+    onSaveChanges(event) {
+      // save the changes
+      controller.onSaveExercise(event);
+      // the rest is the same as discarding changes
+      controller.onDiscardChanges(event);
+    },
+
+    onDiscardChanges(event) {
+      M.Modal.getInstance(document.getElementById("save-edits"))
+             .close();
+      controller.switchToExerciseSelected(); // switch to the exercise selected before the save dialog was opened
     },
 
     checkExerciseDuration(event) {
@@ -185,14 +244,14 @@ const controller = {
     checkExerciseEditForm(event) {
       let okay = true;
       let helper = document.getElementById("exercise-phases-helper"); 
-      if(document.getElementById("exercise-phases").value === "") {
+      if(view.exercisePhases.value === "") {
         helper.classList.add("red-text");
         okay = false;
       } else {
         helper.classList.remove("red-text");
       }
       helper = document.getElementById("exercise-disciplines-helper");
-      if(document.getElementById("exercise-disciplines").value === "") {
+      if(view.exerciseDisciplines.value === "") {
         helper.classList.add("red-text");
         okay = false;
       } else {
@@ -208,22 +267,7 @@ const controller = {
       if(!okay) {
         M.toast({html: "Bitte fülle alle Felder korrekt aus.", classes: "red accent-3 rounded"});
       } else {
-        let phases = Array.from(view.exercisePhases.selectedOptions).map(option => option.value);
-        let modifiedExercise = {
-          id: view.exerciseId.value,
-          name: view.exerciseName.value,
-          warmup: phases.includes("warmup"),
-          runabc: phases.includes("runabc"),
-          mainex: phases.includes("mainex"),
-          ending: phases.includes("ending"),
-          sticky: view.model.selectedExercise.sticky,
-          material: view.exerciseMaterial.value,
-          durationmin: parseInt(view.exerciseDurationMin.value, 10),
-          durationmax: parseInt(view.exerciseDurationMax.value, 10),
-          repeats: view.exerciseReps.value,
-          details: view.exerciseDetails.value,
-          disciplines: Array.from(view.exerciseDisciplines.selectedOptions).map(option => option.value),
-        };
+        let modifiedExercise = controller.getExerciseFromForm();
         let request = new Request("db_update.php", {
           method: "POST",
           headers: {
@@ -278,8 +322,8 @@ const controller = {
     },
 
     onDeleteExerciseConfirmed() {
-      let confirmDialog = M.Modal.getInstance(document.getElementById("confirm-delete"));
-      confirmDialog.close();
+      M.Modal.getInstance(document.getElementById("confirm-delete"))
+             .close();
       let request = new Request("db_update.php", {
         method: "POST",
         headers: { "Content-Type": "application/x-www-form-urlencoded"},
