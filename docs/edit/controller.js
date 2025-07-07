@@ -1,17 +1,16 @@
 import { App, Discipline, Exercise, TrainingPlan } from "../model.js";
 
 document.addEventListener('DOMContentLoaded', () => {
-    App.loadData("../").then( (result) => {
-        view.finishUi({
-          version: App.version,
-          disciplines: Discipline.getAll(),
-          selectedExercise: undefined,
-          gotoExercise: undefined, 
-          exerciseListFilter: "",
-          copying: false,
-        });
-        controller.registerEventHandlers();    
+  App.loadData("../").then( (result) => {
+    view.finishUi({
+      version: App.version,
+      disciplines: Discipline.getAll(),
+      selectedExercise: undefined,
+      gotoExercise: undefined, 
+      exerciseListFilter: "",
     });
+    controller.registerEventHandlers();    
+  });
  });
 
 const NULL_EXERCISE = new Exercise("", "", []);
@@ -89,14 +88,15 @@ const view = {
 
   // update the exerise form with the selected exercise
   updateExerciseForm() {
-    let enable;
+    let enable, copying;
     let exercise = this.model.selectedExercise;
     if (exercise === undefined) {
-      enable = false;
+      enable = copying = false;
       exercise = NULL_EXERCISE;
     } else {
       // enable the form only if the app version supports editing
       enable = this.model.version.supportsEditing;
+      copying = exercise.isNotInDb();
     }
 
     this.exerciseId.value = exercise.id;
@@ -111,7 +111,7 @@ const view = {
     Array.from(this.exerciseDisciplines.children)
          .forEach( (option) => option.selected = exercise.disciplines.includes(option.value) );
     
-    this.exerciseId.disabled = !this.model.copying;
+    this.exerciseId.disabled = !copying;
     this.exerciseName.disabled =
     this.exercisePhases.disabled =
     this.exerciseDisciplines.disabled =
@@ -123,7 +123,7 @@ const view = {
     
     if (enable) {
       document.getElementById("save-exercise").classList.remove("disabled");
-      if( this.model.copying) {
+      if(copying) {
         document.getElementById("copy-exercise").classList.add("disabled");
         document.getElementById("delete-exercise").classList.add("disabled");
       } else {
@@ -169,7 +169,6 @@ const controller = {
     },
 
     onExerciseSelected(exerciseId) {
-      console.log("Switching to exercise selected?", exerciseId);
       view.model.gotoExercise = Exercise.getAll().find( (exercise) => exercise.id==exerciseId );
       // check if there are unsaved changes and if so, ask the user if they want to save them
       if(controller.unsavedChanges()) {
@@ -183,46 +182,46 @@ const controller = {
 
     unsavedChanges() {
       if (view.model.selectedExercise === undefined) {
-        return false; // no exercise selected, no unsaved changes
+        return false; // no exercise selected => no unsaved changes
       } else {
         // check if the exercise data on the form is different from the original (selected) exercise
         // note that validity of the form is checked only before saving
         let exerciseOnForm = controller.getExerciseFromForm();
-        return view.model.copying || !view.model.selectedExercise.equals(exerciseOnForm)
+        return view.model.selectedExercise.isNotInDb() || !view.model.selectedExercise.equals(exerciseOnForm)
       }
     },
 
     switchToExerciseSelected() {
       view.model.selectedExercise = view.model.gotoExercise;
-      view.model.copying = false; // reset the copying flag
       view.updateExerciseForm();
     },
 
     getExerciseFromForm() {
       let phases = Array.from(view.exercisePhases.selectedOptions).map(option => option.value);
-      let exerciseOnForm = {
-        id: view.exerciseId.value,
-        name: view.exerciseName.value,
-        warmup: phases.includes("warmup"),
-        runabc: phases.includes("runabc"),
-        mainex: phases.includes("mainex"),
-        ending: phases.includes("ending"),
-        sticky: view.model.selectedExercise.sticky,
-        material: view.exerciseMaterial.value,
-        durationmin: parseInt(view.exerciseDurationMin.value, 10),
-        durationmax: parseInt(view.exerciseDurationMax.value, 10),
-        repeats: view.exerciseReps.value,
-        details: Array.from(view.exerciseDetails.value.split(':')),
-        disciplines: Array.from(view.exerciseDisciplines.selectedOptions).map(option => option.value),
-      };
+      let exerciseOnForm = new Exercise(
+        view.exerciseId.value,
+        view.exerciseName.value,
+        Array.from(view.exerciseDisciplines.selectedOptions).map(option => option.value),
+        parseInt(view.exerciseDurationMin.value, 10),
+        parseInt(view.exerciseDurationMax.value, 10),
+        phases.includes("warmup"),
+        phases.includes("runabc"),
+        phases.includes("mainex"),
+        phases.includes("ending"),
+        view.exerciseReps.value,
+        view.exerciseMaterial.value,
+        Array.from(view.exerciseDetails.value.split(':'))
+      );
+      exerciseOnForm.sticky = view.model.selectedExercise.sticky;
       return exerciseOnForm;
     },
 
-    onSaveChanges(event) {
+    async onSaveChanges(event) {
       // save the changes
-      controller.onSaveExercise(event);
-      // the rest is the same as discarding changes
-      controller.onDiscardChanges(event);
+      controller.saveExerciseChanges().then( () => {
+        // after saving, switch to the selected exercise, same as discarding changes
+        controller.onDiscardChanges(event);
+      });
     },
 
     onDiscardChanges(event) {
@@ -260,23 +259,15 @@ const controller = {
       return okay;
     },
 
-    onSaveExercise(event) {
+    saveExerciseChanges() {
       let okay = document.forms["exercise-edit"].checkValidity() &&
-                 controller.checkExerciseDuration(event) &&
-                 controller.checkExerciseEditForm(event);
+                 controller.checkExerciseDuration() &&
+                 controller.checkExerciseEditForm();
       if(!okay) {
         M.toast({html: "Bitte fülle alle Felder korrekt aus.", classes: "red accent-3 rounded"});
       } else {
         let modifiedExercise = controller.getExerciseFromForm();
-        let request = new Request("db_update.php", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/x-www-form-urlencoded"
-          },
-          body: (view.model.copying ? "create=" : "update=") + JSON.stringify(modifiedExercise)
-        });
-        fetch(request)
-        .then(response => response.json())
+        return modifiedExercise.save()
         .then(data => {
           if(data.success) {
             M.toast({html: "Übung erfolgreich gespeichert.", classes: "green accent-3 rounded"});
@@ -285,14 +276,7 @@ const controller = {
             M.toast({html: "Fehler beim Speichern der Übung: " + data.message, classes: "red accent-3 rounded"});
           }
         })
-        .then(() => App.loadData("../")) // reload data to ensure the data in the browser is up-to-date
-        .then( (result) => {
-          view.model.copying = false; // reset the copying flag
-          // update the selected exercise
-          view.model.selectedExercise = Exercise.getAll().find(exercise => exercise.id === modifiedExercise.id);
-          view.fillExerciseList();
-          view.updateExerciseForm(); // update the form to reflect the changes 
-        })
+        .then( () =>  view.fillExerciseList() ) // update the exercise list in case an exercise was copied or a name changed
         .catch(error => {
           console.error("Error saving exercise:", error);
           M.toast({html: "Fehler beim Speichern der Übung.", classes: "red accent-3 rounded"});
@@ -300,9 +284,15 @@ const controller = {
       }
     },
 
-    onCopyExercise(event) {
+    onSaveExercise() {
+      controller.saveExerciseChanges().then( () => {
+        view.model.selectedExercise = Exercise.getAll().find(exercise => exercise.id === view.model.selectedExercise.id);
+        view.updateExerciseForm(); // update the form to reflect the changes
+      });
+    },
+
+    onCopyExercise() {
       if (view.model.selectedExercise === undefined) { return; }
-      view.model.copying = true; // set the copying flag to true
       view.model.selectedExercise = view.model.selectedExercise.copy(); // set the copied exercise as the selected exercise
       view.updateExerciseForm();
     },
@@ -324,22 +314,15 @@ const controller = {
     onDeleteExerciseConfirmed() {
       M.Modal.getInstance(document.getElementById("confirm-delete"))
              .close();
-      let request = new Request("db_update.php", {
-        method: "POST",
-        headers: { "Content-Type": "application/x-www-form-urlencoded"},
-        body: "delete=" + JSON.stringify(view.model.selectedExercise.id)
-      });
-      fetch(request)
-      .then(response => response.json())
+      view.model.selectedExercise.delete()
       .then(data => {
         if(data.success) {
           M.toast({html: "Übung erfolgreich gelöscht.", classes: "green accent-3 rounded"});
           // delete the exercise in the model
-          App.loadData("../").then( (result) => {  
-            view.model.selectedExercise = undefined; // clear the selected exercise
-            view.fillExerciseList();
-            view.updateExerciseForm();
-          });
+          // App.loadData("../").then( (result) => {  
+          view.model.selectedExercise = undefined; // clear the selected exercise
+          view.fillExerciseList();
+          view.updateExerciseForm();
         } else {
           M.toast({html: "Fehler beim Löschen der Übung: " + data.message, classes: "red accent-3 rounded"});
         }

@@ -18,6 +18,8 @@ const App = {
     await this.getVersion(pathPrefix);
     // Load the Disciplines from the CSV file or the database
     Discipline.Instances = await this.version.disciplineLoader();
+
+    Exercise.save = this.version.exerciseSaver;
     // Load the Exercises from the CSV or the database
     Exercise.createInstances(await this.version.exerciseLoader());
     // Load the saved (favorite) training plans from the CSV or database
@@ -73,7 +75,7 @@ class Exercise {
   }
 
   copy() {
-    let theCopy = Object.assign({},this);
+    let theCopy = Object.create(this);
     // generate a new id based on the id of the copy source
     let idParts = theCopy.id.split(/_\d+$/);
     let sameStartIds = Exercise.Instances.filter( ex => ex.id.startsWith(idParts[0]));
@@ -109,6 +111,27 @@ class Exercise {
       plan.mainex.some( (exercise) => exercise.id==this.id ) ||
       plan.warmup.some( (exercise) => exercise.id==this.id ) ||
       plan.ending.some( (exercise) => exercise.id==this.id )
+    );
+  }
+
+  isNotInDb() {
+    return Exercise.getAll().find(exercise => exercise.id === this.id) ? false : true;
+  }
+
+  save() {
+    this.details = this.details.join(':');
+    return Exercise.save(this.isNotInDb() ? "create" : "update" , this)
+      .then( result => 
+        App.loadData("../") // reload data to ensure it is up-to-date
+        .then(() => result)
+    );
+  }
+
+  delete() {
+    return Exercise.save("delete" , this.id)
+      .then( result => 
+        App.loadData("../") // reload data to ensure it is up-to-date
+        .then(() => result)
     );
   }
 }

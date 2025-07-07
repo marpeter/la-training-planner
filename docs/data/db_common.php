@@ -39,7 +39,6 @@
               $version[$row['field']] = $row['field_val'];
           }
           $version['withDB'] = true;
-          $version['supportsEditing'] = (bool)$version['supportsEditing'];
           $version['supportsFavorites'] = (bool)$version['supportsFavorites'];
       } else {
           $version = FALLBACK_VERSION;

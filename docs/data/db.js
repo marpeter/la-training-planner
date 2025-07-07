@@ -51,6 +51,7 @@ async function dbVersion(pathPrefix="") {
       version.disciplineLoader = loadFromDbTable.bind(null,pathPrefix,"disciplines");
       version.exerciseLoader   = loadFromDbTable.bind(null,pathPrefix,"exercises");
       version.favoritesLoader  = loadFromDbTable.bind(null,pathPrefix,"favorites");
+      version.exerciseSaver = saveToDb.bind(null,pathPrefix,"exercises");
     } else {
       version.number = version.number + " (mit PHP Backend, aber noch ohne Datenbank)";
       version.supportsFavorites = false;
@@ -66,7 +67,7 @@ async function dbVersion(pathPrefix="") {
       number: "0.13.3 (ohne Backend Datenbank)",
       supportsFavorites: false,
       supportsEditing:   false,
-      supportsDownload:  false,
+      supportsUpload:  false,
       disciplineLoader:  loadDisciplinesFromCSV.bind(null,pathPrefix),
       exerciseLoader:    loadExercisesFromCsv.bind(null,pathPrefix),
       favoritesLoader:   loadFavoritesFromCsv.bind(null,pathPrefix),
@@ -83,6 +84,23 @@ async function loadFromDbTable(pathPrefix,table) {
     console.error(`Error loading table ${table}: ` + error);
   });
 }
+
+// save an entity to the database:
+//   table: the name of the entity table
+//   action: create, update, or delete
+async function saveToDb(pathPrefix,table,action,data) {
+  let body = new URLSearchParams({ table: table });
+  body.append(action, JSON.stringify(data));
+  let request = new Request(pathPrefix + "edit/db_update.php", {
+    method: "POST",
+    headers: { "Content-Type": "application/x-www-form-urlencoded" },
+    body: body
+  });
+  return fetch(request).then(response => {
+    if(!response.ok) throw new Error(`HTTP error saving exercise: ${response.status}`);
+    return response.json();
+  });
+};
 
 async function loadExercisesFromCsv(pathPrefix) {
   let csv = await loadCsvFile(pathPrefix + 'data/Exercises.csv');
