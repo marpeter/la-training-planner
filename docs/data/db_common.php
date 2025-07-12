@@ -25,8 +25,6 @@
       'number' => '0.14.200',
       'date' => '2025-05-13',
       'withDB' => false,
-      'supportsEditing' => false,
-      'supportsFavorites' => false,
     ]);
    $dbConnection = connectDB();
     if($dbConnection) {
@@ -39,7 +37,6 @@
               $version[$row['field']] = $row['field_val'];
           }
           $version['withDB'] = true;
-          $version['supportsFavorites'] = (bool)$version['supportsFavorites'];
       } else {
           $version = FALLBACK_VERSION;
       }
