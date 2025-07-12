@@ -49,25 +49,35 @@
         </div>
       </div>
       <div class="row center">
-        <button id="gnrtBtn" class="btn center red">Trainingsplan erzeugen</button>
+        <button id="generate-plan" class="btn center red">Trainingsplan erzeugen</button>
       </div>
       <div class="row center">
-        <button id="prevBtn" class="btn center red disabled"><i class="material-icons">arrow_back_ios</i></button>
-        <button id="loadBtn" class="btn center red">Favoriten laden</button>
-        <button id="nextBtn" class="btn center red disabled"><i class="material-icons">arrow_forward_ios</i></button>
+        <button id="prev-plan" class="btn center red disabled"><i class="material-icons">arrow_back_ios</i></button>
+        <button id="load-plan" class="btn center red">Favoriten laden</button>
+        <button id="next-plan" class="btn center red disabled"><i class="material-icons">arrow_forward_ios</i></button>
         <div id="messages" class="red-text"></div>
       </div>
     </div>
     <div class="divider"></div>
     <div class="section">
-      <h5 id="plan-title" class="card-small red darken-1 center white-text">LA Trainings-Plan</h5>
+      <h5 id="plan-title" class="card-small red darken-1 center white-text">Trainings-Plan</h5>
       <h6 class="card-small red darken-2 center white-text">Aufwärmen</h6>
-      <div class="row" id="warmup"></div>
+      <div class="row" id="warmup"><!-- wird mittels JavaScript gefüllt--></div>
       <h6 class="card-small red darken-2 center white-text">Hauptteil</h6>
-      <div class="row" id="mainex"></div>
+      <div class="row" id="mainex"><!-- wird mittels JavaScript gefüllt--></div>
       <h6 class="card-small red darken-2 center white-text">Schluss</h6>
-      <div class="row" id="ending"></div>
+      <div class="row" id="ending"><!-- wird mittels JavaScript gefüllt--></div>
+      <div class="row">
+        <div class="col s12 center">
+          <button id="save-plan" class="btn red disabled">Plan speichern
+            <i class="material-icons right">save</i></button>
+          <button id="save-plan-as" class="btn red disabled">Plan speichern als ...
+            <i class="material-icons right">save</i></button>
+          <button id="delete-plan" class="btn red disabled">Plan löschen
+            <i class="material-icons right">delete</i></button>
+        </div>
     </div>
+    <div class="divider"></div>
   </div>
   <footer class="section">
     <div class="center grey-text">Version <span id="version">0.13.0</span>,<br/>&copy; 2025 Markus Peter</div>

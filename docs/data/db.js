@@ -45,16 +45,15 @@ async function dbVersion(pathPrefix="") {
     version.withDB = convertIfBoolean(version.withDB);
     if(version.withDB) {
       version.number = version.number + " (mit Backend Datenbank)";
-      version.supportsFavorites = convertIfBoolean(version.supportsFavorites);
       version.supportsEditing   = true;
       version.supportsUpload = true;
       version.disciplineLoader = loadFromDbTable.bind(null,pathPrefix,"disciplines");
       version.exerciseLoader   = loadFromDbTable.bind(null,pathPrefix,"exercises");
       version.favoritesLoader  = loadFromDbTable.bind(null,pathPrefix,"favorites");
-      version.exerciseSaver = saveToDb.bind(null,pathPrefix,"exercises");
+      version.exerciseSaver = saveToDb.bind(null,pathPrefix,"exercise");
+      version.favoritesSaver = saveToDb.bind(null,pathPrefix,"favorite");
     } else {
       version.number = version.number + " (mit PHP Backend, aber noch ohne Datenbank)";
-      version.supportsFavorites = false;
       version.supportsEditing   = false;
       version.supportsUpload   = false;
       version.disciplineLoader = loadDisciplinesFromCSV.bind(null,pathPrefix);
@@ -64,8 +63,7 @@ async function dbVersion(pathPrefix="") {
   } catch (error) {
     console.error("Error loading version from DB: " + error + " --> assuming there is no PHP/DB backend.");
     version = {
-      number: "0.13.3 (ohne Backend Datenbank)",
-      supportsFavorites: false,
+      number: "0.13.4 (ohne Backend Datenbank)",
       supportsEditing:   false,
       supportsUpload:  false,
       disciplineLoader:  loadDisciplinesFromCSV.bind(null,pathPrefix),
@@ -86,15 +84,13 @@ async function loadFromDbTable(pathPrefix,table) {
 }
 
 // save an entity to the database:
-//   table: the name of the entity table
-//   action: create, update, or delete
-async function saveToDb(pathPrefix,table,action,data) {
-  let body = new URLSearchParams({ table: table });
-  body.append(action, JSON.stringify(data));
+//   entityName: exercise or favorite
+//   verb: create, update, or delete
+async function saveToDb(pathPrefix,entityName,action,data) {
   let request = new Request(pathPrefix + "edit/db_update.php", {
     method: "POST",
     headers: { "Content-Type": "application/x-www-form-urlencoded" },
-    body: body
+    body: new URLSearchParams({ verb: action.toLowerCase(),  entity: entityName.toLowerCase(), data : JSON.stringify(data)})
   });
   return fetch(request).then(response => {
     if(!response.ok) throw new Error(`HTTP error saving exercise: ${response.status}`);

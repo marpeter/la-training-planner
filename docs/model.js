@@ -6,7 +6,7 @@ const TEMP_PLAN_ID = "$TMP";
 const App = {
   version: undefined,
 
-  async getVersion(pathPrefix="") {
+  async getVersion(pathPrefix="./") {
     if( !this.version) {
       this.version = await dbVersion(pathPrefix);
       console.log("App version info: " + JSON.stringify(this.version));
@@ -24,6 +24,7 @@ const App = {
     Exercise.createInstances(await this.version.exerciseLoader());
     // Load the saved (favorite) training plans from the CSV or database
     TrainingPlan.createFavorites(await this.version.favoritesLoader());
+    TrainingPlan.save = this.version.favoritesSaver;
   }
 }
 
@@ -165,8 +166,10 @@ class TrainingPlan {
          plan[mapItem.phase][mapItem.position-1]= exercise;
       });
       plan.setSuitableExercises(favorite.disciplines);
+      plan.modified = false; // plans are not modified when loaded from the database
       this.Favorites.push(plan);
     });
+    this.Favorites.sort( (a,b) => parseInt(a.id) < parseInt(b.id) ? -1 : 1 );
   }
 
   static getAvailableFavorites(forDisciplineIds, targetDuration) {
@@ -263,6 +266,7 @@ class TrainingPlan {
       let predecessor = this.mainex[index-1];
       this.mainex[index-1] = this.mainex[index];
       this.mainex[index] = predecessor;
+      if(this.id !== TEMP_PLAN_ID) this.modified = true;
     }
   }
 
@@ -272,6 +276,7 @@ class TrainingPlan {
       let successor = this.mainex[index+1];
       this.mainex[index+1] = this.mainex[index];
       this.mainex[index] = successor;
+      if(this.id !== TEMP_PLAN_ID) this.modified = true;
     }
   }
 
@@ -286,8 +291,54 @@ class TrainingPlan {
         newExercise.duration = this[phase][index].duration;
       }
     } while( (this[phase].includes(newExercise)) || (newExercise.duration!=this[phase][index].duration));  
+    if(this.id !== TEMP_PLAN_ID && newExercise.id !== this[phase][index].id ) this.modified = true;
     this[phase][index] = newExercise;
   }
+
+  isModified() {
+    if(this.id===TEMP_PLAN_ID) {
+      return true; // temporary plans are always modified}
+    } else {
+      return this.modified;
+    }
+  }
+  
+  save() {
+    return TrainingPlan.save("update", this)
+    .then( result => 
+      App.loadData("../") // reload data to ensure it is up-to-date
+      .then(() => result)
+    );
+  }
+
+  saveAs(description) {
+    if(description===undefined || description.trim()==="") {
+      return Promise.reject("Die Beschreibung darf nicht leer sein.");
+    }
+    this.description = description.trim();;
+    this.id = parseInt(TrainingPlan.Favorites[TrainingPlan.Favorites.length-1].id) + 1;
+    this.created_by = "markus"; // TODO: get the current user
+    return TrainingPlan.save("create" , this)
+    .then( result => 
+      App.loadData("../") // reload data to ensure it is up-to-date
+      .then(() => result)
+    );
+  }
+
+  delete() {
+    if(this.id===TEMP_PLAN_ID) {
+      // this is a temporary plan, so just return
+      return;
+    } else {
+      return TrainingPlan.save("delete" , this.id)
+      .then( result => 
+        App.loadData("../") // reload data to ensure it is up-to-date
+        .then(() => result)
+    );
+    }
+
+  }
+
 };
 
 function adder(field, total, exercise) { return total + exercise[field] };
