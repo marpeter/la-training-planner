@@ -182,14 +182,14 @@ class TrainingPlan {
   }
 
   static generate(forDisciplineIds, targetDuration) {
-    this.messages = [];
     if (forDisciplineIds.length==0) {
-      this.messages.push("Bitte wähle mindestens eine Disziplin aus.");
-      return null;
+      return { plan: undefined, messages: ["Bitte wähle mindestens eine Disziplin aus."] };
     }
-
     let plan = new TrainingPlan(TEMP_PLAN_ID, forDisciplineIds);
-    plan.setSuitableExercises(forDisciplineIds);    
+    let messages = plan.setSuitableExercises(forDisciplineIds);
+    if(messages.length>0) {
+      return { plan: undefined, messages: messages };
+    }
     // the following algorithm is based purely on randomly picking exercises and does
     // not consider potential dependencies between exercises
     let attempts = 0;
@@ -226,14 +226,15 @@ class TrainingPlan {
       }
     }
     if(attempts>=MAX_ATTEMPTS) {
-      TrainingPlan.messages.push(`Ich konnte nach ${MAX_ATTEMPTS} Versuchen keinen Plan finden, der deinen Anforderungen entspricht.`);
-      TrainingPlan.messages.push("Bitte versuche es erneut. Manchmal hilft es, eine weitere Disziplin auszuwählen.");
-      return undefined;
+      messages.push(`Ich konnte nach ${MAX_ATTEMPTS} Versuchen keinen Plan finden, der deinen Anforderungen entspricht.`);
+      messages.push("Bitte versuche es erneut. Manchmal hilft es, eine weitere Disziplin auszuwählen.");
+      return { plan: undefined, messages: messages };
     }
-    return plan;
+    return { plan: plan, messages: messages };
   }
 
   setSuitableExercises(forDisciplineIds) {
+    let messages = [];
     let suitableExercises = Exercise.getAll().filter(
       (exercise) =>  forDisciplineIds.some( (selected) => exercise.disciplines.includes(selected) ));
     suitableExercises.forEach( (exercise) => exercise.duration = exercise.durationmin);
@@ -244,10 +245,10 @@ class TrainingPlan {
       this.suitable[phase] = suitableExercises.filter( (exercise) => exercise[phase] );
       // console.log(`${phases[i][1]}übungen: ${JSON.stringify(plan.suitable[phase])}`);
       if(this.suitable[phase].length==0) {
-        TrainingPlan.messages.push(`Es gibt keine ${phases[i][1]}übungen für die ausgewählten Disziplinen.`);
-        return null;
+        messages.push(`Es gibt keine ${phases[i][1]}übungen für die ausgewählten Disziplinen.`);
       }
-    }    
+    } 
+    return messages;
   }
 
   duration() {

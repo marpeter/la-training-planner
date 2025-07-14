@@ -149,14 +149,8 @@ const view = {
   },
 
   updateMessages(messages) {
-    let messageDiv = document.getElementById("messages");
-    while(messageDiv.firstChild) { messageDiv.removeChild(messageDiv.firstChild);};
-    if(messages.length>0) {
-      let messageCard = document.createElement("div");
-      messageCard.classList.add("card-panel");
-      messageCard.innerHTML = messages.join("<br>");
-      messageDiv.appendChild(messageCard);
-    }
+    if(messages.length===0) return;
+    M.toast({html: messages.join("<br>"), classes: "red accent-3 rounded"});
   },
 };
 
@@ -175,8 +169,8 @@ const controller = {
   },
 
   onCreatePlanButtonPressed() {
-    let plan = TrainingPlan.generate(view.model.selectedDisciplines, view.model.duration);
-    view.updateMessages(TrainingPlan.messages);
+    let { plan: plan, messages: messages } = TrainingPlan.generate(view.model.selectedDisciplines, view.model.duration);
+    view.updateMessages(messages);
     if(plan) {
       view.model.plan = plan;
       view.model.selectedFavorite = undefined;
