@@ -2,13 +2,15 @@
 namespace LaPlanner;
 
 abstract class DataLoader {
-    protected $messages = [];
+    // override these properties in each concrete class
     protected $headerFields = [];
     protected $entityNames = [];
     protected $entityTableNames = [];
+    // default separator is comma - override in subclasses as needed
+    protected $separator = ',';
+    protected $messages = [];
     protected $fieldMaps = [];
     protected $dataLoad = [];
-    protected $separator = ',';
 
     public function load($data, &$messages) {
         $this->messages = &$messages;
@@ -25,8 +27,8 @@ abstract class DataLoader {
             $entityNo++;
         }
         // process the data
-        $dbConnection = connectDB();
-        $dbConnection->autocommit(false);
+        $dbConnection = connectDB_PDO();
+        $dbConnection->beginTransaction();
         // 1. remove current database entries
         $okay = $this->clearCurrentEntries($dbConnection);
         // 2. insert the uploaded disciplines
@@ -34,13 +36,11 @@ abstract class DataLoader {
         // 3. commit or rollback
         if($okay) {
             $dbConnection->commit();
-            $dbConnection->close();
             $c1 = count($this->dataLoad[0]);
             $messages[] = "Es wurden $c1 {$this->entityNames[0]}en geladen.";
             return 1;
         } else {
-            $dbConnection->rollback();
-            $dbConnection->close();
+            $dbConnection->rollBack();
             $messages[] = "Es wurden keine {$this->entityNames[0]}en geladen.";
             return 0;
         }
@@ -49,10 +49,10 @@ abstract class DataLoader {
     protected function clearCurrentEntries($dbConnection) {
         try {
             foreach($this->entityTableNames as $tableName) {
-                $result = $dbConnection->query("DELETE FROM $tableName");
+                $result = $dbConnection->exec("DELETE FROM $tableName");
             }
             return true;
-        } catch( mysqli_sql_exception $ex) {
+        } catch( \PDOException $ex) {
             $error = $ex->getMessage();
             $this->messages[] = "Löschen der vorhanden {$this->entityNames[0]} Daten fehlgeschlagen, Fehler: $error.";
             return false;
@@ -122,39 +122,52 @@ class DisciplineLoader extends DataLoader {
     protected $entityTableNames = ['DISCIPLINES'];
 
     protected function insertUploadedEntries($dbConnection) {
-        $stmt_header = $dbConnection->prepare('INSERT INTO DISCIPLINES (id, name, image) VALUES (?, ?, ?)');
-        $stmt_header->bind_param('sss', $id, $name, $image);
+        $stmt = $dbConnection->prepare('INSERT INTO DISCIPLINES ' . 
+            '( id,  name,  image) VALUES ' . 
+            '(:id, :name, :image)');
+        $stmt->bindParam('id', $id, \PDO::PARAM_STR);
+        $stmt->bindParam('name', $name, \PDO::PARAM_STR);
+        $stmt->bindParam('image', $image, \PDO::PARAM_STR);
         $okay = true;
         foreach($this->dataLoad[0] as ['id' => $id, 'name' => $name, 'image' => $image]) {
             try {
-                if(!$stmt_header->execute()) {
-                    $this->messages[] =  "Einfügen der Disziplin-Zeile $id, $name, $image ist fehlgeschlagen.";
-                    $okay = false;
-                }
-            } catch( mysqli_sql_exception $ex) {
+                $stmt->execute();
+            } catch( \PDOException $ex) {
                 $error = $ex->getMessage();
-                $this->messages[] = "Disziplin $id in die Datenbank laden ist fehlgeschlagen, Fehler: $error.";
+                $this->messages[] =  "Einfügen der Disziplin-Zeile $id, $name, $image ist fehlgeschlagen, Fehler: $error.";
                 $okay = false;
             }
         }
-        $stmt_header->close();
         return $okay;
     }
 }
 
 class ExerciseLoader extends DataLoader {
     protected $headerFields = [ ['id', 'name', 'warmup', 'runabc', 'mainex', 'ending', 
-      'material', 'durationmin', 'durationmax', 'repeats', 'disciplines[]', 'details[]']];
+        'material', 'durationmin', 'durationmax', 'repeats', 'disciplines[]', 'details[]']];
     protected $entityNames = ['Übung'];
     protected $entityTableNames = ['EXERCISES WHERE NOT id="Auslaufen"', 'EXERCISES_DISCIPLINES'];
     protected $separator = ';';
 
     protected function insertUploadedEntries($dbConnection) {
         $okay = true;
-        $stmt_header = $dbConnection->prepare('INSERT INTO EXERCISES (id, name, warmup, runabc, mainex, ending, material, durationmin, durationmax, repeats, details) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)');
-        $stmt_header->bind_param('ssiiiisiiss', $id, $name, $warmup, $runabc, $mainex, $ending, $material, $durationmin, $durationmax, $repeats, $details);
-        $stmt_dscplns = $dbConnection->prepare('INSERT INTO EXERCISES_DISCIPLINES (exercise_id, discipline_id) VALUES (?,?)');
-        $stmt_dscplns->bind_param('ss', $id, $discipline_id);
+        $stmt_header = $dbConnection->prepare('INSERT INTO EXERCISES ' .
+            '( id,  name,  warmup,  runabc,  mainex,  ending,  material,  durationmin,  durationmax,  repeats,  details) VALUES ' . 
+            '(:id, :name, :warmup, :runabc, :mainex, :ending, :material, :durationmin, :durationmax, :repeats, :details)');
+        $stmt_header->bindParam('id', $id, \PDO::PARAM_STR);
+        $stmt_header->bindParam('name', $name, \PDO::PARAM_STR);
+        $stmt_header->bindParam('warmup', $warmup, \PDO::PARAM_INT);
+        $stmt_header->bindParam('runabc', $runabc, \PDO::PARAM_INT);
+        $stmt_header->bindParam('mainex', $mainex, \PDO::PARAM_INT);
+        $stmt_header->bindParam('ending', $ending, \PDO::PARAM_INT);
+        $stmt_header->bindParam('durationmin', $durationmin, \PDO::PARAM_INT);
+        $stmt_header->bindParam('durationmax', $durationmax, \PDO::PARAM_INT);
+        $stmt_header->bindParam('material', $material, \PDO::PARAM_STR);
+        $stmt_header->bindParam('repeats', $repeats, \PDO::PARAM_STR);
+        $stmt_header->bindParam('details', $details, \PDO::PARAM_STR);           
+        $stmt_dscplns = $dbConnection->prepare('INSERT INTO EXERCISES_DISCIPLINES (exercise_id, discipline_id) VALUES (:id,:discipline_id)');
+        $stmt_dscplns->bindParam('id', $id, \PDO::PARAM_STR);
+        $stmt_dscplns->bindParam('discipline_id', $discipline_id, \PDO::PARAM_STR);
         foreach($this->dataLoad[0] as ['id' => $id, 'name' => $name, 'warmup' => $warmup,
               'runabc' => $runabc, 'mainex' => $mainex, 'ending' => $ending, 'material' => $material,
               'durationmin' => $durationmin, 'durationmax' => $durationmax, 'repeats' => $repeats,
@@ -166,25 +179,22 @@ class ExerciseLoader extends DataLoader {
             $mainex = $mainex=="true" ? 1 : 0;
             $ending = $ending=="true" ? 1 : 0;
             try {
-                if(!$stmt_header->execute()) {
-                    $messages[] =  'Einfügen der Übungs-Zeile $id, $name, ... ist fehlgeschlagen.';
-                    $okay = false;
-                } else {
-                    foreach($disciplines as $discipline_id) {
-                        if(!$stmt_dscplns->execute()) {
-                            $messages[] = 'Hinzufügen der Disziplin $discipline_id zu Übung $id ist fehlgeschlagen.';
-                            $okay = false;
-                        }
-                    }
+                $stmt_header->execute();
+                foreach($disciplines as $discipline_id) {
+                    try {
+                        $stmt_dscplns->execute();
+                    } catch(\PDOException $ex) {
+                        $error = $ex->getMessage();
+                        $messages[] = 'Hinzufügen der Disziplin $discipline_id zu Übung $id ist fehlgeschlagen, Fehler: $error.';
+                        $okay = false;
+                    }                    
                 }
-            } catch( mysqli_sql_exception $ex) {
+            } catch(\PDOException $ex) {
                 $error = $ex->getMessage();
-                $messages[] = "Übung $id in die Datenbank laden ist fehlgeschlagen, Fehler: $error.";
+                $messages[] =  'Einfügen der Übungs-Zeile $id, $name, ... ist fehlgeschlagen, Fehler: $error.';
                 $okay = false;
             }
         }
-        $stmt_dscplns->close();
-        $stmt_header->close();
         return $okay;
       }
 }
@@ -197,50 +207,54 @@ class FavoriteLoader extends DataLoader {
     
     protected function insertUploadedEntries($dbConnection) {
         $okay = true;
-        $stmt_header = $dbConnection->prepare('INSERT INTO FAVORITE_HEADERS (id, created_by, created_at, description) VALUES (?, ?, ?, ?)');
-        $stmt_header->bind_param('isss', $id, $created_by, $created_at, $descr);
-        $stmt_dscplns = $dbConnection->prepare('INSERT INTO FAVORITE_DISCIPLINES (favorite_id, discipline_id) VALUES (?,?)');
-        $stmt_dscplns->bind_param('is', $id, $discipline_id);
-
+        $stmt_header = $dbConnection->prepare('INSERT INTO FAVORITE_HEADERS ' . 
+            '( id,  created_by,  created_at,  description) VALUES ' . 
+            '(:id, :created_by, :created_at, :description)');
+        $stmt_header->bindParam('id', $id, \PDO::PARAM_INT);
+        $stmt_header->bindParam('created_by', $created_by, \PDO::PARAM_STR);
+        $stmt_header->bindParam('created_at', $created_at, \PDO::PARAM_STR);
+        $stmt_header->bindParam('description', $descr, \PDO::PARAM_STR);
+        $stmt_dscplns = $dbConnection->prepare('INSERT INTO FAVORITE_DISCIPLINES (favorite_id, discipline_id) VALUES (:id,:discipline_id)');
+        $stmt_dscplns->bindParam('id', $id, \PDO::PARAM_INT);
+        $stmt_dscplns->bindParam('discipline_id', $discipline_id, \PDO::PARAM_STR);
         foreach($this->dataLoad[0] as ['id' => $id, 'created_by' => $created_by, 'created_at' => $created_at,
                                       'description' => $descr, 'disciplines[]' => $disciplines]) {
             try {
-                if(!$stmt_header->execute()) {
-                    $this->messages[] = "Einfügen der Favoritem-Zeile id=$id, created_by=$created_by, created_at=$created_at, description=$descr ist fehlgeschlagen.";
-                    $okay = false;
-                } else {
-                    foreach($disciplines as $discipline_id) {
-                        if(!$stmt_dscplns->execute()) {
-                            $this->messages[] = "Hinzufügen der Disziplin id=$discipline_id zu Favorit id=$id ist fehlgeschlagen.";
-                            $okay = false;
-                        }
+                $stmt_header->execute();
+                foreach($disciplines as $discipline_id) {
+                    try {
+                        $stmt_dscplns->execute();
+                    } catch( \PDOException $ex) {
+                        $error = $ex->getMessage();
+                        $this->messages[] = "Hinzufügen der Disziplin id=$discipline_id zu Favorit id=$id ist fehlgeschlagen, Fehler: $error.";
+                        $okay = false;
                     }
                 }
-            } catch( mysqli_sql_exception $ex) {
+            } catch( \PDOException $ex) {
                 $error = $ex->getMessage();
-                $this->messages[] = "Favorit id=$id in die Datenbank laden ist fehlgeschlagen, Fehler: $error.";
+                $this->messages[] = "Einfügen der Favoritem-Zeile id=$id, created_by=$created_by, created_at=$created_at, description=$descr ist fehlgeschlagen, Fehler: $error.";
                 $okay = false;
             }
         }
-        $stmt_dscplns->close();
-        $stmt_header->close();
         // 3. insert the exercise-favorite relations
-        $stmt_exmap = $dbConnection->prepare('INSERT INTO FAVORITE_EXERCISES (favorite_id, phase, position, exercise_id, duration) VALUES (?,?,?,?,?)');
-        $stmt_exmap->bind_param('isisi', $favorite_id, $phase, $position, $exercise_id, $duration);     
+        $stmt_exmap = $dbConnection->prepare('INSERT INTO FAVORITE_EXERCISES ' . 
+            '( favorite_id,  phase,  position,  exercise_id,  duration) VALUES ' . 
+            '(:favorite_id, :phase, :position, :exercise_id, :duration)');
+        $stmt_exmap->bindParam(':favorite_id', $favorite_id, \PDO::PARAM_INT);
+        $stmt_exmap->bindParam(':phase', $phase, \PDO::PARAM_STR);
+        $stmt_exmap->bindParam(':position', $position, \PDO::PARAM_INT);
+        $stmt_exmap->bindParam(':exercise_id', $exercise_id, \PDO::PARAM_STR);
+        $stmt_exmap->bindParam(':duration', $duration, \PDO::PARAM_INT);
         foreach($this->dataLoad[1] as ['favorite_id' => $favorite_id, 'phase' => $phase, 'position' => $position,
                                       'exercise_id' => $exercise_id, 'duration' => $duration]) {
             try {
-                if(!$stmt_exmap->execute()) {
-                    $messages[] = "Übung $exercise_id zu Favorit $favorite_id (Phase $phase, Pos. $position, Dauer $duration) ist fehlgeschlagen.";
-                    $okay = false;
-                }          
-            } catch( mysqli_sql_exception $ex) {
+                $stmt_exmap->execute();
+            } catch( \PDOException $ex) {
                 $error = $ex->getMessage();
-                $messages[] = "Favorit $favorite_id mit Übung $exercise_id in die Datenbank laden ist fehlgeschlagen, Fehler: $error.";
+                $messages[] = "Übung $exercise_id zu Favorit $favorite_id (Phase $phase, Pos. $position, Dauer $duration) ist fehlgeschlagen, Fehler: $error.";
                 $okay = false;
             }
         }
-        $stmt_exmap->close();
         return $okay;
     }
 }
