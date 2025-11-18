@@ -5,7 +5,7 @@ include('db_common.php');
 
 class DisciplineReader extends AbstractTableReader {
     protected $tableNames = ['DISCIPLINES'];
-    protected function convert() {
+    protected function deserialize() {
         return json_encode($this->data['DISCIPLINES']);
     }
 }
@@ -13,7 +13,7 @@ class DisciplineReader extends AbstractTableReader {
 class ExerciseReader extends AbstractTableReader {
     protected $tableNames = ['EXERCISES', 'EXERCISES_DISCIPLINES'];
 
-    protected function convert() {
+    protected function deserialize() {
         foreach ($this->data['EXERCISES'] as &$exercise) {
             $exercise['warmup'] = (bool)$exercise['warmup'];
             $exercise['runabc'] = (bool)$exercise['runabc'];
@@ -36,7 +36,7 @@ class ExerciseReader extends AbstractTableReader {
 class FavoriteReader extends AbstractTableReader {
     protected $tableNames = ['FAVORITE_HEADERS', 'FAVORITE_DISCIPLINES', 'FAVORITE_EXERCISES'];
 
-    protected function convert() {
+    protected function deserialize() {
         foreach ($this->data['FAVORITE_HEADERS'] as &$favorite) {
             $favorite['disciplines'] = [];
             foreach ($this->data['FAVORITE_DISCIPLINES'] as $favoriteDiscipline) {

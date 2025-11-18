@@ -45,7 +45,6 @@ function getDbVersion() {
             $version[$row['field']] = $row['field_val'];
         }
         $version['withDB'] = true;
-        $dbConnection = null;
         return $version;
     } else {
         return [
@@ -57,6 +56,7 @@ function getDbVersion() {
 }
 
 abstract class AbstractTableReader {
+    // override @tableNames in each concrete class to hold the array of table names to read from DB
     protected $tableNames = [];
     protected $data = null;
 
@@ -77,16 +77,19 @@ abstract class AbstractTableReader {
     protected function setHeader() {
         header('Content-Type: application/json');
     }
-    abstract protected function convert();
+    // override @deserialize in each concrete class to convert $this->data as returned from the
+    // database into the desired format
+    abstract protected function deserialize();
 
     public function echo() {
         $this->readFromDb();
         $this->setHeader();
-        echo $this->convert();
+        echo $this->deserialize();
     }
   }
 
-abstract class AbstractTableReaderCSV extends AbstractTableReader {
+abstract class AbstractTableToCsvReader extends AbstractTableReader {
+    // override @fileName in each concrete class to hold the desired download file name
     protected $fileName;
     protected function setHeader() {
         header('Content-Type: text/csv');
