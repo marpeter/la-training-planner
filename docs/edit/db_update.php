@@ -21,22 +21,22 @@ abstract class DataSaver {
     private function doAction($data, $action, $actionName) {
         $result = "";
         try {
-            $dbConnection = connectDB();
-            $dbConnection->autocommit(false);
+            $dbConnection = connectDB_PDO();
+            $dbConnection->beginTransaction();
             $this->$action($data, $dbConnection);
             $dbConnection->commit();
             $result =  [
                 'success' => true,
                 'message' => $data,
             ];
-        } catch (mysqli_sql_exception $ex) {
-            $dbConnection->rollback();
+        } catch (\PDOException $ex) {
+            $dbConnection->rollBack();
             return [
                 'success' => false,
-                'message' => "Fehler beim {$actionName} der {$ENTITY}: " . $ex->getMessage(),
+                'message' => "Fehler beim {$actionName} der {$this->ENTITY}: " . $ex->getMessage(),
             ];
         } finally {
-            $dbConnection->close();
+            $dbConnection = null;
         }
         return $result;
     }
@@ -47,45 +47,66 @@ class ExerciseSaver extends DataSaver {
 
     protected function createEntity($exercise, $dbConnection) {
         $this->convertPhaseFlags($exercise);
-        $stmt = $dbConnection->prepare(
-            'INSERT INTO EXERCISES (id, name, warmup, runabc, mainex, ending, durationmin, durationmax, material, repeats, details) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)');
-        $stmt->bind_param('ssiiiiiisss',  $exercise['id'], $exercise['name'], $exercise['warmup'], $exercise['runabc'], $exercise['mainex'],
-            $exercise['ending'], $exercise['durationmin'], $exercise['durationmax'], $exercise['material'], $exercise['repeats'],
-            $exercise['details']);
-        if(!$stmt->execute()) {
-            throw new mysqli_sql_exception('Fehler beim Erstellen der Übung: ' . $stmt->error);
+        try {
+            $stmt = $dbConnection->prepare(
+                'INSERT INTO EXERCISES ' . 
+                '(id, name, warmup, runabc, mainex, ending, durationmin, durationmax, material, repeats, details) VALUES ' .
+                '(:id, :name, :warmup, :runabc, :mainex, :ending, :durationmin, :durationmax, :material, :repeats, :details)');
+            $stmt->bindParam('id', $exercise['id'], \PDO::PARAM_STR);
+            $stmt->bindParam('name', $exercise['name'], \PDO::PARAM_STR);
+            $stmt->bindParam('warmup', $exercise['warmup'], \PDO::PARAM_INT);
+            $stmt->bindParam('runabc', $exercise['runabc'], \PDO::PARAM_INT);
+            $stmt->bindParam('mainex', $exercise['mainex'], \PDO::PARAM_INT);
+            $stmt->bindParam('ending', $exercise['ending'], \PDO::PARAM_INT);
+            $stmt->bindParam('durationmin', $exercise['durationmin'], \PDO::PARAM_INT);
+            $stmt->bindParam('durationmax', $exercise['durationmax'], \PDO::PARAM_INT);
+            $stmt->bindParam('material', $exercise['material'], \PDO::PARAM_STR);
+            $stmt->bindParam('repeats', $exercise['repeats'], \PDO::PARAM_STR);
+            $stmt->bindParam('details', $exercise['details'], \PDO::PARAM_STR);
+            $stmt->execute();
+            $stmt = null;
+            $this->insertDependants($exercise,$dbConnection);
+        } catch (\PDOException $ex) {
+            throw new \PDOException('Fehler beim Erstellen der Übung: ' . $ex->getMessage());
         }
-        $stmt->close();
-        $this->insertDependants($exercise,$dbConnection);
     }
     protected function updateEntity($exercise, $dbConnection) {
         $this->convertPhaseFlags($exercise);
-        $stmt = $dbConnection->prepare(
-            'UPDATE EXERCISES SET name=?, warmup=?, runabc=?, mainex=?, ending=?, durationmin=?, durationmax=?, material=?, repeats=?, details=? WHERE id = ?');
-        $stmt->bind_param('siiiiiissss', $exercise['name'], $exercise['warmup'], $exercise['runabc'], $exercise['mainex'],
-            $exercise['ending'], $exercise['durationmin'], $exercise['durationmax'], $exercise['material'], $exercise['repeats'],
-            $exercise['details'], $exercise['id']);
-        if(!$stmt->execute()) {
-            throw new mysqli_sql_exception('Fehler beim Ändern der Übung: ' . $stmt->error);
+        try {
+            $stmt = $dbConnection->prepare(
+                'UPDATE EXERCISES SET name=:name, warmup=:warmup, runabc=:runabc, mainex=:mainex, ending=:ending, durationmin=:durationmin, ' . 
+                'durationmax=:durationmax, material=:material, repeats=:repeats, details=:details WHERE id = :id');
+            $stmt->bindParam('id', $exercise['id'], \PDO::PARAM_STR);
+            $stmt->bindParam('name', $exercise['name'], \PDO::PARAM_STR);
+            $stmt->bindParam('warmup', $exercise['warmup'], \PDO::PARAM_INT);
+            $stmt->bindParam('runabc', $exercise['runabc'], \PDO::PARAM_INT);
+            $stmt->bindParam('mainex', $exercise['mainex'], \PDO::PARAM_INT);
+            $stmt->bindParam('ending', $exercise['ending'], \PDO::PARAM_INT);
+            $stmt->bindParam('durationmin', $exercise['durationmin'], \PDO::PARAM_INT);
+            $stmt->bindParam('durationmax', $exercise['durationmax'], \PDO::PARAM_INT);
+            $stmt->bindParam('material', $exercise['material'], \PDO::PARAM_STR);
+            $stmt->bindParam('repeats', $exercise['repeats'], \PDO::PARAM_STR);
+            $stmt->bindParam('details', $exercise['details'], \PDO::PARAM_STR);
+            $stmt->execute();
+            $stmt = null;
+            $this->deleteDependants($exercise,$dbConnection);
+            $this->insertDependants($exercise,$dbConnection);
+        } catch (\PDOException $ex) {
+            throw new \PDOException('Fehler beim Ändern der Übung: ' . $ex->getMessage());
         }
-        $stmt->close();
-        $this->deleteDependants($exercise,$dbConnection);
-        $this->insertDependants($exercise,$dbConnection);
     }
     protected function deleteEntity($exerciseId, $dbConnection) {
-        $stmt = $dbConnection->prepare('DELETE FROM EXERCISES WHERE id = ?');
-        $stmt->bind_param('s', $exerciseId);
-        if(!$stmt->execute()) {
-            throw new mysqli_sql_exception('Fehler beim Löschen der Übung: ' . $stmt->error);
+        try {
+            $stmt = $dbConnection->prepare('DELETE FROM EXERCISES WHERE id = :id');
+            $stmt->bindParam('id', $exerciseId, \PDO::PARAM_STR);
+            $stmt->execute();
+            $this->deleteDependants($exercise,$dbConnection);
+            $stmt = $dbConnection->prepare('DELETE FROM FAVORITE_EXERCISES WHERE exercise_id=:id');
+            $stmt->bindParam('id', $exerciseId, \PDO::PARAM_STR);
+            $stmt->execute();
+        } catch (\PDOException $ex) {
+            throw new \PDOException('Fehler beim Löschen der Übung: ' . $ex->getMessage());
         }
-        $stmt->close();
-        $this->deleteDependants($exercise,$dbConnection);
-        $stmt = $dbConnection->prepare('DELETE FROM FAVORITE_EXERCISES WHERE exercise_id=?');
-        $stmt->bind_param('s', $exerciseId);
-        if(!$stmt->execute()) {
-            throw new mysqli_sql_exception('Fehler beim Löschen der Übung: ' . $stmt->error);
-        }
-        $stmt->close();
     }
 
     private function convertPhaseFlags(&$exercise) {
@@ -95,22 +116,24 @@ class ExerciseSaver extends DataSaver {
         $exercise['ending'] = $exercise['ending']=="true" ? 1 : 0;
     }
     private function deleteDependants($exercise, $dbConnection) {
-        $stmt = $dbConnection->prepare('DELETE FROM EXERCISES_DISCIPLINES WHERE exercise_id=?');
-        $stmt->bind_param('s', $exercise['id']);
+        $stmt = $dbConnection->prepare('DELETE FROM EXERCISES_DISCIPLINES WHERE exercise_id=:id');
+        $stmt->bindParam('id', $exercise['id'], \PDO::PARAM_STR);
         $stmt->execute();
-        $stmt->close();
-        // note that FAVORITE_EXERCISES are NOT deleted to prevent them from being delete in the update case
+        // note that FAVORITE_EXERCISES are NOT deleted to prevent them from being deleted in the update case
         //      because the exercise data would not include update information for FAVORITE_EXERCISES
     }
     private function insertDependants($exercise, $dbConnection) {
-        $stmt = $dbConnection->prepare('INSERT INTO EXERCISES_DISCIPLINES (exercise_id, discipline_id) VALUES (?, ?)');
-        $stmt->bind_param('ss', $exercise['id'], $discipline_id);
-        foreach($exercise['disciplines'] as $discipline_id){
-            if(!$stmt->execute()) {
-                  throw new mysqli_sql_exception('Fehler beim Erstellen der Disziplinen der Übung: ' . $stmt->error);
+        try {
+            $stmt = $dbConnection->prepare('INSERT INTO EXERCISES_DISCIPLINES (exercise_id, discipline_id) '
+                . 'VALUES (:exercise_id, :discipline_id)');
+            $stmt->bindParam('exercise_id', $exercise['id'], \PDO::PARAM_STR);
+            $stmt->bindParam('discipline_id', $discipline_id, \PDO::PARAM_STR);
+            foreach($exercise['disciplines'] as $discipline_id){
+                $stmt->execute();
             }
+        } catch (\PDOException $ex) {
+            throw new \PDOException('Fehler beim Erstellen der Disziplinen der Übung: ' . $ex->getMessage());   
         }
-        $stmt->close();
     }
 }
 
@@ -118,73 +141,91 @@ class FavoriteSaver extends DataSaver {
     protected $ENTITY = "Favoriten";
 
     protected function createEntity($favorite, $dbConnection) {
-        $stmt = $dbConnection->prepare('INSERT INTO FAVORITE_HEADERS (id, created_by, description) VALUES (?, ?, ?)');
-        $stmt->bind_param('iss', $favorite['id'], $favorite['created_by'], $favorite['description']);
-        if(!$stmt->execute()) {
-            throw new mysqli_sql_exception('Fehler beim Erstellen des Favoriten: ' . $stmt->error);
+        try {
+            $stmt = $dbConnection->prepare('INSERT INTO FAVORITE_HEADERS (id, created_by, description) VALUES ' . 
+                '(:id, :created_by, :description)');
+            $stmt->bindParam('id', $favorite['id'], \PDO::PARAM_INT);
+            $stmt->bindParam('created_by', $favorite['created_by'], \PDO::PARAM_STR);
+            $stmt->bindParam('description', $favorite['description'], \PDO::PARAM_STR);
+            $stmt->execute();
+            $stmt = null;
+            $this->insertDependants($favorite, $dbConnection);
+        } catch (\PDOException $ex) {
+            throw new \PDOException('Fehler beim Erstellen des Favoriten: ' . $ex->getMessage());   
         }
-        $stmt->close();
-        $this->insertDependants($favorite, $dbConnection);
     }
 
     protected function updateEntity($favorite, $dbConnection) {
-        $stmt = $dbConnection->prepare('UPDATE FAVORITE_HEADERS SET description = ? WHERE id = ?');
-        $stmt->bind_param('si', $favorite['description'], $favorite['id']);
-        if(!$stmt->execute()) {
-            throw new mysqli_sql_exception('Fehler beim Ändern des Favoriten: ' . $stmt->error);
+        try {
+            $stmt = $dbConnection->prepare('UPDATE FAVORITE_HEADERS SET description = :description WHERE id = :id');
+            $stmt->bindParam('id', $favorite['id'], \PDO::PARAM_INT);
+            $stmt->bindParam('description', $favorite['description'], \PDO::PARAM_STR);
+            $stmt =null;
+            $this->deleteDependants($favorite['id'], $dbConnection);
+            $this->insertDependants($favorite, $dbConnection);
+        } catch (\PDOException $ex) {
+            throw new \PDOException('Fehler beim Ändern des Favoriten: ' . $ex->getMessage());   
         }
-        $stmt->close();
-        $this->deleteDependants($favorite['id'], $dbConnection);
-        $this->insertDependants($favorite, $dbConnection);
     }
 
     protected function deleteEntity($favoriteId, $dbConnection) {
-        $stmt = $dbConnection->prepare('DELETE FROM FAVORITE_HEADERS WHERE id = ?');
-        $stmt->bind_param('i', $favoriteId);
-        if(!$stmt->execute()) {
-            throw new mysqli_sql_exception('Fehler beim Löschen des Favoriten: ' . $stmt->error);
+        try {
+            $stmt = $dbConnection->prepare('DELETE FROM FAVORITE_HEADERS WHERE id = :id');
+            $stmt->bindParam('id', $favoriteId, \PDO::PARAM_INT);
+            $stmt->execute();
+            $stmt = null;
+            $this->deleteDependants($favoriteId, $dbConnection);
+        } catch (\PDOException $ex) {
+            throw new \PDOException('Fehler beim Laden des Favoriten zum Löschen: ' . $ex->getMessage());
         }
-        $stmt->close();
-        $this->deleteDependants($favoriteId, $dbConnection);
     }
 
     private function insertDependants($favorite, $dbConnection) {
-        $stmt = $dbConnection->prepare('INSERT INTO FAVORITE_DISCIPLINES (favorite_id, discipline_id) VALUES (?, ?)');
-        $stmt->bind_param('is', $favorite['id'], $discipline_id);
-        foreach($favorite['disciplines'] as $discipline) {
-            $discipline_id = $discipline['id'];
-            if(!$stmt->execute()) {
-                throw new mysqli_sql_exception('Fehler beim Erstellen der Disziplinen des Favoriten: ' . $stmt->error);
+        try {
+            $stmt = $dbConnection->prepare('INSERT INTO FAVORITE_DISCIPLINES (favorite_id, discipline_id) VALUES ' . 
+                '(:favorite_id, :discipline_id)');
+            $stmt->bindParam('favorite_id', $favorite['id'], \PDO::PARAM_INT);
+            $stmt->bindParam('discipline_id', $discipline_id, \PDO::PARAM_STR);
+            foreach($favorite['disciplines'] as $discipline) {
+                $discipline_id = $discipline['id'];
+                $stmt->execute();
             }
-        }
-        $stmt->close();
-        $stmt = $dbConnection->prepare('INSERT INTO FAVORITE_EXERCISES (favorite_id, exercise_id, phase, position, duration) VALUES (?, ?, ?, ?, ?)');
-        foreach(['warmup', 'mainex', 'ending'] as $phase) {
-            $position = 1;
-            foreach($favorite[$phase] as $exercise) {
-                $stmt->bind_param('issii', $favorite['id'], $exercise['id'], $phase, $position, $exercise['duration']);
-                if(!$stmt->execute()) {
-                    throw new mysqli_sql_exception('Fehler beim Erstellen der Übungen im Favoriten: ' . $stmt->error);
+            $stmt = $dbConnection->prepare('INSERT INTO FAVORITE_EXERCISES ' . 
+                '( favorite_id,  exercise_id,  phase,  position,  duration) VALUES ' . 
+                '(:favorite_id, :exercise_id, :phase, :position, :duration)');
+            $stmt->bindParam('favorite_id', $favorite['id'], \PDO::PARAM_INT);
+            foreach(['warmup', 'mainex', 'ending'] as $phase) {
+                $position = 1;
+                foreach($favorite[$phase] as $exercise) {
+                    $stmt->bindParam('exercise_id', $exercise['id'], \PDO::PARAM_STR);
+                    $stmt->bindParam('phase', $phase, \PDO::PARAM_STR);
+                    $stmt->bindParam('position', $position, \PDO::PARAM_INT);
+                    $stmt->bindParam('duration', $exercise['duration'], \PDO::PARAM_INT);
+                    $stmt->execute();
+                    $position++;
                 }
-                $position++;
             }
+        } catch (\PDOException $ex) {
+            throw new \PDOException('Fehler beim Erstellen der Disziplinen des Favoriten: ' . $ex->getMessage());
         }
-        $stmt->close();
     }
 
     private function deleteDependants($favoriteId, $dbConnection) {
-        $stmt = $dbConnection->prepare('DELETE FROM FAVORITE_DISCIPLINES WHERE favorite_id = ?');
-        $stmt->bind_param('i', $favoriteId);
-        if(!$stmt->execute()) {
-            throw new mysqli_sql_exception('Fehler beim Löschen der Disziplinen des Favoriten: ' . $stmt->error);
+        try {   
+            $stmt = $dbConnection->prepare('DELETE FROM FAVORITE_DISCIPLINES WHERE favorite_id = :id');
+            $stmt->bindParam('id', $favorite['id'], \PDO::PARAM_INT);
+            $stmt->execute();
+        } catch (\PDOException $ex) {
+            throw new \PDOException('Fehler beim Löschen der Disziplinen des Favoriten: ' . $ex->getMessage());
         }
-        $stmt->close();
-        $stmt = $dbConnection->prepare('DELETE FROM FAVORITE_EXERCISES WHERE favorite_id = ?');
-        $stmt->bind_param('i', $favoriteId);
-        if(!$stmt->execute()) {
-            throw new mysqli_sql_exception('Fehler beim Löschen der Übungen im Favoriten: ' . $stmt->error);
-        }
-        $stmt->close();
+        try {   
+            $stmt = $dbConnection->prepare('DELETE FROM FAVORITE_EXERCISES WHERE favorite_id = :id');
+            $stmt->bindParam('id', $favorite['id'], \PDO::PARAM_INT);
+            $stmt->execute();
+        } catch (\PDOException $ex) {
+            throw new \PDOException('Fehler beim Löschen der Übungen im Favoriten: ' . $ex->getMessage());
+        }       
+
     }
 }
 
