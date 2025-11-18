@@ -21,7 +21,7 @@ abstract class DataSaver {
     private function doAction($data, $action, $actionName) {
         $result = "";
         try {
-            $dbConnection = connectDB_PDO();
+            $dbConnection = connectDB();
             $dbConnection->beginTransaction();
             $this->$action($data, $dbConnection);
             $dbConnection->commit();

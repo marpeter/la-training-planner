@@ -3,25 +3,6 @@ namespace LaPlanner;
 
 function connectDB() {
     try {
-        $connection = new \mysqli(
-            getenv('LA_PLANNER_HOSTNAME'),
-            getenv('LA_PLANNER_USERNAME'),
-            getenv('LA_PLANNER_PASSWORD'),
-            getenv('LA_PLANNER_DBNAME')
-        );
-        if ($connection->connect_error) {
-            error_log('Cannot connect to DB: ' . mysqli_connect_error(), 0);
-            return false;
-        }
-        return $connection;
-    } catch( mysqli_sql_exception $ex ){
-        error_log('Cannot connect to DB: ' . $ex->getMessage());
-        return false;
-    }
-}
-
-function connectDB_PDO() {
-    try {
         $connection = new \PDO(
             'mysql:host=' . getenv('LA_PLANNER_HOSTNAME') . ';dbname=' . getenv('LA_PLANNER_DBNAME'),
             getenv('LA_PLANNER_USERNAME'),
@@ -38,7 +19,7 @@ function connectDB_PDO() {
 }
 
 function getDbVersion() {
-    $dbConnection = connectDB_PDO();
+    $dbConnection = connectDB();
     if($dbConnection) {
         $sql = 'SELECT field, field_val FROM version';
         foreach($dbConnection->query($sql) as $row) {
@@ -61,7 +42,7 @@ abstract class AbstractTableReader {
     protected $data = null;
 
     protected function readFromDb() {
-        $dbConnection = connectDB_PDO();
+        $dbConnection = connectDB();
         foreach ($this->tableNames as $tableName) {
             $sql = "SELECT * FROM $tableName";
             $result = $dbConnection->query($sql);

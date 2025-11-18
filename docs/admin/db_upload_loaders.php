@@ -27,7 +27,7 @@ abstract class DataLoader {
             $entityNo++;
         }
         // process the data
-        $dbConnection = connectDB_PDO();
+        $dbConnection = connectDB();
         $dbConnection->beginTransaction();
         // 1. remove current database entries
         $okay = $this->clearCurrentEntries($dbConnection);
