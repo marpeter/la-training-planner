@@ -52,17 +52,7 @@ class ExerciseSaver extends DataSaver {
                 'INSERT INTO EXERCISES ' . 
                 '(id, name, warmup, runabc, mainex, ending, durationmin, durationmax, material, repeats, details) VALUES ' .
                 '(:id, :name, :warmup, :runabc, :mainex, :ending, :durationmin, :durationmax, :material, :repeats, :details)');
-            $stmt->bindParam('id', $exercise['id'], \PDO::PARAM_STR);
-            $stmt->bindParam('name', $exercise['name'], \PDO::PARAM_STR);
-            $stmt->bindParam('warmup', $exercise['warmup'], \PDO::PARAM_INT);
-            $stmt->bindParam('runabc', $exercise['runabc'], \PDO::PARAM_INT);
-            $stmt->bindParam('mainex', $exercise['mainex'], \PDO::PARAM_INT);
-            $stmt->bindParam('ending', $exercise['ending'], \PDO::PARAM_INT);
-            $stmt->bindParam('durationmin', $exercise['durationmin'], \PDO::PARAM_INT);
-            $stmt->bindParam('durationmax', $exercise['durationmax'], \PDO::PARAM_INT);
-            $stmt->bindParam('material', $exercise['material'], \PDO::PARAM_STR);
-            $stmt->bindParam('repeats', $exercise['repeats'], \PDO::PARAM_STR);
-            $stmt->bindParam('details', $exercise['details'], \PDO::PARAM_STR);
+            $this->bindUpsertParams($stmt, $exercise);
             $stmt->execute();
             $stmt = null;
             $this->insertDependants($exercise,$dbConnection);
@@ -76,17 +66,7 @@ class ExerciseSaver extends DataSaver {
             $stmt = $dbConnection->prepare(
                 'UPDATE EXERCISES SET name=:name, warmup=:warmup, runabc=:runabc, mainex=:mainex, ending=:ending, durationmin=:durationmin, ' . 
                 'durationmax=:durationmax, material=:material, repeats=:repeats, details=:details WHERE id = :id');
-            $stmt->bindParam('id', $exercise['id'], \PDO::PARAM_STR);
-            $stmt->bindParam('name', $exercise['name'], \PDO::PARAM_STR);
-            $stmt->bindParam('warmup', $exercise['warmup'], \PDO::PARAM_INT);
-            $stmt->bindParam('runabc', $exercise['runabc'], \PDO::PARAM_INT);
-            $stmt->bindParam('mainex', $exercise['mainex'], \PDO::PARAM_INT);
-            $stmt->bindParam('ending', $exercise['ending'], \PDO::PARAM_INT);
-            $stmt->bindParam('durationmin', $exercise['durationmin'], \PDO::PARAM_INT);
-            $stmt->bindParam('durationmax', $exercise['durationmax'], \PDO::PARAM_INT);
-            $stmt->bindParam('material', $exercise['material'], \PDO::PARAM_STR);
-            $stmt->bindParam('repeats', $exercise['repeats'], \PDO::PARAM_STR);
-            $stmt->bindParam('details', $exercise['details'], \PDO::PARAM_STR);
+            $this->bindUpsertParams($stmt, $exercise);
             $stmt->execute();
             $stmt = null;
             $this->deleteDependants($exercise['id'],$dbConnection);
@@ -109,6 +89,19 @@ class ExerciseSaver extends DataSaver {
         }
     }
 
+    private function bindUpsertParams($stmt, $exercise) {
+        $stmt->bindParam('id', $exercise['id'], \PDO::PARAM_STR);
+        $stmt->bindParam('name', $exercise['name'], \PDO::PARAM_STR);
+        $stmt->bindParam('warmup', $exercise['warmup'], \PDO::PARAM_INT);
+        $stmt->bindParam('runabc', $exercise['runabc'], \PDO::PARAM_INT);
+        $stmt->bindParam('mainex', $exercise['mainex'], \PDO::PARAM_INT);
+        $stmt->bindParam('ending', $exercise['ending'], \PDO::PARAM_INT);
+        $stmt->bindParam('durationmin', $exercise['durationmin'], \PDO::PARAM_INT);
+        $stmt->bindParam('durationmax', $exercise['durationmax'], \PDO::PARAM_INT);
+        $stmt->bindParam('material', $exercise['material'], \PDO::PARAM_STR);
+        $stmt->bindParam('repeats', $exercise['repeats'], \PDO::PARAM_STR);
+        $stmt->bindParam('details', $exercise['details'], \PDO::PARAM_STR);
+    }
     private function convertPhaseFlags(&$exercise) {
         $exercise['warmup'] = $exercise['warmup']=="true" ? 1 : 0;
         $exercise['runabc'] = $exercise['runabc']=="true" ? 1 : 0;
