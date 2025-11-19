@@ -1,14 +1,14 @@
 <?php
 namespace LaPlanner;
 
+class ParseException extends \Exception {}
+
 class CsvParser {
     private $separator = ',';
-    private $messages = [];
     private $dataLength = 0;
  
-    public function __construct(&$messages, $separator=',') {
+    public function __construct($separator=',') {
         $this->separator = $separator;
-        $this->messages = &$messages;
     }
     /*
      * Takes an array of strings
@@ -27,11 +27,8 @@ class CsvParser {
         $tableNo = 0;
         while($tableStartLine<$this->dataLength) {
             $fieldMap = $this->getFieldMapping($tableLines[$tableStartLine], $expectedFields[$tableNo], $tableNames[$tableNo]);
-            if(!$fieldMap) {
-                return false;
-            }
-            $tableData[$tableNo] = $this->parseSingleTable($tableLines, $expectedFields[$tableNo], $fieldMap, $tableStartLine + 1);
-            $tableStartLine += count($tableData[$tableNo]) + 2; // +1 for header line and +1 for separator line
+            $tableData[$tableNo] = $this->parseSingleTable($tableLines, $expectedFields[$tableNo], $fieldMap, ++$tableStartLine);
+            $tableStartLine += count($tableData[$tableNo]) + 1; // +1 for separator line
             $tableNo++;
         }
         return $tableData;
@@ -49,8 +46,7 @@ class CsvParser {
         $header = explode($this->separator, preg_replace("/\xEF\xBB\xBF/", "", $headerLine));
         $expectedFieldCount = count($expectedFields);
         if(count($header)!=$expectedFieldCount) {
-            $this->messages[] = "Die Kopfzeile der $tableName-Daten $headerLine enthält nicht die erwartete Anzahl an $expectedFieldCount Spalten.";
-            return false;
+            throw new ParseException("Die Kopfzeile der $tableName-Daten $headerLine enthält nicht die erwartete Anzahl an $expectedFieldCount Spalten.");
         }
         // Convert field names to lower case
         foreach($header as &$field) { $field = strtolower(trim($field)); }
@@ -58,8 +54,7 @@ class CsvParser {
         if(count(array_diff($header,$expectedFields))>0) {
             $expectedStr = implode(',',$expectedFields);
             $actualStr = implode(',', array_diff($header,$expectedFields));
-            $this->messages[] = "Die Kopfzeile der $tableName Daten $headerLine enthält nicht die erwarteten Spaltennamen $expectedStr, der Unterschied ist $actualStr.";
-            return false;
+            throw new ParseException("Die Kopfzeile der $tableName Daten $headerLine enthält nicht die erwarteten Spaltennamen $expectedStr, der Unterschied ist $actualStr.");
         }
         // "pivot" the header
         $fieldMap = [];
@@ -108,16 +103,20 @@ abstract class DataLoader {
     protected $headerFields = [];
     protected $entityNames = [];
     protected $entityTableNames = [];
-    // default separator is comma - override in subclasses as needed
-    protected $separator = ',';
     protected $messages = [];
     protected $dbConnection = null;
+    protected $csvParser = null;
+
+    public function __construct() {
+        $this->csvParser = new CsvParser();
+    }
 
     public function load($data, &$messages) {
         $this->messages = &$messages;
-        $csvParser = new CsvParser($this->messages, $this->separator);
-        $tableContent = $csvParser->parseTables($data, $this->headerFields, $this->entityTableNames);
-        if(!$tableContent) {
+        try {
+            $tableContent = $this->csvParser->parseTables($data, $this->headerFields, $this->entityTableNames);
+        } catch(ParseException $ex) {
+            $this->messages[] = $ex->getMessage();
             return 0;
         }
         // process the data
@@ -185,7 +184,10 @@ class ExerciseLoader extends DataLoader {
         'material', 'durationmin', 'durationmax', 'repeats', 'disciplines[]', 'details[]']];
     protected $entityNames = ['Übung'];
     protected $entityTableNames = ['EXERCISES WHERE NOT id="Auslaufen"', 'EXERCISES_DISCIPLINES'];
-    protected $separator = ';';
+
+    public function __construct() {
+        $this->csvParser = new CsvParser(';');
+    }
 
     protected function insertEntries($tableEntries) {
         $okay = true;
