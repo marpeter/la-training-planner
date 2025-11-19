@@ -1,6 +1,108 @@
 <?php
 namespace LaPlanner;
 
+class CsvParser {
+    private $separator = ',';
+    private $messages = [];
+    private $dataLength = 0;
+ 
+    public function __construct(&$messages, $separator=',') {
+        $this->separator = $separator;
+        $this->messages = &$messages;
+    }
+    /*
+     * Takes an array of strings
+     * @param $tableLines assumed to be lines of a few tables, with different
+     *        tables separated empty lines
+     * @param $expectedFields an array of arrays, each internal array the
+     *        field names in the table and declared in its first line (header)
+     * @param $tableNames and the name of the tables (for error messages)
+     * Returns an array of assiciative arrays representing the tables if parsing was successful,
+     * false otherwise
+     */
+    public function parseTables($tableLines, $expectedFields, $tableNames) {
+        $this->dataLength = count($tableLines);
+        $tableData = [];
+        $tableStartLine = 0;
+        $tableNo = 0;
+        while($tableStartLine<$this->dataLength) {
+            $fieldMap = $this->getFieldMapping($tableLines[$tableStartLine], $expectedFields[$tableNo], $tableNames[$tableNo]);
+            if(!$fieldMap) {
+                return false;
+            }
+            $tableData[$tableNo] = $this->parseSingleTable($tableLines, $expectedFields[$tableNo], $fieldMap, $tableStartLine + 1);
+            $tableStartLine += count($tableData[$tableNo]) + 2; // +1 for header line and +1 for separator line
+            $tableNo++;
+        }
+        return $tableData;
+    }
+    /*
+     * Takes an array of strings
+     * @param $headerLine considered the header line of a table,
+     * @param $expectedFields an array of field names expected in the header line
+     * @param $tableName and the name of the table (for error messages)
+     * Returns an array of field positions in the table if the header line is valid,
+     * false otherwise
+     */
+    public function getFieldMapping($headerLine, $expectedFields, $tableName) {
+        // preg_replace removes a potential \xEFBBBF UTF8 "ZERO WIDTH NO-BREAK SPACE" character at the beginning
+        $header = explode($this->separator, preg_replace("/\xEF\xBB\xBF/", "", $headerLine));
+        $expectedFieldCount = count($expectedFields);
+        if(count($header)!=$expectedFieldCount) {
+            $this->messages[] = "Die Kopfzeile der $tableName-Daten $headerLine enthält nicht die erwartete Anzahl an $expectedFieldCount Spalten.";
+            return false;
+        }
+        // Convert field names to lower case
+        foreach($header as &$field) { $field = strtolower(trim($field)); }
+        // Check that only valid field names are used
+        if(count(array_diff($header,$expectedFields))>0) {
+            $expectedStr = implode(',',$expectedFields);
+            $actualStr = implode(',', array_diff($header,$expectedFields));
+            $this->messages[] = "Die Kopfzeile der $tableName Daten $headerLine enthält nicht die erwarteten Spaltennamen $expectedStr, der Unterschied ist $actualStr.";
+            return false;
+        }
+        // "pivot" the header
+        $fieldMap = [];
+        foreach($expectedFields as $field) {
+            $fieldMap[$field] = array_search($field, $header);
+        }
+        return $fieldMap;
+    }
+    /* 
+     * Converts the array of strings
+     * @param $tableLines assumed to be lines of a few tables, with different
+     *        tables separated empty lines, starting from line
+     * @param $from assumed to be the first line of table number
+     * @param $entityNo, into an array of associative arrays, with
+     * @param $fieldNames the names of the fields in the table / associative array,
+     * @param $fieldMap mapping field names to positions in the lines
+     * Returns the line number where the next table starts (or total line count
+     * if there are no more tables).
+     */
+    protected function parseSingleTable($tableLines, $fieldNames, $fieldMap, $from=1) {
+        $tableLoaded = [];
+        for($lineNo=$from; $lineNo<$this->dataLength; $lineNo++) {
+            if(strlen(trim($tableLines[$lineNo]))==0) { // empty line separating different tables reached
+                break;
+            }
+            $tableLoaded[] = $this->parseLine($tableLines[$lineNo], $fieldNames, $fieldMap, $this->separator);
+        }
+        return $tableLoaded;
+    }
+    private function parseLine($line, $fieldNames, $fieldMap) {
+        $values = explode($this->separator, $line);
+        $fields = [];
+        foreach($fieldNames as $field) {
+            if(str_ends_with($field,'[]')) { // "array" field
+                $fields[$field] = explode(':', trim($values[$fieldMap[$field]]));
+            } else {
+                $fields[$field] = trim($values[$fieldMap[$field]]," \"\n\r\t\v\x00");
+            }
+        }
+        return $fields;
+    }
+}
+
 abstract class DataLoader {
     // override these properties in each concrete class
     protected $headerFields = [];
@@ -9,47 +111,38 @@ abstract class DataLoader {
     // default separator is comma - override in subclasses as needed
     protected $separator = ',';
     protected $messages = [];
-    protected $fieldMaps = [];
-    protected $dataLoad = [];
+    protected $dbConnection = null;
 
     public function load($data, &$messages) {
         $this->messages = &$messages;
-        $max = count($data);
-        $nextStart = 0;
-        $entityNo = 0;
-        while($nextStart<$max) {
-            $this->fieldMap[$entityNo] = 
-                $this->checkHeader($data[$nextStart], $this->headerFields[$entityNo], $this->entityNames[$entityNo], $this->messages, $this->separator);
-            if(!$this->fieldMap[$entityNo]) {
-                return 0;
-            }
-            $nextStart = $this->convertUploadedEntries($data, $entityNo, $nextStart+1);
-            $entityNo++;
+        $csvParser = new CsvParser($this->messages, $this->separator);
+        $tableContent = $csvParser->parseTables($data, $this->headerFields, $this->entityTableNames);
+        if(!$tableContent) {
+            return 0;
         }
         // process the data
-        $dbConnection = connectDB();
-        $dbConnection->beginTransaction();
+        $this->dbConnection = connectDB();
+        $this->dbConnection->beginTransaction();
         // 1. remove current database entries
-        $okay = $this->clearCurrentEntries($dbConnection);
+        $okay = $this->clearCurrentEntries();
         // 2. insert the uploaded disciplines
-        $okay = $this->insertUploadedEntries($dbConnection);
+        $okay = $this->insertEntries($tableContent);
         // 3. commit or rollback
         if($okay) {
-            $dbConnection->commit();
-            $c1 = count($this->dataLoad[0]);
+            $this->dbConnection->commit();
+            $c1 = count($tableContent[0]);
             $messages[] = "Es wurden $c1 {$this->entityNames[0]}en geladen.";
             return 1;
         } else {
-            $dbConnection->rollBack();
+            $this->dbConnection->rollBack();
             $messages[] = "Es wurden keine {$this->entityNames[0]}en geladen.";
             return 0;
         }
     }
-
-    protected function clearCurrentEntries($dbConnection) {
+    protected function clearCurrentEntries() {
         try {
             foreach($this->entityTableNames as $tableName) {
-                $result = $dbConnection->exec("DELETE FROM $tableName");
+                $result = $this->dbConnection->exec("DELETE FROM $tableName");
             }
             return true;
         } catch( \PDOException $ex) {
@@ -58,62 +151,7 @@ abstract class DataLoader {
             return false;
         }      
     }
-
-    protected function convertUploadedEntries($data,$entityNo,$from=1) {
-        $this->dataLoad[$entityNo] = [];
-        $max = count($data);
-        $nextStart = $max;
-        for($lineNo=$from; $lineNo<$max; $lineNo++) {
-            if(strlen(trim($data[$lineNo]))==0) { // empty line separating different entities reached
-                $nextStart = $lineNo+1;
-                break;
-            }
-            $this->dataLoad[$entityNo][] = $this->fields_from_line($data[$lineNo],
-            $this->headerFields[$entityNo], $this->fieldMap[$entityNo], $this->separator);
-        }
-        return $nextStart;
-    }
-
-    abstract protected function insertUploadedEntries($dbConnection);
-
-    private function fields_from_line($line, $fieldNames, $fieldMap) {
-        $values = explode($this->separator, $line);
-        $fields = [];
-        foreach($fieldNames as $field) {
-            if(str_ends_with($field,'[]')) {
-                $fields[$field] = explode(':', trim($values[$fieldMap[$field]]));
-            } else {
-                $fields[$field] = trim($values[$fieldMap[$field]]," \"\n\r\t\v\x00");
-            }
-        }
-        return $fields;
-    }
-
-    private function checkHeader($data, $expected, $dataName) {
-        // preg_replace removes a potential \xEFBBBF UTF8 "ZERO WIDTH NO-BREAK SPACE" character at the beginning
-        $header = explode($this->separator, preg_replace("/\xEF\xBB\xBF/", "", $data));
-        $expectedNum = count($expected);
-        if(count($header)!=$expectedNum) {
-            $this->messages[] = "Die Kopfzeile der $dataName-Daten $data enthält nicht die erwartete Anzahl an $expectedNum Spalten.";
-            return false;
-        }
-        // Convert field names to lower case
-        foreach($header as &$field) { $field = strtolower(trim($field)); }
-        // Check that only valid field names are used
-        if(count(array_diff($header,$expected))>0) {
-            $expectedStr = implode(',',$expected);
-            $actualStr = implode(',', array_diff($header,$expected));
-            $this->messages[] = "Die Kopfzeile der $dataName Daten $data enthält nicht die erwarteten Spaltennamen $expectedStr, der Unterschied ist $actualStr.";
-            return false;
-        }
-        // "pivot" the header
-        $fieldMap = [];
-        foreach($expected as $field) {
-            $fieldMap[$field] = array_search($field, $header);
-        }
-        return $fieldMap;
-    }
-
+    abstract protected function insertEntries($tableEntries);
 }
 
 class DisciplineLoader extends DataLoader {
@@ -121,15 +159,15 @@ class DisciplineLoader extends DataLoader {
     protected $entityNames = ['Disziplin'];
     protected $entityTableNames = ['DISCIPLINES'];
 
-    protected function insertUploadedEntries($dbConnection) {
-        $stmt = $dbConnection->prepare('INSERT INTO DISCIPLINES ' . 
+    protected function insertEntries($tableEntries) {
+        $stmt = $this->dbConnection->prepare('INSERT INTO DISCIPLINES ' . 
             '( id,  name,  image) VALUES ' . 
             '(:id, :name, :image)');
         $stmt->bindParam('id', $id, \PDO::PARAM_STR);
         $stmt->bindParam('name', $name, \PDO::PARAM_STR);
         $stmt->bindParam('image', $image, \PDO::PARAM_STR);
         $okay = true;
-        foreach($this->dataLoad[0] as ['id' => $id, 'name' => $name, 'image' => $image]) {
+        foreach($tableEntries[0] as ['id' => $id, 'name' => $name, 'image' => $image]) {
             try {
                 $stmt->execute();
             } catch( \PDOException $ex) {
@@ -149,9 +187,9 @@ class ExerciseLoader extends DataLoader {
     protected $entityTableNames = ['EXERCISES WHERE NOT id="Auslaufen"', 'EXERCISES_DISCIPLINES'];
     protected $separator = ';';
 
-    protected function insertUploadedEntries($dbConnection) {
+    protected function insertEntries($tableEntries) {
         $okay = true;
-        $stmt_header = $dbConnection->prepare('INSERT INTO EXERCISES ' .
+        $stmt_header = $this->dbConnection->prepare('INSERT INTO EXERCISES ' .
             '( id,  name,  warmup,  runabc,  mainex,  ending,  material,  durationmin,  durationmax,  repeats,  details) VALUES ' . 
             '(:id, :name, :warmup, :runabc, :mainex, :ending, :material, :durationmin, :durationmax, :repeats, :details)');
         $stmt_header->bindParam('id', $id, \PDO::PARAM_STR);
@@ -165,10 +203,10 @@ class ExerciseLoader extends DataLoader {
         $stmt_header->bindParam('material', $material, \PDO::PARAM_STR);
         $stmt_header->bindParam('repeats', $repeats, \PDO::PARAM_STR);
         $stmt_header->bindParam('details', $details, \PDO::PARAM_STR);           
-        $stmt_dscplns = $dbConnection->prepare('INSERT INTO EXERCISES_DISCIPLINES (exercise_id, discipline_id) VALUES (:id,:discipline_id)');
+        $stmt_dscplns = $this->dbConnection->prepare('INSERT INTO EXERCISES_DISCIPLINES (exercise_id, discipline_id) VALUES (:id,:discipline_id)');
         $stmt_dscplns->bindParam('id', $id, \PDO::PARAM_STR);
         $stmt_dscplns->bindParam('discipline_id', $discipline_id, \PDO::PARAM_STR);
-        foreach($this->dataLoad[0] as ['id' => $id, 'name' => $name, 'warmup' => $warmup,
+        foreach($tableEntries[0] as ['id' => $id, 'name' => $name, 'warmup' => $warmup,
               'runabc' => $runabc, 'mainex' => $mainex, 'ending' => $ending, 'material' => $material,
               'durationmin' => $durationmin, 'durationmax' => $durationmax, 'repeats' => $repeats,
               'details[]' => $detailsArray, 'disciplines[]' => $disciplines]) {
@@ -203,21 +241,21 @@ class FavoriteLoader extends DataLoader {
     protected $headerFields = [['id', 'created_by', 'created_at', 'description', 'disciplines[]'],
                                ['favorite_id', 'phase', 'position', 'exercise_id', 'duration']];
     protected $entityNames = ['Favoriten', 1 => 'FavoritenÜbungen'];
-    protected $entityTableNames = ['FAVORITE_DISCIPLINES', 'FAVORITE_EXERCISES', 'FAVORITE_HEADERS'];
+    protected $entityTableNames = ['FAVORITE_HEADERS' , 'FAVORITE_DISCIPLINES', 'FAVORITE_EXERCISES'];
     
-    protected function insertUploadedEntries($dbConnection) {
+    protected function insertEntries($tableEntries) {
         $okay = true;
-        $stmt_header = $dbConnection->prepare('INSERT INTO FAVORITE_HEADERS ' . 
+        $stmt_header = $this->dbConnection->prepare('INSERT INTO FAVORITE_HEADERS ' . 
             '( id,  created_by,  created_at,  description) VALUES ' . 
             '(:id, :created_by, :created_at, :description)');
         $stmt_header->bindParam('id', $id, \PDO::PARAM_INT);
         $stmt_header->bindParam('created_by', $created_by, \PDO::PARAM_STR);
         $stmt_header->bindParam('created_at', $created_at, \PDO::PARAM_STR);
         $stmt_header->bindParam('description', $descr, \PDO::PARAM_STR);
-        $stmt_dscplns = $dbConnection->prepare('INSERT INTO FAVORITE_DISCIPLINES (favorite_id, discipline_id) VALUES (:id,:discipline_id)');
+        $stmt_dscplns = $this->dbConnection->prepare('INSERT INTO FAVORITE_DISCIPLINES (favorite_id, discipline_id) VALUES (:id,:discipline_id)');
         $stmt_dscplns->bindParam('id', $id, \PDO::PARAM_INT);
         $stmt_dscplns->bindParam('discipline_id', $discipline_id, \PDO::PARAM_STR);
-        foreach($this->dataLoad[0] as ['id' => $id, 'created_by' => $created_by, 'created_at' => $created_at,
+        foreach($tableEntries[0] as ['id' => $id, 'created_by' => $created_by, 'created_at' => $created_at,
                                       'description' => $descr, 'disciplines[]' => $disciplines]) {
             try {
                 $stmt_header->execute();
@@ -232,12 +270,12 @@ class FavoriteLoader extends DataLoader {
                 }
             } catch( \PDOException $ex) {
                 $error = $ex->getMessage();
-                $this->messages[] = "Einfügen der Favoritem-Zeile id=$id, created_by=$created_by, created_at=$created_at, description=$descr ist fehlgeschlagen, Fehler: $error.";
+                $this->messages[] = "Einfügen der Favoriten-Zeile id=$id, created_by=$created_by, created_at=$created_at, description=$descr ist fehlgeschlagen, Fehler: $error.";
                 $okay = false;
             }
         }
         // 3. insert the exercise-favorite relations
-        $stmt_exmap = $dbConnection->prepare('INSERT INTO FAVORITE_EXERCISES ' . 
+        $stmt_exmap = $this->dbConnection->prepare('INSERT INTO FAVORITE_EXERCISES ' . 
             '( favorite_id,  phase,  position,  exercise_id,  duration) VALUES ' . 
             '(:favorite_id, :phase, :position, :exercise_id, :duration)');
         $stmt_exmap->bindParam(':favorite_id', $favorite_id, \PDO::PARAM_INT);
@@ -245,7 +283,7 @@ class FavoriteLoader extends DataLoader {
         $stmt_exmap->bindParam(':position', $position, \PDO::PARAM_INT);
         $stmt_exmap->bindParam(':exercise_id', $exercise_id, \PDO::PARAM_STR);
         $stmt_exmap->bindParam(':duration', $duration, \PDO::PARAM_INT);
-        foreach($this->dataLoad[1] as ['favorite_id' => $favorite_id, 'phase' => $phase, 'position' => $position,
+        foreach($tableEntries[1] as ['favorite_id' => $favorite_id, 'phase' => $phase, 'position' => $position,
                                       'exercise_id' => $exercise_id, 'duration' => $duration]) {
             try {
                 $stmt_exmap->execute();

@@ -131,15 +131,12 @@ if (!empty($_FILES)) { // files were uploaded
             case UPLOAD_ERR_INI_SIZE:
                 $messages[] = "Die Datei {$data['name']} überschreitet die maximal erlaubte Größe.";
                 break;
-            
             case UPLOAD_ERR_FORM_SIZE:
                 $messages[] = "Die Datei  {$data['name']} überschreitet die maximal erlaubte Größe.";
                 break;
-            
             case UPLOAD_ERR_NO_FILE:
                 // No error if one the other files was uploaded
                 break;
-            
             default:
                 $messages[] = 'Upload der Dateien fehlgeschlagen.';
                 break;
