@@ -67,5 +67,3 @@ switch(strtolower($_GET['entity'])) {
 }
 
 $reader->echo();
-
-?>

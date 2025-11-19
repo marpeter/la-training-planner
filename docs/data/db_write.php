@@ -221,5 +221,3 @@ class FavoriteSaver extends DataSaver {
 
     }
 }
-
-?>

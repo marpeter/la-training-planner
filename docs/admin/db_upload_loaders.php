@@ -10,46 +10,52 @@ class CsvParser {
     public function __construct($separator=',') {
         $this->separator = $separator;
     }
-    /*
+    /**
      * Takes an array of strings
      * @param $tableLines assumed to be lines of a few tables, with different
      *        tables separated empty lines
      * @param $expectedFields an array of arrays, each internal array the
      *        field names in the table and declared in its first line (header)
      * @param $tableNames and the name of the tables (for error messages)
-     * Returns an array of assiciative arrays representing the tables if parsing was successful,
-     * false otherwise
+     * @return an array of assiciative arrays representing the tables if
+     *         parsing was successful,
+     * @throws ParseException otherwise
      */
     public function parseTables($tableLines, $expectedFields, $tableNames) {
         $this->dataLength = count($tableLines);
         $tableData = [];
         $tableStartLine = 0;
         $tableNo = 0;
-        while($tableStartLine<$this->dataLength) {
-            $fieldMap = $this->getFieldMapping($tableLines[$tableStartLine], $expectedFields[$tableNo], $tableNames[$tableNo]);
-            $tableData[$tableNo] = $this->parseSingleTable($tableLines, $expectedFields[$tableNo], $fieldMap, ++$tableStartLine);
-            $tableStartLine += count($tableData[$tableNo]) + 1; // +1 for separator line
+        while( $tableStartLine < $this->dataLength ) {
+            $fieldMap = $this->getFieldMapping($tableLines[$tableStartLine],
+                $expectedFields[$tableNo], $tableNames[$tableNo]);
+            $tableData[$tableNo] = $this->parseSingleTable($tableLines,
+                $expectedFields[$tableNo], $fieldMap, ++$tableStartLine);
+            $tableStartLine += count($tableData[$tableNo]) + 1; // for separator line
             $tableNo++;
         }
         return $tableData;
     }
-    /*
+    /** 
      * Takes an array of strings
      * @param $headerLine considered the header line of a table,
-     * @param $expectedFields an array of field names expected in the header line
+     * @param $expectedFields an array of field names expected in the header
      * @param $tableName and the name of the table (for error messages)
-     * Returns an array of field positions in the table if the header line is valid,
-     * false otherwise
+     * @return an array of field positions in the table if the line is valid,
+     * @throws ParseException otherwise
      */
     public function getFieldMapping($headerLine, $expectedFields, $tableName) {
-        // preg_replace removes a potential \xEFBBBF UTF8 "ZERO WIDTH NO-BREAK SPACE" character at the beginning
+        // preg_replace removes a potential
+        // \xEFBBBF UTF8 "ZERO WIDTH NO-BREAK SPACE" character at the beginning
         $header = explode($this->separator, preg_replace("/\xEF\xBB\xBF/", "", $headerLine));
         $expectedFieldCount = count($expectedFields);
-        if(count($header)!=$expectedFieldCount) {
+        if( count($header) !== $expectedFieldCount ) {
             throw new ParseException("Die Kopfzeile der $tableName-Daten $headerLine enthält nicht die erwartete Anzahl an $expectedFieldCount Spalten.");
         }
         // Convert field names to lower case
-        foreach($header as &$field) { $field = strtolower(trim($field)); }
+        foreach($header as &$field) {
+            $field = strtolower(trim($field));
+        }
         // Check that only valid field names are used
         if(count(array_diff($header,$expectedFields))>0) {
             $expectedStr = implode(',',$expectedFields);
@@ -63,7 +69,7 @@ class CsvParser {
         }
         return $fieldMap;
     }
-    /* 
+    /** 
      * Converts the array of strings
      * @param $tableLines assumed to be lines of a few tables, with different
      *        tables separated empty lines, starting from line
@@ -71,13 +77,12 @@ class CsvParser {
      * @param $entityNo, into an array of associative arrays, with
      * @param $fieldNames the names of the fields in the table / associative array,
      * @param $fieldMap mapping field names to positions in the lines
-     * Returns the line number where the next table starts (or total line count
-     * if there are no more tables).
+     * @return table as associative array.
      */
     protected function parseSingleTable($tableLines, $fieldNames, $fieldMap, $from=1) {
         $tableLoaded = [];
         for($lineNo=$from; $lineNo<$this->dataLength; $lineNo++) {
-            if(strlen(trim($tableLines[$lineNo]))==0) { // empty line separating different tables reached
+            if( strlen(trim($tableLines[$lineNo])) == 0) { // empty line separating different tables reached
                 break;
             }
             $tableLoaded[] = $this->parseLine($tableLines[$lineNo], $fieldNames, $fieldMap, $this->separator);
@@ -88,7 +93,7 @@ class CsvParser {
         $values = explode($this->separator, $line);
         $fields = [];
         foreach($fieldNames as $field) {
-            if(str_ends_with($field,'[]')) { // "array" field
+            if( str_ends_with($field,'[]') ) { // "array" field
                 $fields[$field] = explode(':', trim($values[$fieldMap[$field]]));
             } else {
                 $fields[$field] = trim($values[$fieldMap[$field]]," \"\n\r\t\v\x00");
@@ -298,4 +303,3 @@ class FavoriteLoader extends DataLoader {
         return $okay;
     }
 }
-?>

@@ -35,5 +35,3 @@ echo json_encode(
     $saver->$action(
         json_decode($_POST['data'],true)
 ));
-
-?>

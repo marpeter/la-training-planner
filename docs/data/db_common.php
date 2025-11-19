@@ -90,4 +90,3 @@ abstract class AbstractTableToCsvReader extends AbstractTableReader {
         return $contents;
     }
 }
-?>
