@@ -114,7 +114,7 @@ abstract class DataLoader {
     protected ?CsvParser $csvParser = null;
     protected ?DataSaver $saver = null;
 
-    public function load($data, &$messages) {
+    public function load($data, &$messages): int {
         $this->messages = &$messages;
         try {
             $tableContent = $this->csvParser->parseTables($data,
@@ -143,7 +143,7 @@ abstract class DataLoader {
         }
     }
 
-    protected function clearCurrentEntries() {
+    protected function clearCurrentEntries(): bool {
         try {
             foreach($this->entityTableNames as $tableName) {
                 $result = $this->dbConnection->exec("DELETE FROM $tableName");
@@ -156,7 +156,7 @@ abstract class DataLoader {
         }      
     }
 
-    protected function insertEntries($tableEntries) {
+    protected function insertEntries($tableEntries): bool {
         $new_messages = $this->saver->createEntityBulk($tableEntries, $this->dbConnection);
         $this->messages = array_merge($this->messages,$new_messages);
         return !$new_messages; // if there are messages, something went wrong
