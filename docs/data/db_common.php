@@ -3,6 +3,16 @@ namespace LaPlanner;
 
 function connectDB() {
     try {
+        $handle = fopen('db.env', 'r');
+        if($handle) {
+            while(($buffer = fgets($handle, 4096)) !== false) {
+                $parts = explode('=',trim($buffer),2);
+                if(count($parts) == 2) {
+                    putenv(trim($parts[0]) . '=' . trim($parts[1]));
+                }
+            }
+            fclose($handle);
+        } 
         $connection = new \PDO(
             'mysql:host=' . getenv('LA_PLANNER_HOSTNAME') . ';dbname=' . getenv('LA_PLANNER_DBNAME'),
             getenv('LA_PLANNER_USERNAME'),
