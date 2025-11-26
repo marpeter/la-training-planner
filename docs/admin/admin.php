@@ -14,7 +14,7 @@
            href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css">
   </head>
   <body>
-    <div class="container">
+    <header>
       <nav class="red darken-1">
         <div class="nav-wrapper">
           <a href="#" class="brand-logo left"><img src="../assets/tsvlogo.png" height="50px"/></a>
@@ -25,24 +25,24 @@
           </ul>
         </div>
       </nav>
-      <div class="section">
-        <h4 class="card-panel red darken-1 center">Hilfsfunktionen für den LA Trainings-Planer</h4>    
-      </div>
-      <div class="row">
-        <div class="col s12">Download der Daten aus der Datenbank:</div>
-      </div> 
-      <div class="row">
-        <div class="col s6"> <a id="downloadDisciplinesBtn" href="db_download.php?entity=Disciplines" class="btn center red">Disziplinen</a></div>
-        <div class="col s6"> <a id="downloadExercisesBtn" href="db_download.php?entity=Exercises" class="btn center red">Übungen</a></div>
-      </div>
-      <div class="row">
-        <div class="col s12"> <a id="downloadFavoritesBtn" href="db_download.php?entity=Favorites" class="btn center red">Gespeicherte Pläne (Favoriten)</a></div> 
-      </div>
-      <div class="divider"></div>
-      <div class="row">
-        <div class="col s12">Upload von Daten in die Datenbank:
-        <div class="card-panel red center">Achtung! Dies ersetzt die bereits in der Datenbank gespeicherten Daten vollständig!</div></div>
-      </div>
+    </header>
+    <section class="container">
+      <h4 class="card-panel red darken-1 center">Hilfsfunktionen für den LA Trainings-Planer</h4> 
+      <p>Download der Daten aus der Datenbank:
+        <div class="row">
+          <div class="col s6"> <a id="downloadDisciplinesBtn" href="db_download.php?entity=Disciplines" class="btn center red">Disziplinen</a></div>
+          <div class="col s6"> <a id="downloadExercisesBtn" href="db_download.php?entity=Exercises" class="btn center red">Übungen</a></div>
+        </div>
+        <div class="row">
+          <div class="col s12"> <a id="downloadFavoritesBtn" href="db_download.php?entity=Favorites" class="btn center red">Gespeicherte Pläne (Favoriten)</a></div> 
+        </div>
+      </p>
+    </section>
+    <div class="divider"></div>
+    <section class="container">
+      <p>Upload von Daten in die Datenbank:
+        <div class="card-panel red center">Achtung! Dies ersetzt die bereits in der Datenbank gespeicherten Daten vollständig!</div>
+      </p>
       <form name="uploadForm" enctype="multipart/form-data" method="POST" action="#">
         <div class="row">
           <div class="col s6">
@@ -84,7 +84,8 @@
         <?php } ?>    
         </div>
       </div>
-    </div>
+    </section>
+    <div class="divider"></div>
     <footer class="section">
       <div class="center grey-text">Version <span id="version"><?php echo $version['number'] ?></span>,<br/>&copy; 2025 Markus Peter</div>
     </footer>

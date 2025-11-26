@@ -16,7 +16,7 @@
          <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
    </head>
    <body>
-    <div class="container">
+    <header>
       <nav class="red darken-1">
         <div class="nav-wrapper">
           <a href="#" class="brand-logo left"><img src="../assets/tsvlogo.png" height="50px"/></a>
@@ -27,24 +27,24 @@
           </ul>
         </div>
       </nav>
-      <div class="section">
-        <h4 class="card-panel red darken-1 center">Übungen bearbeiten</h4>
-      </div>
-      <div class="row">
-        <div class="col s4">
-          <ul class="collection with-header" id="exercise-list">
-            <li class="collection-header"><h6>Wähle die Übung aus:</h6>
+    </header>
+    <div class="row">
+      <div class="col s4"><!-- Übungsliste zum Auswählen -->
+        <ul class="collection with-header" id="exercise-list">
+          <li class="collection-header"><h6>Wähle die Übung aus:</h6>
             <form class="col s12" id="exercise-list-form">
-                <div class="input-field col s12">
-                  <i class="material-icons prefix">search</i>
-                  <input id="exercise-filter" type="text" class="validate"/>
-                </div>
+              <div class="input-field col s12">
+                <i class="material-icons prefix">search</i>
+                <input id="exercise-filter" type="text" class="validate"/>
+              </div>
             </form>
-            </li>
-            <!-- wird mittels JavaScript gefüllt-->
-          </ul>
-        </div>
+          </li>
+         <!-- wird mittels JavaScript gefüllt-->
+        </ul>
+      </div>
+      <section class="container">
         <div class="col s8">
+          <h4 class="card-panel red darken-1 center">Übungen bearbeiten</h4>
           <form id="exercise-edit" class="col s12">
             <div class="row">
               <div class="input-field col s12">
@@ -58,7 +58,7 @@
                 <label for="exercise-name">Name</label>
               </div>
             </div>
-            <div  class="row">
+            <div class="row">
               <div class="input-field col s12">
                 <select id="exercise-phases" multiple>
                   <option value="warmup">Aufwärmen</option>
@@ -91,7 +91,7 @@
                 <label for="exercise-duration-min">Dauer von</label>
                 <span class="helper-text">in Minuten</span>
               </div>
-               <div class="input-field col s4">
+              <div class="input-field col s4">
                 <input id="exercise-duration-max" type="number" min="5" max="30" class="validate" required>
                 <label for="exercise-duration-max">bis</label>
                 <span class="helper-text">in Minuten</span>
@@ -143,10 +143,11 @@
             </div>
           </div>
         </div>
-        <footer class="section">
-          <div class="center grey-text">Version <span id="version">0.13.0</span>,<br/>&copy; 2025 Markus Peter</div>
-        </footer>  
-      </div>
+      </section>
     </div>
+    <div class="divider"></div>
+    <footer class="section">
+      <div class="center grey-text">Version <span id="version">0.13.0</span>,<br/>&copy; 2025 Markus Peter</div>
+    </footer>  
   </body>
 </html>  
