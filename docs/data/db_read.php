@@ -4,17 +4,18 @@ namespace LaPlanner;
 include('db_common.php');
 
 class DisciplineReader extends AbstractTableReader {
-    protected $tableNames = ['DISCIPLINES'];
+    use DisciplineTable;
+
     protected function deserialize() {
-        return json_encode($this->data['DISCIPLINES']);
+        return json_encode($this->data[self::HEADER_TABLE]);
     }
 }
 
 class ExerciseReader extends AbstractTableReader {
-    protected $tableNames = ['EXERCISES', 'EXERCISES_DISCIPLINES'];
+    use ExerciseTable;
 
     protected function deserialize() {
-        foreach ($this->data['EXERCISES'] as &$exercise) {
+        foreach ($this->data[self::HEADER_TABLE] as &$exercise) {
             $exercise['warmup'] = (bool)$exercise['warmup'];
             $exercise['runabc'] = (bool)$exercise['runabc'];
             $exercise['mainex'] = (bool)$exercise['mainex'];
@@ -23,29 +24,31 @@ class ExerciseReader extends AbstractTableReader {
             $exercise['durationmax'] = (int)$exercise['durationmax'];
             $exercise['details'] = explode(":",$exercise['details']);
             $exercise['disciplines'] = [];
-            foreach ($this->data['EXERCISES_DISCIPLINES'] as $exerciseDiscipline) {
+            foreach ($this->data[self::LINK_DISCIPLINES_TABLE] as $exerciseDiscipline) {
                if ($exercise['id'] == $exerciseDiscipline['exercise_id']) {
                    $exercise['disciplines'][] = $exerciseDiscipline['discipline_id'];
                }
             }
         }        
-        return json_encode($this->data['EXERCISES']);
+        return json_encode($this->data[self::HEADER_TABLE]);
     }
 }
 
 class FavoriteReader extends AbstractTableReader {
-    protected $tableNames = ['FAVORITE_HEADERS', 'FAVORITE_DISCIPLINES', 'FAVORITE_EXERCISES'];
+    use FavoriteTable;
 
     protected function deserialize() {
-        foreach ($this->data['FAVORITE_HEADERS'] as &$favorite) {
+        foreach ($this->data[self::HEADER_TABLE] as &$favorite) {
             $favorite['disciplines'] = [];
-            foreach ($this->data['FAVORITE_DISCIPLINES'] as $favoriteDiscipline) {
+            foreach ($this->data[self::LINK_DISCIPLINES_TABLE] as $favoriteDiscipline) {
                 if ($favorite['id'] == $favoriteDiscipline['favorite_id']) {
                     $favorite['disciplines'][] = $favoriteDiscipline['discipline_id'];
                 }
             }
         }
-        return json_encode(['headers' => $this->data['FAVORITE_HEADERS'], 'exerciseMap' => $this->data['FAVORITE_EXERCISES']]);
+        return json_encode(
+            ['headers' => $this->data[self::HEADER_TABLE],
+            'exerciseMap' => $this->data[self::LINK_EXERCISES_TABLE]]);
     }
 }
 

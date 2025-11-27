@@ -3,8 +3,9 @@ namespace LaPlanner;
 
 function connectDB() {
     try {
-        $handle = fopen('db.env', 'r');
-        if($handle) {
+        $env_file = __DIR__ . '/db.env';
+        if (file_exists($env_file) && is_readable($env_file)) {
+            $handle = fopen($env_file, 'r');
             while(($buffer = fgets($handle, 4096)) !== false) {
                 $parts = explode('=',trim($buffer),2);
                 if(count($parts) == 2) {
@@ -47,13 +48,11 @@ function getDbVersion() {
 }
 
 abstract class AbstractTableReader {
-    // override @tableNames in each concrete class to hold the array of table names to read from DB
-    protected $tableNames = [];
     protected $data = null;
 
     protected function readFromDb() {
         $dbConnection = connectDB();
-        foreach ($this->tableNames as $tableName) {
+        foreach ($this->getTableNames() as $tableName) {
             $sql = "SELECT * FROM $tableName";
             $result = $dbConnection->query($sql);
             if ($result) {
@@ -71,6 +70,9 @@ abstract class AbstractTableReader {
     // override @deserialize in each concrete class to convert $this->data as returned from the
     // database into the desired format
     abstract protected function deserialize();
+    
+    // @getTableNames is added to each concrete class by using the appropriate trait below
+    abstract protected function getTableNames();    
 
     public function echo() {
         $this->readFromDb();
@@ -98,5 +100,29 @@ abstract class AbstractTableToCsvReader extends AbstractTableReader {
         }
         fclose($handle);
         return $contents;
+    }
+}
+
+trait DisciplineTable {
+    const HEADER_TABLE = 'disciplines';
+    public function getTableNames() {
+        return [self::HEADER_TABLE];
+    }
+}
+
+trait ExerciseTable {
+    const HEADER_TABLE = 'exercises';
+    const LINK_DISCIPLINES_TABLE = 'exercises_disciplines';
+    public function getTableNames() {
+        return [self::HEADER_TABLE, self::LINK_DISCIPLINES_TABLE];
+    }
+}
+
+trait FavoriteTable {
+    const HEADER_TABLE = 'favorite_headers';
+    const LINK_DISCIPLINES_TABLE = 'favorite_disciplines';
+    const LINK_EXERCISES_TABLE = 'favorite_exercises';
+    public function getTableNames() {
+        return [self::HEADER_TABLE, self::LINK_DISCIPLINES_TABLE, self::LINK_EXERCISES_TABLE];
     }
 }

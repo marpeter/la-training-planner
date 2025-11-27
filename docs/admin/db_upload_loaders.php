@@ -109,7 +109,6 @@ abstract class DataLoader {
     // override these properties in each concrete class:
     protected $headerFields = [];
     protected $entityNames = [];
-    protected $entityTableNames = [];
     // initialize these properties in the __construct method of each concrete class:
     protected ?CsvParser $csvParser = null;
     protected ?DataSaver $saver = null;
@@ -118,7 +117,7 @@ abstract class DataLoader {
         $this->messages = &$messages;
         try {
             $tableContent = $this->csvParser->parseTables($data,
-                $this->headerFields, $this->entityTableNames);
+                $this->headerFields, $this->getTableNames());
         } catch(ParseException $ex) {
             $this->messages[] = $ex->getMessage();
             return 0;
@@ -143,9 +142,13 @@ abstract class DataLoader {
         }
     }
 
+    protected function getTableNames(): array {
+        return $this->saver->getTableNames();
+    }
+
     protected function clearCurrentEntries(): bool {
         try {
-            foreach($this->entityTableNames as $tableName) {
+            foreach($this->getTableNames() as $tableName) {
                 $result = $this->dbConnection->exec("DELETE FROM $tableName");
             }
             return true;
@@ -166,7 +169,6 @@ abstract class DataLoader {
 class DisciplineLoader extends DataLoader {
     protected $headerFields = [['id', 'name', 'image']];
     protected $entityNames = ['Disziplin'];
-    protected $entityTableNames = ['DISCIPLINES'];
 
     public function __construct() {
         $this->csvParser = new CsvParser();
@@ -178,11 +180,17 @@ class ExerciseLoader extends DataLoader {
     protected $headerFields = [ ['id', 'name', 'warmup', 'runabc', 'mainex', 'ending', 
         'material', 'durationmin', 'durationmax', 'repeats', 'disciplines[]', 'details[]']];
     protected $entityNames = ['Übung'];
-    protected $entityTableNames = ['EXERCISES WHERE NOT id="Auslaufen"', 'EXERCISES_DISCIPLINES'];
 
     public function __construct() {
         $this->csvParser = new CsvParser(';');
         $this->saver = new ExerciseSaver();
+    }
+
+    // override to exclude "Auslaufen" exercises
+    protected function getTableNames(): array {
+        $tableNames = $this->saver->getTableNames();
+        $tableNames[0] = $tableNames[0] . ' WHERE NOT id="Auslaufen"';
+        return $tableNames;
     }
 }
 
@@ -190,7 +198,6 @@ class FavoriteLoader extends DataLoader {
     protected $headerFields = [['id', 'created_by', 'created_at', 'description', 'disciplines[]'],
                                ['favorite_id', 'phase', 'position', 'exercise_id', 'duration']];
     protected $entityNames = ['Favorit', 1 => 'FavoritenÜbungen'];
-    protected $entityTableNames = ['FAVORITE_HEADERS' , 'FAVORITE_DISCIPLINES', 'FAVORITE_EXERCISES'];
 
     public function __construct() {
         $this->csvParser = new CsvParser();

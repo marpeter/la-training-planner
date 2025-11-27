@@ -71,6 +71,8 @@ abstract class DataSaver {
 }
 
 class DisciplineSaver extends DataSaver {
+    use DisciplineTable;
+
     protected $ENTITY = "Disziplin";
 
     public function createEntityBulk(array $disciplines, $dbConnection): array {
@@ -88,9 +90,9 @@ class DisciplineSaver extends DataSaver {
 
     protected function createEntity(array $discipline): void {
         try {
-            $stmt = $this->dbConnection->prepare('INSERT INTO DISCIPLINES ' . 
-                '( id,  name,  image) VALUES ' . 
-                '(:id, :name, :image)');
+            $stmt = $this->dbConnection->prepare('INSERT INTO ' . self::HEADER_TABLE . 
+                ' ( id,  name,  image) VALUES' . 
+                ' (:id, :name, :image)');
             $stmt->bindParam('id', $discipline['id'], \PDO::PARAM_STR);
             $stmt->bindParam('name', $discipline['name'], \PDO::PARAM_STR);
             $stmt->bindParam('image', $discipline['image'], \PDO::PARAM_STR);
@@ -115,6 +117,7 @@ class DisciplineSaver extends DataSaver {
 }
 
 class ExerciseSaver extends DataSaver {
+    use ExerciseTable;
     protected $ENTITY = "Übung";
 
     public function createEntityBulk(array $exercises, $dbConnection): array {
@@ -137,8 +140,8 @@ class ExerciseSaver extends DataSaver {
         $this->convertPhaseFlags($exercise);     
         try {
             $stmt = $this->dbConnection->prepare(
-                'INSERT INTO EXERCISES ' . 
-                '(id, name, warmup, runabc, mainex, ending, durationmin, durationmax, material, repeats, details) VALUES ' .
+                'INSERT INTO ' . self::HEADER_TABLE . 
+                ' (id, name, warmup, runabc, mainex, ending, durationmin, durationmax, material, repeats, details) VALUES ' .
                 '(:id, :name, :warmup, :runabc, :mainex, :ending, :durationmin, :durationmax, :material, :repeats, :details)');
             $this->bindUpsertParams($stmt, $exercise);
             $stmt->execute();
@@ -153,8 +156,11 @@ class ExerciseSaver extends DataSaver {
         $this->convertPhaseFlags($exercise);
         try {
             $stmt = $this->dbConnection->prepare(
-                'UPDATE EXERCISES SET name=:name, warmup=:warmup, runabc=:runabc, mainex=:mainex, ending=:ending, durationmin=:durationmin, ' . 
-                'durationmax=:durationmax, material=:material, repeats=:repeats, details=:details WHERE id = :id');
+                'UPDATE ' . self::HEADER_TABLE . ' SET name=:name, ' . 
+                'warmup=:warmup, runabc=:runabc, mainex=:mainex, ending=:ending, ' . 
+                'durationmin=:durationmin, durationmax=:durationmax, ' . 
+                'material=:material, repeats=:repeats, details=:details ' . 
+                'WHERE id = :id');
             $this->bindUpsertParams($stmt, $exercise);
             $stmt->execute();
             $stmt = null;
@@ -167,11 +173,13 @@ class ExerciseSaver extends DataSaver {
 
     protected function deleteEntity($exerciseId): void {
         try {
-            $stmt = $this->dbConnection->prepare('DELETE FROM EXERCISES WHERE id = :id');
+            $stmt = $this->dbConnection->prepare('DELETE FROM ' .
+                 self::HEADER_TABLE . ' WHERE id = :id');
             $stmt->bindParam('id', $exerciseId, \PDO::PARAM_STR);
             $stmt->execute();
             $this->deleteDependants($exerciseId,$dbConnection);
-            $stmt = $this->dbConnection->prepare('DELETE FROM FAVORITE_EXERCISES WHERE exercise_id=:id');
+            $stmt = $this->dbConnection->prepare('DELETE FROM ' .
+                self::LINK_DISCIPLINES_TABLE . '  WHERE exercise_id=:id');
             $stmt->bindParam('id', $exerciseId, \PDO::PARAM_STR);
             $stmt->execute();
         } catch (\PDOException $ex) {
@@ -201,7 +209,8 @@ class ExerciseSaver extends DataSaver {
     }
 
     private function deleteDependants($exerciseId): void {
-        $stmt = $this->dbConnection->prepare('DELETE FROM EXERCISES_DISCIPLINES WHERE exercise_id=:id');
+        $stmt = $this->dbConnection->prepare('DELETE FROM ' .
+            self::LINK_DISCIPLINES_TABLE . ' WHERE exercise_id=:id');
         $stmt->bindParam('id', $exerciseId, \PDO::PARAM_STR);
         $stmt->execute();
         // note that FAVORITE_EXERCISES are NOT deleted to prevent them from being deleted in the update case
@@ -210,8 +219,10 @@ class ExerciseSaver extends DataSaver {
 
     private function insertDependants(array $exercise): void {
         try {
-            $stmt = $this->dbConnection->prepare('INSERT INTO EXERCISES_DISCIPLINES (exercise_id, discipline_id) '
-                . 'VALUES (:exercise_id, :discipline_id)');
+            $stmt = $this->dbConnection->prepare('INSERT INTO '
+                . self::LINK_DISCIPLINES_TABLE
+                . ' (exercise_id, discipline_id) VALUES '
+                . '(:exercise_id, :discipline_id)');
             $stmt->bindParam('exercise_id', $exercise['id'], \PDO::PARAM_STR);
             $stmt->bindParam('discipline_id', $discipline_id, \PDO::PARAM_STR);
             foreach($exercise['disciplines'] as $discipline_id){
@@ -224,6 +235,7 @@ class ExerciseSaver extends DataSaver {
 }
 
 class FavoriteSaver extends DataSaver {
+    use FavoriteTable;
     protected $ENTITY = "Favoriten";
 
     public function createEntityBulk($favorites, $dbConnection): array {
@@ -249,9 +261,9 @@ class FavoriteSaver extends DataSaver {
 
     private function insertFavoriteExercisesBulk(array $favoriteExercises): array {
         $messages = [];
-        $stmt = $this->dbConnection->prepare('INSERT INTO FAVORITE_EXERCISES ' . 
-            '( favorite_id,  phase,  position,  exercise_id,  duration) VALUES ' . 
-            '(:favorite_id, :phase, :position, :exercise_id, :duration)');
+        $stmt = $this->dbConnection->prepare('INSERT INTO ' . self::LINK_EXERCISES_TABLE . 
+            ' ( favorite_id,  phase,  position,  exercise_id,  duration) VALUES' . 
+            ' (:favorite_id, :phase, :position, :exercise_id, :duration)');
         $stmt->bindParam(':favorite_id', $favorite_id, \PDO::PARAM_INT);
         $stmt->bindParam(':phase', $phase, \PDO::PARAM_STR);
         $stmt->bindParam(':position', $position, \PDO::PARAM_INT);
@@ -272,7 +284,8 @@ class FavoriteSaver extends DataSaver {
 
     protected function createEntity(array $favorite): void {
         try {
-            $stmt = $this->dbConnection->prepare('INSERT INTO FAVORITE_HEADERS (id, created_by, description) VALUES ' . 
+            $stmt = $this->dbConnection->prepare('INSERT INTO ' . self::HEADER_TABLE .
+                ' (id, created_by, description) VALUES ' . 
                 '(:id, :created_by, :description)');
             $stmt->bindParam('id', $favorite['id'], \PDO::PARAM_INT);
             $stmt->bindParam('created_by', $favorite['created_by'], \PDO::PARAM_STR);
@@ -286,7 +299,8 @@ class FavoriteSaver extends DataSaver {
 
     protected function updateEntity(array $favorite): void {
         try {
-            $stmt = $this->dbConnection->prepare('UPDATE FAVORITE_HEADERS SET description = :description WHERE id = :id');
+            $stmt = $this->dbConnection->prepare('UPDATE ' . self::HEADER_TABLE . 
+                ' SET description = :description WHERE id = :id');
             $stmt->bindParam('id', $favorite['id'], \PDO::PARAM_INT);
             $stmt->bindParam('description', $favorite['description'], \PDO::PARAM_STR);
             $this->deleteDependants($favorite['id']);
@@ -298,7 +312,8 @@ class FavoriteSaver extends DataSaver {
 
     protected function deleteEntity($favoriteId): void {
         try {
-            $stmt = $this->dbConnection->prepare('DELETE FROM FAVORITE_HEADERS WHERE id = :id');
+            $stmt = $this->dbConnection->prepare('DELETE FROM ' .
+                self::HEADER_TABLE . ' WHERE id = :id');
             $stmt->bindParam('id', $favoriteId, \PDO::PARAM_INT);
             $stmt->execute();
             $this->deleteDependants($favoriteId);
@@ -309,7 +324,9 @@ class FavoriteSaver extends DataSaver {
 
     private function insertDependants($favorite): void {
         try {
-            $stmt = $this->dbConnection->prepare('INSERT INTO FAVORITE_DISCIPLINES (favorite_id, discipline_id) VALUES ' . 
+            $stmt = $this->dbConnection->prepare('INSERT INTO ' . 
+                self::LINK_DISCIPLINES_TABLE . 
+                ' (favorite_id, discipline_id) VALUES ' . 
                 '(:favorite_id, :discipline_id)');
             $stmt->bindParam('favorite_id', $favorite['id'], \PDO::PARAM_INT);
             $stmt->bindParam('discipline_id', $discipline_id, \PDO::PARAM_STR);
@@ -320,8 +337,9 @@ class FavoriteSaver extends DataSaver {
                 $discipline_id = is_array($discipline) ? $discipline['id'] : $discipline;
                 $stmt->execute();
             }
-            $stmt = $this->dbConnection->prepare('INSERT INTO FAVORITE_EXERCISES ' . 
-                '( favorite_id,  exercise_id,  phase,  position,  duration) VALUES ' . 
+            $stmt = $this->dbConnection->prepare('INSERT INTO ' .
+                self::LINK_EXERCISES_TABLE .
+                ' (favorite_id,  exercise_id,  phase,  position,  duration) VALUES ' . 
                 '(:favorite_id, :exercise_id, :phase, :position, :duration)');
             $stmt->bindParam('favorite_id', $favorite['id'], \PDO::PARAM_INT);
             $stmt->bindParam('exercise_id', $exercise['id'], \PDO::PARAM_STR);
@@ -345,14 +363,16 @@ class FavoriteSaver extends DataSaver {
 
     private function deleteDependants($favoriteId): void {
         try {   
-            $stmt = $this->dbConnection->prepare('DELETE FROM FAVORITE_DISCIPLINES WHERE favorite_id = :id');
+            $stmt = $this->dbConnection->prepare('DELETE FROM ' . 
+                self::LINK_DISCIPLINES_TABLE . ' WHERE favorite_id = :id');
             $stmt->bindParam('id', $favorite['id'], \PDO::PARAM_INT);
             $stmt->execute();
         } catch (\PDOException $ex) {
             throw new \PDOException('Fehler beim Löschen der Disziplinen des Favoriten: ' . $ex->getMessage());
         }
         try {   
-            $stmt = $this->dbConnection->prepare('DELETE FROM FAVORITE_EXERCISES WHERE favorite_id = :id');
+            $stmt = $this->dbConnection->prepare('DELETE FROM ' .
+                self::LINK_EXERCISES_TABLE . ' WHERE favorite_id = :id');
             $stmt->bindParam('id', $favorite['id'], \PDO::PARAM_INT);
             $stmt->execute();
         } catch (\PDOException $ex) {
