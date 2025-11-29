@@ -105,7 +105,7 @@ const view = {
     this.exerciseDurationMin.value = exercise.durationmin;
     this.exerciseDurationMax.value = exercise.durationmax;
     this.exerciseReps.value = exercise.repeats;
-    this.exerciseDetails.value = exercise.details;
+    this.exerciseDetails.value = Array.isArray(exercise.details) ? exercise.details.join(':') : exercise.details;
     Array.from(this.exercisePhases.children)
          .forEach( (option) => option.selected = exercise[option.value] );
     Array.from(this.exerciseDisciplines.children)
