@@ -337,18 +337,22 @@ class FavoriteSaver extends DataSaver {
                 $discipline_id = is_array($discipline) ? $discipline['id'] : $discipline;
                 $stmt->execute();
             }
+        } catch (\PDOException $ex) {
+            throw new \PDOException('Fehler beim Erstellen der Disziplinen des Favoriten: ' . $ex->getMessage());
+        }
+        try {
             $stmt = $this->dbConnection->prepare('INSERT INTO ' .
                 self::LINK_EXERCISES_TABLE .
                 ' (favorite_id,  exercise_id,  phase,  position,  duration) VALUES ' . 
                 '(:favorite_id, :exercise_id, :phase, :position, :duration)');
             $stmt->bindParam('favorite_id', $favorite['id'], \PDO::PARAM_INT);
-            $stmt->bindParam('exercise_id', $exercise['id'], \PDO::PARAM_STR);
             $stmt->bindParam('phase', $phase, \PDO::PARAM_STR);
             $stmt->bindParam('position', $position, \PDO::PARAM_INT);
-            $stmt->bindParam('duration', $exercise['duration'], \PDO::PARAM_INT);
             foreach(['warmup', 'mainex', 'ending'] as $phase) {
                 $position = 1;
                 foreach($favorite[$phase] as $exercise) {
+                    $stmt->bindParam('exercise_id', $exercise['id'], \PDO::PARAM_STR);
+                    $stmt->bindParam('duration', $exercise['duration'], \PDO::PARAM_INT);
                     if (isset($exercise['position'])) {
                         $position = $exercise['position'];
                     }
@@ -357,7 +361,7 @@ class FavoriteSaver extends DataSaver {
                 }
             }
         } catch (\PDOException $ex) {
-            throw new \PDOException('Fehler beim Erstellen der Disziplinen des Favoriten: ' . $ex->getMessage());
+            throw new \PDOException('Fehler beim Erstellen der Übungen des Favoriten: ' . $ex->getMessage());
         }
     }
 
@@ -365,7 +369,7 @@ class FavoriteSaver extends DataSaver {
         try {   
             $stmt = $this->dbConnection->prepare('DELETE FROM ' . 
                 self::LINK_DISCIPLINES_TABLE . ' WHERE favorite_id = :id');
-            $stmt->bindParam('id', $favorite['id'], \PDO::PARAM_INT);
+            $stmt->bindParam('id', $favoriteId, \PDO::PARAM_INT);
             $stmt->execute();
         } catch (\PDOException $ex) {
             throw new \PDOException('Fehler beim Löschen der Disziplinen des Favoriten: ' . $ex->getMessage());
@@ -373,7 +377,7 @@ class FavoriteSaver extends DataSaver {
         try {   
             $stmt = $this->dbConnection->prepare('DELETE FROM ' .
                 self::LINK_EXERCISES_TABLE . ' WHERE favorite_id = :id');
-            $stmt->bindParam('id', $favorite['id'], \PDO::PARAM_INT);
+            $stmt->bindParam('id', $favoriteId, \PDO::PARAM_INT);
             $stmt->execute();
         } catch (\PDOException $ex) {
             throw new \PDOException('Fehler beim Löschen der Übungen im Favoriten: ' . $ex->getMessage());

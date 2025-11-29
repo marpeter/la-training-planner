@@ -245,8 +245,8 @@ const controller = {
     if(!view.model.version.supportsEditing) return;
 
     if(view.model.selectedFavorite===undefined) {
+      view.deletePlanButton.classList.add("disabled");
       if(view.model.plan !== undefined){
-        view.deletePlanButton.classList.add("disabled");
         view.savePlanButton.classList.add("disabled");
         view.savePlanAsButton.classList.remove("disabled");
       }
