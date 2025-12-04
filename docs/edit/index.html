@@ -1,5 +1,5 @@
-<!DOCTYPE html>
-<html>
+<!doctype html>
+<html lang="de">
    <head>
       <title>Planer für Leichtathletik-Training</title>
          <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -11,20 +11,17 @@
         <link rel="stylesheet"
               href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css">
         <link rel="stylesheet" href="../ownstyle.css">
+        <!-- Compiled and minified JavaScript -->
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
         <script type="module" src="controller.js"></script>
-         <!-- Compiled and minified JavaScript -->
-         <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
    </head>
    <body>
     <header>
       <nav class="red darken-1">
         <div class="nav-wrapper">
-          <a href="#" class="brand-logo left"><img src="../assets/tsvlogo.png" height="50px"/></a>
-          <ul id="nav-mobile" class="right">
-            <li><a href="../" class="btn-small red"</li><i class="material-icons">calendar_view_day</i></a></li>
-            <li class="active"><a href="./" id="editBtn" class="btn-small red"><i class="material-icons">construction</i></a></li>
-            <li><a href="../admin/" class="btn-small red"><i class="material-icons">import_export</i></a></li>
-            <li><a href="../help/" class="btn-small red"><i class="material-icons">help_center</i></a></li>  
+          <a href="#" class="brand-logo left"><img src="../assets/tsvlogo.png" alt="Logo" height="50" class="left">Übungen bearbeiten</a>
+          <ul class="right">
+            <li><a href="login/" id="loginBtn" class="btn-small red"><i class="material-icons">login</i></a></li>  
           </ul>
         </div>
       </nav>
@@ -36,7 +33,7 @@
             <form class="col s12" id="exercise-list-form">
               <div class="input-field col s12">
                 <i class="material-icons prefix">search</i>
-                <input id="exercise-filter" type="text" class="validate"/>
+                <input id="exercise-filter" type="text" class="validate">
               </div>
             </form>
           </li>
@@ -45,17 +42,16 @@
       </div>
       <section class="container">
         <div class="col s8">
-          <h4 class="card-panel red darken-1 center">Übungen bearbeiten</h4>
           <form id="exercise-edit" class="col s12">
             <div class="row">
               <div class="input-field col s12">
-                <input id="exercise-id" type="text" class="validate" disabled required/>
+                <input id="exercise-id" type="text" class="validate" disabled required>
                 <label for="exercise-id">Übung </label>
               </div>
             </div>
             <div class="row">
               <div class="input-field col s12">
-                <input id="exercise-name" type="text" maxlength="255" />
+                <input id="exercise-name" type="text" maxlength="255">
                 <label for="exercise-name">Name</label>
               </div>
             </div>
@@ -149,8 +145,18 @@
       </section>
     </div>
     <div class="divider"></div>
-    <footer class="section">
-      <div class="center grey-text">Version <span id="version">0.13.0</span>,<br/>&copy; 2025 Markus Peter</div>
+    <div class="center grey-text">Version <span id="version">0.13.0</span>,<br>&copy; 2025 Markus Peter</div>
+    <footer>
+      <nav class="red darken-1">
+        <div class="nav-wrapper">
+          <ul>
+            <li><a href="../" class="btn-small red"><i class="material-icons">home</i></a></li>
+            <li><a href="../help/" class="btn-small red"><i class="material-icons">help_center</i></a></li>
+            <li class="active"><a href="./" id="editBtn" class="btn-small red"><i class="material-icons">construction</i></a></li>
+            <li><a href="../admin/" class="btn-small red"><i class="material-icons">import_export</i></a></li>
+          </ul>
+        </div>
+      </nav>      
     </footer>  
   </body>
 </html>  

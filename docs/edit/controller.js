@@ -161,6 +161,10 @@ const controller = {
       document.getElementById("confirm-delete-no").onclick = this.onDeleteExerciseCancelled;
       document.getElementById("confirm-save-yes").onclick = this.onSaveChanges;
       document.getElementById("confirm-save-no").onclick = this.onDiscardChanges;
+
+      // So far no login screen available ...
+      document.getElementById("loginBtn").classList.add("disabled");
+      console.log(document.getElementById("loginBtn").classList);
     },
 
     onExcerciseFilterChanged(event) {

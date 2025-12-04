@@ -1,3 +1,15 @@
+footer {
+    position: fixed !important;
+    padding: 0.2em;
+    bottom: 0;
+    left: 0;
+    width: 100%;   
+}
+
+body {
+  padding-bottom: 5em;
+}
+
 .disziplin {
     max-height: 40px;
     max-width: 40px;

@@ -19,6 +19,7 @@ document.addEventListener('DOMContentLoaded', function() {
 const view = {
 
   model: undefined,
+  loginButton: undefined,
   generatePlanButton: undefined,
   loadPlanButton: undefined,
   prevPlanButton: undefined,
@@ -32,6 +33,7 @@ const view = {
     this.createDisciplineCardList();
     this.setVersionInfo();
 
+    this.loginButton = document.getElementById("loginBtn");
     this.generatePlanButton = document.getElementById("generate-plan");
     this.loadPlanButton = document.getElementById("load-plan");
     this.prevPlanButton = document.getElementById("prev-plan");
@@ -64,6 +66,8 @@ const view = {
     document.getElementById("version").innerHTML = this.model.version.number;
     if(this.model.version.supportsEditing) {
       document.getElementById("editBtn").classList.remove("disabled");
+    } else {
+      document.getElementById("editBtn").classList.add("disabled");
     }
   },
 
@@ -85,7 +89,7 @@ const view = {
        this.model.plan.disciplines.map((discipline) => discipline.name ).join(" & ") +
        ` (${this.model.plan.duration()}min)`;
     } else { 
-      document.getElementById("plan-title").innerHTML = "Bitte erzuege oder lade einen Plan";
+      document.getElementById("plan-title").innerHTML = "Bitte erzeuge oder lade einen Plan";
     }
 
   },
@@ -166,6 +170,9 @@ const controller = {
     document.getElementById("delete-plan").onclick = this.onDeletePlanBtnPressed;
     
     document.durationForm.duration.forEach( (radio) => radio.onchange = this.onDurationChanged);
+
+    // So far no login screen available ...
+    view.loginButton.classList.add("disabled");
   },
 
   onCreatePlanButtonPressed() {
