@@ -29,7 +29,7 @@ function connectDB() {
     }
 }
 
-function getDbVersion() {
+function getDbVersion($keep_session=true) {
     $dbConnection = connectDB();
     if($dbConnection) {
         $sql = 'SELECT field, field_val FROM version';
@@ -37,12 +37,28 @@ function getDbVersion() {
             $version[$row['field']] = $row['field_val'];
         }
         $version['withDB'] = true;
+
+        if( $keep_session) {
+            session_start();
+        } else {
+            session_start(["read_and_close" => true]);
+        }
+        if( isset($_SESSION["username"]) ) {
+            $version["username"] = $_SESSION["username"];
+            // $version["userrole"] = "admin";
+            $version["supportsEditing"] = true;
+        } else {
+            $version["supportsEditing"] = false;
+        }
+
         return $version;
     } else {
         return [
             'number' => '0.14.200',
             'date' => '2025-05-13',
             'withDB' => false,
+            'username' => false,
+            'supportsEditing' => false,
         ];
     }
 }

@@ -1,4 +1,5 @@
 import { App, Discipline, TrainingPlan } from "./model.js";
+import { updateLogInOutButton } from "./common-controller.js";
 
 document.addEventListener('DOMContentLoaded', function() {
   App.loadData().then( (result) => {
@@ -19,7 +20,6 @@ document.addEventListener('DOMContentLoaded', function() {
 const view = {
 
   model: undefined,
-  loginButton: undefined,
   generatePlanButton: undefined,
   loadPlanButton: undefined,
   prevPlanButton: undefined,
@@ -33,7 +33,6 @@ const view = {
     this.createDisciplineCardList();
     this.setVersionInfo();
 
-    this.loginButton = document.getElementById("loginBtn");
     this.generatePlanButton = document.getElementById("generate-plan");
     this.loadPlanButton = document.getElementById("load-plan");
     this.prevPlanButton = document.getElementById("prev-plan");
@@ -41,6 +40,8 @@ const view = {
     this.savePlanButton = document.getElementById("save-plan");
     this.savePlanAsButton = document.getElementById("save-plan-as");
     this.deletePlanButton = document.getElementById("delete-plan");
+
+    updateLogInOutButton('loginBtn', this.model.version, '.');
   },
 
   // add the list of disciplines as clickable "chips" to the UI
@@ -170,9 +171,6 @@ const controller = {
     document.getElementById("delete-plan").onclick = this.onDeletePlanBtnPressed;
     
     document.durationForm.duration.forEach( (radio) => radio.onchange = this.onDurationChanged);
-
-    // So far no login screen available ...
-    view.loginButton.classList.add("disabled");
   },
 
   onCreatePlanButtonPressed() {

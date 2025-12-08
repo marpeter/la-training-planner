@@ -1,5 +1,13 @@
 <!doctype html>
-<?php include('db_upload.php'); ?>
+<?php include('db_upload.php');
+if( isset($version['username']) ) {
+  $icon = 'logout';
+  $loginButtonHref = "../login/logout.php?url=../admin/admin.php";
+} else {
+  $icon = 'login';
+  $loginButtonHref = "../login/";
+}
+?>
 <html lang="de">
   <head>
     <title>Hilfs-Funktionen für den Planer für Leichtathletik-Trainings</title>
@@ -19,14 +27,15 @@
         <div class="nav-wrapper">
           <a href="#" class="brand-logo left"><img src="../assets/tsvlogo.png" alt="Logo" height="50" class="left">Einrichtung</a>
           <ul class="right">
-            <li><a href="login/" id="loginBtn" class="btn-small red disabled"><i class="material-icons">login</i></a></li>
+            <li><a href="<?= $loginButtonHref ?>" id="loginBtn"
+              class="btn-small red"><i class="material-icons"><?= $icon ?></i></a></li>
           </ul>
         </div>
       </nav>
     </header>
     <section class="container">
-      <h4 class="card-panel red darken-1 center">Hilfsfunktionen für den LA Trainings-Planer</h4> 
-      <p>Download der Daten aus der Datenbank:</p>
+      <h4 class="center">Download der Daten aus der Datenbank</h4> 
+      <!-- <p>Download der Daten aus der Datenbank:</p> -->
       <div class="row">
         <div class="col s6"> <a id="downloadDisciplinesBtn" href="db_download.php?entity=Disciplines" class="btn center red">Disziplinen</a></div>
         <div class="col s6"> <a id="downloadExercisesBtn" href="db_download.php?entity=Exercises" class="btn center red">Übungen</a></div>
@@ -37,35 +46,37 @@
     </section>
     <div class="divider"></div>
     <section class="container">
-      <p>Upload von Daten in die Datenbank:</p>
-      <div class="card-panel red center">Achtung! Dies ersetzt die bereits in der Datenbank gespeicherten Daten vollständig!</div>
+      <h4 class="center">Upload von Daten in die Datenbank:</h4>
+      <div class="card-panel red center">Achtung! Dies ersetzt die bereits in der Datenbank gespeicherten Daten vollständig!
+        Daher steht die Funktion nur Benutzern mit Administrationsrechten zur Verfügung.</div>
       <form name="uploadForm" enctype="multipart/form-data" method="POST" action="#">
         <div class="row">
           <div class="col s6">
+            <?php $disabled = $version['supportsEditing'] ? '' : 'disabled' ?> 
             <label>Wähle eine CSV-Datei mit der Liste der Disziplinen:
-            <input type="file" id="DisciplinesFile" name="DisciplinesFile" accecpt="text/*">
+              <input type="file" id="DisciplinesFile" name="DisciplinesFile" accecpt="text/*" <?= $disabled ?>>
             </label>
           </div>
           <div class="col s6">
             <label>Wähle eine CSV-Datei mit der Liste der Übungen:
-            <input type="file" id="ExercisesFile" name="ExercisesFile" accecpt="text/*">
+            <input type="file" id="ExercisesFile" name="ExercisesFile" accecpt="text/*" <?= $disabled ?>>
             </label>
           </div>
         </div>
         <div class="row">
           <div class="col s6">
             <label>Wähle eine CSV-Datei mit der Liste der Favoriten:
-            <input type="file" id="FavoritesFile" name="FavoritesFile" accecpt="text/*">
+            <input type="file" id="FavoritesFile" name="FavoritesFile" accecpt="text/*" <?= $disabled ?>>
             </label>
           </div>
-          <div class="col s6"> <button id="uploadDataBtn" class="btn center red">Daten hochladen</button></div> 
+          <div class="col s6"> <button id="uploadDataBtn" class="btn center red <?= $disabled ?>">Daten hochladen</button></div> 
         </div>
       </form>
       <form name="uploadIncludedData" method="POST" action="#">
         <div class="row">
           <div class="col s12 center">
             <input type="hidden" name="uploadIncludedData" value="1">
-            <button id="uploadIncludedDataBtn" class="btn center red">Mit der App gelieferte Daten hochladen</button>
+            <button id="uploadIncludedDataBtn" class="btn center red <?= $disabled ?>">Mit der App gelieferte Daten hochladen</button>
           </div>
         </div>
       </form> 
@@ -82,7 +93,7 @@
       </div>
     </section>
     <div class="divider"></div>
-    <div class="center grey-text">Version <span id="version"><?php echo $version['number'] ?></span>,<br>&copy; 2025 Markus Peter</div>
+    <div class="center grey-text">Version <span id="version"><?php echo $version['number'] ?></span>, &copy; 2025 Markus Peter</div>
     <footer>
       <nav class="red darken-1">
         <div class="nav-wrapper">

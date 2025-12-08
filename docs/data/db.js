@@ -43,10 +43,9 @@ async function dbVersion(pathPrefix="") {
       return response.json();
     });
     version.withDB = convertIfBoolean(version.withDB);
+    version.supportsEditing = convertIfBoolean(version.supportsEditing);
     if(version.withDB) {
       version.number = version.number + " (mit Backend Datenbank)";
-      version.supportsEditing   = true;
-      version.supportsUpload = true;
       version.disciplineLoader = loadFromDbTable.bind(null,pathPrefix,"disciplines");
       version.exerciseLoader   = loadFromDbTable.bind(null,pathPrefix,"exercises");
       version.favoritesLoader  = loadFromDbTable.bind(null,pathPrefix,"favorites");
@@ -54,8 +53,6 @@ async function dbVersion(pathPrefix="") {
       version.favoritesSaver = saveToDb.bind(null,pathPrefix,"favorite");
     } else {
       version.number = version.number + " (mit PHP Backend, aber noch ohne Datenbank)";
-      version.supportsEditing   = false;
-      version.supportsUpload   = false;
       version.disciplineLoader = loadDisciplinesFromCSV.bind(null,pathPrefix);
       version.exerciseLoader = loadExercisesFromCsv.bind(null,pathPrefix);
       version.favoritesLoader = loadFavoritesFromCsv.bind(null,pathPrefix);
@@ -65,7 +62,6 @@ async function dbVersion(pathPrefix="") {
     version = {
       number: "0.13.4 (ohne Backend Datenbank)",
       supportsEditing:   false,
-      supportsUpload:  false,
       disciplineLoader:  loadDisciplinesFromCSV.bind(null,pathPrefix),
       exerciseLoader:    loadExercisesFromCsv.bind(null,pathPrefix),
       favoritesLoader:   loadFavoritesFromCsv.bind(null,pathPrefix),

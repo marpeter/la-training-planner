@@ -7,8 +7,8 @@ CREATE TABLE la_planner.version (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 INSERT INTO la_planner.version (field, field_val)
-    VALUES ('number', '0.16.0'),
-           ('date', '2025-11-18');
+    VALUES ('number', '0.16.1'),
+           ('date', '2025-12-04');
 
 -- Drop dependent tables first
 -- else foreign key relationships prevent dropping less dependent tables

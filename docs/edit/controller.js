@@ -1,4 +1,5 @@
 import { App, Discipline, Exercise, TrainingPlan } from "../model.js";
+import { updateLogInOutButton } from "../common-controller.js";
 
 document.addEventListener('DOMContentLoaded', () => {
   App.loadData("../").then( (result) => {
@@ -42,6 +43,8 @@ const view = {
     this.exerciseDurationMax = document.getElementById("exercise-duration-max");
     this.exerciseReps = document.getElementById("exercise-reps");
     this.exerciseDetails = document.getElementById("exercise-details");
+
+    updateLogInOutButton('loginBtn', this.model.version, '..');
 
     this.fillExerciseList();
     this.updateExerciseForm();
@@ -161,10 +164,6 @@ const controller = {
       document.getElementById("confirm-delete-no").onclick = this.onDeleteExerciseCancelled;
       document.getElementById("confirm-save-yes").onclick = this.onSaveChanges;
       document.getElementById("confirm-save-no").onclick = this.onDiscardChanges;
-
-      // So far no login screen available ...
-      document.getElementById("loginBtn").classList.add("disabled");
-      console.log(document.getElementById("loginBtn").classList);
     },
 
     onExcerciseFilterChanged(event) {
