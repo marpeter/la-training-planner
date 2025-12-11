@@ -29,6 +29,20 @@ function connectDB() {
     }
 }
 
+function getUserRole(string $username): string {
+    try {
+        $dbConnection = connectDB();
+        $stmt = $dbConnection->prepare('SELECT role FROM users WHERE username = :username');
+        $stmt->bindParam('username', $username, \PDO::PARAM_STR);
+        $stmt->execute();
+        $stmt->bindColumn('role', $role);
+        $stmt->fetch(\PDO::FETCH_BOUND);
+        return $role;
+    } catch (\PDOException $ex) {
+        return '';
+    }
+}
+
 function getDbVersion($keep_session=true) {
     $dbConnection = connectDB();
     if($dbConnection) {
@@ -43,21 +57,20 @@ function getDbVersion($keep_session=true) {
         } else {
             session_start(["read_and_close" => true]);
         }
-        if( isset($_SESSION["username"]) ) {
-            $version["username"] = $_SESSION["username"];
-            // $version["userrole"] = "admin";
-            $version["supportsEditing"] = true;
-        } else {
-            $version["supportsEditing"] = false;
+        $version['supportsEditing'] = false;
+        if( isset($_SESSION['username']) ) {
+            $version['username'] = $_SESSION['username'];
+            $version['userrole'] = getUserRole($version['username']);
+            if( $version['userrole']==='admin' || $version['userrole']==='superuser' ) {
+                $version['supportsEditing'] = true;
+            }
         }
-
         return $version;
     } else {
         return [
             'number' => '0.14.200',
             'date' => '2025-05-13',
             'withDB' => false,
-            'username' => false,
             'supportsEditing' => false,
         ];
     }

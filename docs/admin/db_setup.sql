@@ -1,4 +1,4 @@
-CREATE SCHEMA IF NOT EXISTS la_planner CHARSET utf8;
+CREATE SCHEMA IF NOT EXISTS la_planner CHARSET utf8mb4;
 
 DROP TABLE IF EXISTS la_planner.version;
 CREATE TABLE la_planner.version (
@@ -7,8 +7,18 @@ CREATE TABLE la_planner.version (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 INSERT INTO la_planner.version (field, field_val)
-    VALUES ('number', '0.16.1'),
-           ('date', '2025-12-04');
+    VALUES ('number', '0.17.0'),
+           ('date', '2025-12-09');
+
+
+DROP TABLE IF EXISTS la_planner.users;
+CREATE TABLE la_planner.users (
+    id INT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
+    username VARCHAR(100) NOT NULL,
+    `password` VARCHAR(255) CHARACTER SET latin1 COLLATE latin1_general_cs NOT NULL,
+    role VARCHAR(100) NOT NULL DEFAULT 'user',
+    UNIQUE KEY username ( `username` )
+);
 
 -- Drop dependent tables first
 -- else foreign key relationships prevent dropping less dependent tables
