@@ -1,24 +1,43 @@
 <?php
 namespace LaPlanner;
+
 include('../data/db_common.php');
-
 $version = getDbVersion(true);
-$loginMessages = [];
-$createUserMessages = [];
+$messages = [];
 
-if( isset($version['username']) ) {
-    if( isset($_POST['create_username']) && isset($_POST['create_password']) && isset($_POST['create_role']) ) {
-        $user = new UserRecord(strtolower($_POST['create_username']), $_POST['create_password']);
-        $user->setRole($_POST['create_role']);
-        $user->create();
-        $createUserMessages = $user->getMessages();
+if( isset($_POST['action']) ) {
+    switch($_POST['action']) {
+        case 'login':
+            $user = new UserRecord($_POST['username'], $_POST['password']);
+            if( $user->logIn() ) {
+                $version['username'] = $user->getName();
+                $version['userrole'] = $user->getRole();
+                $_SESSION['username'] = $user->getName();              
+            }
+            $messages = $user->getMessages();
+            break;
+        case 'changePassword':
+            $user = new UserRecord($version['username'], $_POST['password']);
+            if( $user->login() && $user->setPassword($_POST['new_password']) ) {
+                $user->update();
+            }
+            $messages = $user->getMessages();
+            break;
+        default:
+            $messages[] = 'Unbekannte Aktion angefordert';
     }
-} elseif( isset($_POST['username']) && isset($_POST['password']) ) {
-    $user = new UserRecord($_POST['username'], $_POST['password']);
-    if ( $user->logIn() ) {
-        $version['username'] = $user->getName();
-        $version['userrole'] = $user->getRole();
-        $_SESSION['username'] = $user->getName();
-    }
-    $loginMessages = $user->getMessages();
 }
+
+$loggedIn = isset($version['username']);
+
+if( $loggedIn ) {
+    $canLogin = 'disabled';
+    $loginMenuItemDisabled = '';
+    $loginButtonHref = "logout.php?url=./";
+} else {
+    $canLogin = $version['withDB'] === true ? '' : 'disabled';
+    $loginMenuItemDisabled = $canLogin;
+    $loginButtonHref = "#";
+}
+$canManageUsers = (isset($version['userrole']) && ( 
+    $version['userrole']==='superuser' ||  $version['userrole']==='admin') );

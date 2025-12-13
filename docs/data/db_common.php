@@ -39,6 +39,29 @@ class UserRecord {
     private $dbConnection = null;
     private array $messages = [];
 
+    public static function readAll(): array {
+        try {
+            $dbConnection = connectDB();
+            $result = $dbConnection->query('SELECT * FROM users');
+            $users = [];
+            if ($result) {
+                $userRecords = $result->fetchAll();
+                foreach($userRecords as $userRecord) {
+                    $user = new static($userRecord['username'],'');
+                    $user->role = $userRecord['role'];
+                    $user->passwordHash = $userRecord['password'];
+                    $users[] = $user;
+                }
+            } 
+            $result = null;
+            $dbConnection = null;
+            return $users;
+        } catch (\PDOException $ex) {
+            $this->messages[] = $ex->getMessage();
+            return [];
+        } 
+    }
+
     public function __construct(string $name, string $password) {
         $this->name = $name;
         $this->password = $password;
@@ -48,10 +71,6 @@ class UserRecord {
         $this->dbConnection = null;
     }
 
-    // Set the role, not checking that it is valid
-    public function setRole(string $role): void {
-        $this->role = $role;
-    }
     public function getRole(): string {
         return $this->role;
     }
@@ -61,7 +80,15 @@ class UserRecord {
     public function getMessages(): array {
         return $this->messages;
     }
-
+    // Set the role, not checking that it is valid
+    public function setRole(string $role): void {
+        $this->role = $role;
+    }
+    // Set the (new) password, checking that it is allowed
+    public function setPassword(string $password): bool {
+        $this->password = $password;
+        return $this->hasAllowedPassword();
+    }
     public function logIn(): bool {
         try {
             $this->readFromDB();
@@ -147,7 +174,7 @@ class UserRecord {
                 ' username=:username');
             $stmt->bindParam('username', $this->name, \PDO::PARAM_STR);
             $stmt->execute();
-            $this->messages[] = "Benutzer $this->username wurde gelöscht.";
+            $this->messages[] = "Benutzer $this->name wurde gelöscht.";
             return true;
         } catch(\PDOException $ex) {
             $$this->messages[] = $ex->getMessage();

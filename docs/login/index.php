@@ -1,19 +1,5 @@
 <?php
-    include('login.php');
-
-    if( isset($version['username']) ) {
-      $icon = 'logout';
-      $disabled = 'disabled';
-      $loginMenuItemDisabled = '';
-      $loginButtonHref = "logout.php?url=./";
-    } else {
-      $icon = 'login';
-      $disabled = $version['withDB'] === true ? '' : 'disabled';
-      $loginMenuItemDisabled = $disabled;
-      $loginButtonHref = "#";
-    }
-
-    $showCreateUserForm = (isset($version['userrole']) && $version['userrole']==='superuser');
+include('login.php');
 ?>
 <!doctype html>
 <html lang="de">
@@ -38,7 +24,7 @@
           <a href="#" class="brand-logo left"><img src="../assets/tsvlogo.png" alt="Logo" height="50" class="left">Benutzeranmeldung</a>
           <ul class="right">
             <li class="active"><a href="<?= $loginButtonHref ?>" id="loginBtn"
-              class="btn-small red <?= $loginMenuItemDisabled ?>"><i class="material-icons"><?= $icon ?></i></a></li>
+              class="btn-small red <?= $loginMenuItemDisabled ?>"><i class="material-icons"><?= $loggedIn ? 'logout' : 'login' ?></i></a></li>
           </ul>
         </div>
       </nav>
@@ -52,24 +38,43 @@
         </p>
         <form name="loginForm" method="post" action="#">
           <div class="row">
-            <div class="input-field col s12 l6 offset-l3">
-              <input type="text" id="userName" name="username" <?= $disabled ?>>
-              <label for="userName">Benutzername</label>
+            <?php if( !$loggedIn) { ?>
+              <div class="input-field col s12 l6 offset-l3">
+                <input type="text" id="username" name="username" <?= $canLogin ?>>
+                <label for="username">Benutzername</label>
+              </div>
+          <?php } else { ?>
+            <div class="col s12 l6 offset-l3">
+               Willkommen <?= $version['username'] ?>. Du bist angemeldet mit Rolle <?= $version['userrole'] ?>.
+               <a href="<?= $loginButtonHref ?>" class="btn red"><i class="material-icons right">logout</i>Abmelden</a>
+               <?php if( $canManageUsers ) { ?>
+                <a href="users.php" class="btn center red">Benutzer verwalten
+                   <i class="material-icons right">manage_accounts</i>
+                </a>
+              <?php } ?>
             </div>
+          <?php } ?>
           </div>
           <div class="row">
             <div class="input-field col s12 l6 offset-l3">
-              <input type="password" id="password" name="password" <?= $disabled ?>>
+              <input type="password" id="password" name="password" $canLogin>
               <label for="password">Passwort</label>
             </div>
           </div>
-          <div class="row">
-            <div class="col s12 l6 offset-l3">
-              <?php if( isset($version['username'])) { ?>
-                Willkommen <?= $version['username'] ?>. Du bist angemeldet mit Rolle <?= $version['userrole'] ?>. 
-                <a href="<?= $loginButtonHref ?>" class="btn red"><i class="material-icons right">logout</i>Abmelden</a>
+          <?php if( $loggedIn ) { ?>
+            <div class="row">
+              <div class="input-field col s12 l6 offset-l3">
+                <input type="password" id="newpassword" name="new_password">
+                <label for="newpassword">Neues Passwort</label>
+              </div>
+            </div>
+          <?php } ?>
+          <div class="row">            
+              <div class="col s12 l6 offset-l3">
+              <?php if( $loggedIn ) { ?>
+                <button id="changePwdBtn" name='action' value='changePassword'class="btn center red">Passwort ändern</button>
               <?php } else { ?>
-                <button id="loginBtn" class="btn center red <?= $disabled ?>">Anmelden</button>
+                <button id="loginBtn" name='action' value='login' class="btn center red <?= $canLogin ?>">Anmelden</button>
               <?php } ?>
             </div>
           </div>                           
@@ -77,59 +82,13 @@
         <div class="row">
           <div class="col s12 l6 offset-l3 red">
             <?php
-              foreach($loginMessages as $message) {
+              foreach($messages as $message) {
                 echo $message;
               }
             ?>
           </div>
         </div>
       </section>
-      <div class="divider"></div>
-      <?php if( $showCreateUserForm ) { ?>
-        <section>
-          <h4 class="center">Benutzer anlegen</h4>
-          <p>Nur Super-Administratoren können neue Benutzer anlegen.</p>
-          <form name="createUserForm" method="post" action="#">
-            <div class="row">
-              <div class="input-field col s12 l6 offset-l3">
-                <input type="text" id="create_username" name="create_username">
-                <label for="create_username">Benutzername</label>
-              </div>
-            </div>
-            <div class="row">
-              <div class="input-field col s12 l6 offset-l3">
-                <input type="password" id="create_userpassword" name="create_password">
-                <label for="create_userpassword">Passwort</label>
-              </div>
-            </div>
-            <div class="row">
-              <div class="input-field col s12 l6 offset-l3">
-                <select id="create_userrole" name="create_role">
-                  <option value="user">Benutzer</option>
-                  <option value="admin">Administrator</option>
-                  <option value="superuser">Super-User</option>
-                </select>
-                <label for="create_userrole">Rolle:</label>
-              </div>
-            </div>          
-            <div class="row">
-              <div class="col s12 l6 offset-l3">
-                <button id="createUserBtn" class="btn center red">Anlegen</button>
-              </div>
-            </div>
-          </form>
-          <div class="row">
-            <div class="col s12 l6 offset-l3 red">
-              <?php
-                foreach($createUserMessages as $message) {
-                  echo $message;
-                }
-              ?>
-            </div>
-        </div>
-        </section>
-        <div class="divider"></div>
-      <?php } ?>
     </main>
     <div class="center grey-text">Version <span id="version"><?php echo $version['number'] ?></span>, &copy; 2025 Markus Peter</div>
     <footer>
@@ -145,8 +104,4 @@
       </nav>
     </footer>
   </body>
-  <script>
-    // initialize the static select elements
-      M.FormSelect.init(document.querySelectorAll('select'));
-  </script>
 </html>
