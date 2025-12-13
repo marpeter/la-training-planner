@@ -1,4 +1,3 @@
-<!doctype html>
 <?php include('db_upload.php');
 if( isset($version['username']) ) {
   $icon = 'logout';
@@ -8,6 +7,7 @@ if( isset($version['username']) ) {
   $loginButtonHref = "../login/";
 }
 ?>
+<!doctype html>
 <html lang="de">
   <head>
     <title>Hilfs-Funktionen für den Planer für Leichtathletik-Trainings</title>

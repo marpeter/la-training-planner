@@ -29,17 +29,169 @@ function connectDB() {
     }
 }
 
-function getUserRole(string $username): string {
-    try {
-        $dbConnection = connectDB();
-        $stmt = $dbConnection->prepare('SELECT role FROM users WHERE username = :username');
-        $stmt->bindParam('username', $username, \PDO::PARAM_STR);
-        $stmt->execute();
-        $stmt->bindColumn('role', $role);
-        $stmt->fetch(\PDO::FETCH_BOUND);
-        return $role;
-    } catch (\PDOException $ex) {
-        return '';
+// Note that instances of the following class represent a single user
+// record in the DB, not the whole table like the DataSaver instances.
+class UserRecord {
+    private string $name;
+    private string $password;
+    private string $passwordHash = '';
+    private string $role = '';
+    private $dbConnection = null;
+    private array $messages = [];
+
+    public function __construct(string $name, string $password) {
+        $this->name = $name;
+        $this->password = $password;
+        $this->dbConnection = connectDB();
+    }
+    public function __destructor(): void {
+        $this->dbConnection = null;
+    }
+
+    // Set the role, not checking that it is valid
+    public function setRole(string $role): void {
+        $this->role = $role;
+    }
+    public function getRole(): string {
+        return $this->role;
+    }
+    public function getName(): string {
+        return $this->name;
+    }
+    public function getMessages(): array {
+        return $this->messages;
+    }
+
+    public function logIn(): bool {
+        try {
+            $this->readFromDB();
+            if( password_verify($this->password, $this->passwordHash) ) {
+                if( password_needs_rehash($this->passwordHash, PASSWORD_DEFAULT) ) {
+                    return $this->update();
+                }
+                return true;
+            } else {
+                $this->messages[] = 'Da stimmte etwas mit Benutzername oder Passwort nicht ...';
+                return false;
+            }
+        } catch (\PDOException $ex) {
+            $this->messages[] = $ex->getMessage();
+            return false;
+        }       
+    }
+
+    public function readFromDB(): bool {
+        try {
+            $stmt = $this->dbConnection->prepare('SELECT password, role FROM users WHERE username = :username');
+            $stmt->bindParam('username', $this->name, \PDO::PARAM_STR);
+            $stmt->execute();
+            $stmt->bindColumn('password', $this->passwordHash);
+            $stmt->bindColumn('role', $this->role);
+            $stmt->fetch(\PDO::FETCH_BOUND);
+            return true;
+        } catch (\PDOException $ex) {
+            $this->messages[] = $ex->getMessage();
+            return false;
+        }  
+    }
+
+    public function create(): bool {
+        if( $this->canBeCreated() ) {
+            try {
+                $password = password_hash($this->password, PASSWORD_DEFAULT);
+                $stmt = $this->dbConnection->prepare('INSERT INTO users' . 
+                    ' (username,  password,  role) VALUES ' .
+                    '(:username, :password, :role)');
+                $stmt->bindParam('username', $this->name, \PDO::PARAM_STR);
+                $stmt->bindParam('password', $password, \PDO::PARAM_STR);
+                $stmt->bindParam('role', $this->role, \PDO::PARAM_STR);
+                $stmt->execute();
+                $this->messages[] = "Benutzer $this->name wurde mit Rolle "
+                    . "$this->role angelegt.";
+                return true;
+            } catch(\PDOException $ex) {
+                $this->messages[] = $ex->getMessage();
+                return false;
+            }
+        } else {
+            return false;
+        }
+    }
+
+    public function update(): bool {
+        if( $this->canBeCreated() ) {
+            try {
+                $this->passwordHash = password_hash($this->password, PASSWORD_DEFAULT);
+                $stmt = $this->dbConnection->prepare('UPDATE users SET ' . 
+                    'password=:password, role=:role ' .
+                    'WHERE username=:username' );
+                $stmt->bindParam('username', $this->name, \PDO::PARAM_STR);
+                $stmt->bindParam('password', $this->passwordHash, \PDO::PARAM_STR);
+                $stmt->bindParam('role', $this->role, \PDO::PARAM_STR);
+                $stmt->execute();
+                $this->messages[] = "Benutzer $this->name wurde mit Rolle "
+                    . "$this->role aktualisiert.";
+                return true;                
+            } catch(\PDOException $ex) {
+                $$this->messages[] = $ex->getMessage();
+                return false;
+            }
+        } else {
+            return false;
+        }
+    }
+
+    public function delete(): bool {
+        try {
+            $stmt = $this->dbConnection->prepare('DELETE FROM users WHERE' .
+                ' username=:username');
+            $stmt->bindParam('username', $this->name, \PDO::PARAM_STR);
+            $stmt->execute();
+            $this->messages[] = "Benutzer $this->username wurde gelöscht.";
+            return true;
+        } catch(\PDOException $ex) {
+            $$this->messages[] = $ex->getMessage();
+            return false;
+        }
+    }
+
+    protected function canBeCreated(): bool {
+        return $this->hasAllowedUsername()
+            && $this->hasAllowedPassword()
+            && $this->hasValidRole();
+    }
+
+    // Check that the username only contains reasonable characters
+    protected function hasAllowedUsername(): bool {
+        if( preg_match('/^[a-zäöüßA-ZÄÖÜ0-9\.\-_@]{4,20}$/', $this->name) ) {
+            return true;
+        } else {
+            $this->messages[] = "Benutzername $this->name enhält ungültige Zeichen, ist zu kurz oder zu lang.";
+            $this->messages[] = 'Er muss aus 4-20 Buchstaben, Ziffern, ., _, @ und - bestehen.';
+            return false;
+        }
+    }  
+
+    // Check that the password has a minimum length
+    // TODO: also check for minimum complexity?
+    protected function hasAllowedPassword(): bool {
+        if( !preg_match('/^\s/', $this->password) && !preg_match('/\s$/', $this->password) 
+                && strlen($this->password) > 4 ) {
+            return true;
+        } else {
+            $this->messages[] = 'Das Passwort muss mindestens 5 Zeichen lang sein ';
+            $this->messages[] = 'und darf nicht mit Leerzeichen beginnen oder enden.';
+            return false;
+        }
+    }
+
+    protected function hasValidRole(): bool {
+        if( in_array($this->role, ['user', 'admin', 'superuser']) ) {
+            return true;
+        } else {
+            $this->messages[] = 'Es gibt keine Rolle ' . $this->role;
+            return false;
+        }        
     }
 }
 
@@ -59,8 +211,10 @@ function getDbVersion($keep_session=true) {
         }
         $version['supportsEditing'] = false;
         if( isset($_SESSION['username']) ) {
-            $version['username'] = $_SESSION['username'];
-            $version['userrole'] = getUserRole($version['username']);
+            $user = new UserRecord($_SESSION['username'], '');
+            $user->readFromDB();
+            $version['username'] = $user->getName();
+            $version['userrole'] = $user->getRole();
             if( $version['userrole']==='admin' || $version['userrole']==='superuser' ) {
                 $version['supportsEditing'] = true;
             }
