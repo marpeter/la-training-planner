@@ -1,23 +1,40 @@
 <?php
 namespace LaPlanner;
 
+function loadEnvIfExists() {
+    $env_file = __DIR__ . '/db.env';
+    if (file_exists($env_file) && is_readable($env_file)) {
+        $handle = fopen($env_file, 'r');
+        while(($buffer = fgets($handle, 4096)) !== false) {
+            $parts = explode('=',trim($buffer),2);
+            if(count($parts) == 2) {
+                putenv(trim($parts[0]) . '=' . trim($parts[1]));
+            }
+        }
+        fclose($handle);
+    } 
+}   
+
 function connectDB() {
     try {
-        $env_file = __DIR__ . '/db.env';
-        if (file_exists($env_file) && is_readable($env_file)) {
-            $handle = fopen($env_file, 'r');
-            while(($buffer = fgets($handle, 4096)) !== false) {
-                $parts = explode('=',trim($buffer),2);
-                if(count($parts) == 2) {
-                    putenv(trim($parts[0]) . '=' . trim($parts[1]));
-                }
-            }
-            fclose($handle);
-        } 
-        $connection = new \PDO(
-            'mysql:host=' . getenv('LA_PLANNER_HOSTNAME') . ';dbname=' . getenv('LA_PLANNER_DBNAME'),
+        loadEnvIfExists(); 
+        $connection = connectDbUsing(
+            getenv('LA_PLANNER_HOSTNAME'),
+            getenv('LA_PLANNER_DBNAME'),
             getenv('LA_PLANNER_USERNAME'),
-            getenv('LA_PLANNER_PASSWORD'),
+            getenv('LA_PLANNER_PASSWORD'));
+        return $connection;
+    } catch( \PDOException $ex ){
+        error_log('Cannot connect to DB: ' . $ex->getMessage());
+        return false;
+    }
+}
+
+function connectDBUsing($dbHost, $dbName, $dbUser, $dbPassword) {
+    try {
+        $connection = new \PDO(
+            'mysql:host=' . $dbHost . ';dbname=' . $dbName,
+            $dbUser, $dbPassword,
             array(\PDO::ATTR_ERRMODE => \PDO::ERRMODE_EXCEPTION,
                   \PDO::ATTR_DEFAULT_FETCH_MODE => \PDO::FETCH_ASSOC,
                   \PDO::MYSQL_ATTR_INIT_COMMAND => "SET NAMES utf8mb4 COLLATE utf8mb4_unicode_ci"
@@ -27,8 +44,8 @@ function connectDB() {
         error_log('Cannot connect to DB: ' . $ex->getMessage());
         return false;
     }
-}
 
+}
 // Note that instances of the following class represent a single user
 // record in the DB, not the whole table like the DataSaver instances.
 class UserRecord {
@@ -88,6 +105,14 @@ class UserRecord {
     public function setPassword(string $password): bool {
         $this->password = $password;
         return $this->hasAllowedPassword();
+    }
+    // Set a random password and return it
+    public function setRandomPassword(int $length = 12): string {
+        $chars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*()_-=+;:,.?";
+        do {
+            $this->password = substr( str_shuffle( $chars ), 0, $length );
+        } while( !($this->hasAllowedPassword() && ctype_alpha($this-password[0])) );
+        return $this->password;
     }
     public function logIn(): bool {
         try {
@@ -182,7 +207,7 @@ class UserRecord {
         }
     }
 
-    protected function canBeCreated(): bool {
+    public function canBeCreated(): bool {
         return $this->hasAllowedUsername()
             && $this->hasAllowedPassword()
             && $this->hasValidRole();

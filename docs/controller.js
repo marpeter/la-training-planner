@@ -3,6 +3,11 @@ import { updateLogInOutButton } from "./common-controller.js";
 
 document.addEventListener('DOMContentLoaded', function() {
   App.loadData().then( (result) => {
+
+    if( App.version.withBackend && !App.version.withDB ) {
+      window.location = "admin/setup.php";
+    }
+
     view.finishUi({
       disciplines: Discipline.getAll(),
       version: App.version,

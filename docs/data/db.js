@@ -42,6 +42,7 @@ async function dbVersion(pathPrefix="") {
       if(!response.ok) throw new Error(`HTTP error accessing db_version.php: ${response.status}`);
       return response.json();
     });
+    version.withBackend = true;
     version.withDB = convertIfBoolean(version.withDB);
     version.supportsEditing = convertIfBoolean(version.supportsEditing);
     if(version.withDB) {
@@ -61,6 +62,7 @@ async function dbVersion(pathPrefix="") {
     console.error("Error loading version from DB: " + error + " --> assuming there is no PHP/DB backend.");
     version = {
       number: "0.13.4 (ohne Backend Datenbank)",
+      withBackend: false,
       supportsEditing:   false,
       disciplineLoader:  loadDisciplinesFromCSV.bind(null,pathPrefix),
       exerciseLoader:    loadExercisesFromCsv.bind(null,pathPrefix),
