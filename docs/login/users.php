@@ -1,5 +1,5 @@
 <?php
-include('db_users.php');
+require 'db_users.php';
 ?>
 <!doctype html>
 <html lang="de">

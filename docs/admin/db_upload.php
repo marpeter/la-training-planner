@@ -1,8 +1,8 @@
 <?php
 namespace LaPlanner;
 
-include('../data/db_write.php');
-include('db_upload_loaders.php');
+require '../data/db_write.php';
+require 'db_upload_loaders.php';
  
 $messages = [];
 $uploadedFiles = 0;

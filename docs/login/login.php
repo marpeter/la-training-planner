@@ -1,7 +1,7 @@
 <?php
 namespace LaPlanner;
 
-include('../data/db_common.php');
+require '../data/db_common.php';
 $version = getDbVersion(true);
 $messages = [];
 

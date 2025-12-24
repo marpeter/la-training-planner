@@ -1,7 +1,7 @@
 <?php
 namespace LaPlanner;
 
-include('../data/db_write.php');
+require '../data/db_write.php';
 
 $SAVERS = ['exercise' => 'LaPlanner\ExerciseSaver', 'favorite' => 'LaPLanner\FavoriteSaver'];
 $VERBS = ['create', 'update', 'delete'];

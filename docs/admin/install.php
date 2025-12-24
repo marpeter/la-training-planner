@@ -1,7 +1,8 @@
 <?php
 namespace LaPlanner;
 
-include('../data/db_common.php');
+require '../data/db_common.php';
+
 $version = getDbVersion();
 $suMessages = [];
 $dbMessages = [];
@@ -13,13 +14,21 @@ class DatabaseInstaller {
     private \PDO $dbConnection;
 
     public function __construct(string $dbAdminName, string $dbAdminPassword) {
-        $this->dbConnection = connectDBUsing('localhost', '', $dbAdminName, $dbAdminPassword);
+        global $CONFIG;
+        $CONFIG = [
+            'dbhost' => 'localhost',
+            'dbname'   => '',
+            'dbuser' => $dbAdminName,
+            'dbpassword' => $dbAdminPassword
+        ];
+        $this->dbConnection = connectDB();
     }
     public function start(): bool {
+        global $CONFIG;
         $okay = $this->createDbUser() &&
                 $this->switchToDbUser() &&
                 $this->createDbTables() &&
-                $this->createEnvFile();
+                $this->createConfigFile($CONFIG);
         return $okay;
     }
     public function getMessages(): array {
@@ -51,11 +60,14 @@ class DatabaseInstaller {
     }
     private function switchToDbUser(): bool {
         try {
-            $this->dbConnection = connectDBUsing(
-                'localhost',
-                'la_planner',
-                $this->dbUserName,
-                $this->dbUserPassword);
+            global $CONFIG;
+            $CONFIG = [
+                'dbhost' => 'localhost',
+                'dbname'   => 'la_planner',
+                'dbuser' => $this->dbUserName,
+                'dbpassword' => $this->dbUserPassword   
+            ];
+            $this->dbConnection = connectDB();
             return true;
         } catch( \PDOException $ex) {
             $this->messages[] = $ex->getMessage();
@@ -81,13 +93,13 @@ class DatabaseInstaller {
             return false;
         }
     }
-    private function createEnvFile(): bool {
-        $envContent = "LA_PLANNER_HOSTNAME=localhost\n" .
-                      "LA_PLANNER_DBNAME=la_planner\n" .
-                      "LA_PLANNER_USERNAME={$this->dbUserName}\n" .
-                      "LA_PLANNER_PASSWORD={$this->dbUserPassword}\n";
+    private function createConfigFile($CONFIG): bool {
+        $configContent =
+            "<?php\n\n" .
+            '$CONFIG = ' .
+            var_export($CONFIG, true) . ";\n";
         try {
-            file_put_contents(__DIR__ . '/../data/db.env', $envContent);
+            file_put_contents(__DIR__ . '/../config/config.php', $configContent);
             return true;
         } catch( \Exception $ex) {
             $this->messages[] = $ex->getMessage();

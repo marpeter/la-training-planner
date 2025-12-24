@@ -1,5 +1,5 @@
 <?php
-include('login.php');
+require 'login.php';
 ?>
 <!doctype html>
 <html lang="de">

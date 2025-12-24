@@ -1,6 +1,6 @@
 <?php
 namespace LaPlanner;
-include('db_common.php'); 
+require 'db_common.php'; 
 
 abstract class DataSaver {
     protected $ENTITY = "";

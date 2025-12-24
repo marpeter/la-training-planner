@@ -1,7 +1,7 @@
 <?php
 namespace LaPlanner;
 
-include('../data/db_common.php');
+require '../data/db_common.php';
 
 class DisciplineReader extends AbstractTableToCsvReader {
     use DisciplineTable;

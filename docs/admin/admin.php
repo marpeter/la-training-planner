@@ -1,4 +1,6 @@
-<?php include('db_upload.php');
+<?php
+require 'db_upload.php';
+
 if( isset($version['username']) ) {
   $icon = 'logout';
   $loginButtonHref = "../login/logout.php?url=../admin/admin.php";

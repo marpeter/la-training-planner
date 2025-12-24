@@ -1,5 +1,5 @@
 <?php
-include('install.php');
+require 'install.php';
 ?>
 <!doctype html>
 <html lang="de">
