@@ -1,3 +1,8 @@
+-- Drop dependent tables first
+-- else foreign key relationships prevent dropping less dependent tables
+DROP TABLE IF EXISTS favorite_exercises;
+
+DROP TABLE IF EXISTS exercises;
 CREATE TABLE exercises (
     id CHAR(40) PRIMARY KEY,
     name VARCHAR(255) NOT NULL,

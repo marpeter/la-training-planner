@@ -23,12 +23,17 @@ class DatabaseInstaller {
         ];
         $this->dbConnection = connectDB();
     }
-    public function start(): bool {
+    public function install(): bool {
         global $CONFIG;
         $okay = $this->createDbUser() &&
                 $this->switchToDbUser() &&
-                $this->createDbTables() &&
-                $this->createConfigFile($CONFIG);
+                $this->createDbTables();
+        if( $okay ) {
+            $okay = $this->createConfigFile($CONFIG);
+            if( !$okay ) {
+                $this->messages[] = "Fehler beim Erstellen der Konfigurationsdatei.";
+            }
+        }
         return $okay;
     }
     public function getMessages(): array {
@@ -47,7 +52,6 @@ class DatabaseInstaller {
             $stmt->bindParam('password', $this->dbUserPassword);
             $stmt->execute();
             // TODO: remove once user and pwd are stored securely
-            $this->messages[] = "la_planner Passwort: $this->dbUserPassword";
             $this->dbConnection->exec(
                 "CREATE DATABASE IF NOT EXISTS la_planner CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci");
             $this->dbConnection->exec(
@@ -99,8 +103,11 @@ class DatabaseInstaller {
             '$CONFIG = ' .
             var_export($CONFIG, true) . ";\n";
         try {
-            file_put_contents(__DIR__ . '/../config/config.php', $configContent);
-            return true;
+            // Create the config directory if it doesn't exist yet
+            if( !is_dir(__DIR__ . '/../config') ) {
+                mkdir(__DIR__ . '/../config', 0755, true);
+            }
+            return file_put_contents(__DIR__ . '/../config/config.php', $configContent);
         } catch( \Exception $ex) {
             $this->messages[] = $ex->getMessage();
             return false;
@@ -125,18 +132,17 @@ if( isset($_POST['action']) ) {
             if( $superUser->canBeCreated() && $dbUser->canBeCreated() ) {
                 try {
                     $dbInstaller = new DatabaseInstaller($dbUser->getName(), $_POST['db_password'] ?? '');
-                    $dbInstaller->start();
-
+                    if( $dbInstaller->install() ) {
+                        $version = getDbVersion(true);
+                        // recreate $superUser to refresh DB connection with new settings
+                        $superUser = new UserRecord($_POST['su_name'] ?? '', $_POST['su_password'] ?? '');
+                        $superUser->setRole('superuser');
+                        $superUser->create();
+                        $superUser->logIn();
+                        $_SESSION['username'] = $superUser->getName();  
+                        header('Location: admin.php');
+                    }   
                     $dbMessages = $dbInstaller->getMessages();
-                    // recreate $superUser to refresh DB connection with new settings
-                    $version = getDbVersion(true);
-                    $superUser = new UserRecord($_POST['su_name'] ?? '', $_POST['su_password'] ?? '');
-                    $superUser->setRole('superuser');
-                    $superUser->create();
-                    $superUser->logIn();
-                    $_SESSION['username'] = $superUser->getName();  
-                    header('Location: admin.php');
-
                 } catch(\PDOException $ex) {
                     $dbMessages[] = $ex->getMessage();
                 }

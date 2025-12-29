@@ -1,7 +1,9 @@
 <?php
 namespace LaPlanner;
 
-include '../config/config.php';
+if( file_exists(__DIR__ . '/../config/config.php') ) {
+    include __DIR__ . '/../config/config.php';
+}
 
 function connectDB() {
     global $CONFIG;

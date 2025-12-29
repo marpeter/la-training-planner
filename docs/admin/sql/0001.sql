@@ -1,3 +1,4 @@
+DROP TABLE IF EXISTS version;
 CREATE TABLE version (
     field VARCHAR(255) PRIMARY KEY,
     field_val TEXT,

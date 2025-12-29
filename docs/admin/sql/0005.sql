@@ -1,3 +1,4 @@
+DROP TABLE IF EXISTS favorite_headers;
 CREATE TABLE favorite_headers (
     id SMALLINT PRIMARY KEY,
     created_by VARCHAR(100),
