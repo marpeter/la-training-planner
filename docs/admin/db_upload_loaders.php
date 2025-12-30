@@ -21,7 +21,7 @@ class CsvParser {
      *         parsing was successful,
      * @throws ParseException otherwise
      */
-    public function parseTables($tableLines, $expectedFields, $tableNames) {
+    public function parseTables($tableLines, $expectedFields, $tableNames): array {
         $this->dataLength = count($tableLines);
         $tableData = [];
         $tableStartLine = 0;
@@ -44,7 +44,7 @@ class CsvParser {
      * @return an array of field positions in the table if the line is valid,
      * @throws ParseException otherwise
      */
-    public function getFieldMapping($headerLine, $expectedFields, $tableName) {
+    public function getFieldMapping($headerLine, $expectedFields, $tableName): array {
         // preg_replace removes a potential
         // \xEFBBBF UTF8 "ZERO WIDTH NO-BREAK SPACE" character at the beginning
         $header = explode($this->separator, preg_replace("/\xEF\xBB\xBF/", "", $headerLine));
@@ -79,7 +79,7 @@ class CsvParser {
      * @param $fieldMap mapping field names to positions in the lines
      * @return table as associative array.
      */
-    protected function parseSingleTable($tableLines, $fieldNames, $fieldMap, $from=1) {
+    protected function parseSingleTable($tableLines, $fieldNames, $fieldMap, $from=1): array {
         $tableLoaded = [];
         for($lineNo=$from; $lineNo<$this->dataLength; $lineNo++) {
             if( strlen(trim($tableLines[$lineNo])) == 0) { // empty line separating different tables reached
@@ -89,7 +89,7 @@ class CsvParser {
         }
         return $tableLoaded;
     }
-    private function parseLine($line, $fieldNames, $fieldMap) {
+    private function parseLine($line, $fieldNames, $fieldMap): array {
         $values = explode($this->separator, $line);
         $fields = [];
         foreach($fieldNames as $field) {

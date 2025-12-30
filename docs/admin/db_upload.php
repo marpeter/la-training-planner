@@ -7,7 +7,7 @@ require 'db_upload_loaders.php';
 $messages = [];
 $uploadedFiles = 0;
   
-function readFromFile($realFileName,$logicalFileName, &$messages) {
+function readFromFile($realFileName,$logicalFileName, &$messages): array|false {
     $handle = fopen($realFileName, 'r');
     if($handle) {
         $content = [];

@@ -5,7 +5,7 @@ if( file_exists(__DIR__ . '/../config/config.php') ) {
     include __DIR__ . '/../config/config.php';
 }
 
-function connectDB() {
+function connectDB(): \PDO|false {
     global $CONFIG;
     if( isset($CONFIG) ) {
         try {
@@ -228,7 +228,7 @@ class UserRecord {
     }
 }
 
-function getDbVersion($keep_session=true) {
+function getDbVersion($keep_session=true): array {
     global $CONFIG;
     $dbConnection = connectDB();
     if($dbConnection) {
@@ -267,7 +267,7 @@ function getDbVersion($keep_session=true) {
 abstract class AbstractTableReader {
     protected $data = null;
 
-    protected function readFromDb() {
+    protected function readFromDb(): void {
         $dbConnection = connectDB();
         foreach ($this->getTableNames() as $tableName) {
             $sql = "SELECT * FROM $tableName";
@@ -281,15 +281,15 @@ abstract class AbstractTableReader {
         $result = null;
         $dbConnection = null;
     }
-    protected function setHeader() {
+    protected function setHeader(): void {
         header('Content-Type: application/json');
     }
     // override @deserialize in each concrete class to convert $this->data as returned from the
     // database into the desired format
-    abstract protected function deserialize();
+    abstract protected function deserialize(): string;
     
     // @getTableNames is added to each concrete class by using the appropriate trait below
-    abstract protected function getTableNames();    
+    abstract protected function getTableNames(): array;    
 
     public function echo() {
         $this->readFromDb();
@@ -301,11 +301,11 @@ abstract class AbstractTableReader {
 abstract class AbstractTableToCsvReader extends AbstractTableReader {
     // override @fileName in each concrete class to hold the desired download file name
     protected $fileName;
-    protected function setHeader() {
+    protected function setHeader(): void {
         header('Content-Type: text/csv');
         header('Content-Disposition: attachment; filename="' . $this->fileName . '"');
     }
-    public function convertToCsv($data,$separator = ',') {
+    public function convertToCsv($data,$separator = ','): string {
         $handle = fopen('php://temp', 'r+');
         foreach($data as $line) {
             fputcsv($handle, $line, $separator, '"');
@@ -322,7 +322,7 @@ abstract class AbstractTableToCsvReader extends AbstractTableReader {
 
 trait DisciplineTable {
     const HEADER_TABLE = 'disciplines';
-    public function getTableNames() {
+    public function getTableNames(): array {
         return [self::HEADER_TABLE];
     }
 }
@@ -330,7 +330,7 @@ trait DisciplineTable {
 trait ExerciseTable {
     const HEADER_TABLE = 'exercises';
     const LINK_DISCIPLINES_TABLE = 'exercises_disciplines';
-    public function getTableNames() {
+    public function getTableNames(): array {
         return [self::HEADER_TABLE, self::LINK_DISCIPLINES_TABLE];
     }
 }
@@ -339,7 +339,7 @@ trait FavoriteTable {
     const HEADER_TABLE = 'favorite_headers';
     const LINK_DISCIPLINES_TABLE = 'favorite_disciplines';
     const LINK_EXERCISES_TABLE = 'favorite_exercises';
-    public function getTableNames() {
+    public function getTableNames(): array {
         return [self::HEADER_TABLE, self::LINK_DISCIPLINES_TABLE, self::LINK_EXERCISES_TABLE];
     }
 }

@@ -7,7 +7,7 @@ class DisciplineReader extends AbstractTableToCsvReader {
     use DisciplineTable;
 
     protected $fileName = 'Disciplines.csv';
-    public function deserialize() {
+    public function deserialize(): string {
         foreach($this->data[self::HEADER_TABLE] as &$discipline) {
             unset($discipline['created_at']);
         }
@@ -22,7 +22,7 @@ class ExerciseReader extends AbstractTableToCsvReader {
     use ExerciseTable;
 
     protected $fileName = 'Exercises.csv';
-    public function deserialize() {
+    public function deserialize(): string {
         // Remove the "Auslaufen" exercise from the CSV to prevent it from being modified by mistake
         $this->data[self::HEADER_TABLE] = array_filter($this->data[self::HEADER_TABLE], function($exercise) {
             return $exercise['name'] !== 'Auslaufen';
@@ -56,7 +56,7 @@ class FavoriteReader extends AbstractTableToCsvReader {
     use FavoriteTable;
 
     protected $fileName = 'Favorites.csv';
-    public function deserialize() {
+    public function deserialize(): string {
         foreach ($this->data[self::HEADER_TABLE] as &$favorite) {
             $favorite['Disciplines[]'] = array();
             foreach ($this->data[self::LINK_DISCIPLINES_TABLE] as $favoriteDiscipline) {

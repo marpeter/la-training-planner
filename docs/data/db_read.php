@@ -6,7 +6,7 @@ require 'db_common.php';
 class DisciplineReader extends AbstractTableReader {
     use DisciplineTable;
 
-    protected function deserialize() {
+    protected function deserialize(): string {
         return json_encode($this->data[self::HEADER_TABLE]);
     }
 }
@@ -14,7 +14,7 @@ class DisciplineReader extends AbstractTableReader {
 class ExerciseReader extends AbstractTableReader {
     use ExerciseTable;
 
-    protected function deserialize() {
+    protected function deserialize(): string {
         foreach ($this->data[self::HEADER_TABLE] as &$exercise) {
             $exercise['warmup'] = (bool)$exercise['warmup'];
             $exercise['runabc'] = (bool)$exercise['runabc'];
@@ -37,7 +37,7 @@ class ExerciseReader extends AbstractTableReader {
 class FavoriteReader extends AbstractTableReader {
     use FavoriteTable;
 
-    protected function deserialize() {
+    protected function deserialize(): string {
         foreach ($this->data[self::HEADER_TABLE] as &$favorite) {
             $favorite['disciplines'] = [];
             foreach ($this->data[self::LINK_DISCIPLINES_TABLE] as $favoriteDiscipline) {
