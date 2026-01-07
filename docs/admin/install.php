@@ -25,9 +25,27 @@ class DatabaseInstaller {
     }
     public function install(): bool {
         global $CONFIG;
-        $okay = $this->createDbUser() &&
-                $this->switchToDbUser() &&
-                $this->createDbTables();
+        if( $this->canCreateDbAndUser() ) {
+            $okay = $this->createDbUser() &&
+                    $this->switchToDbAndUser() &&
+                    $this->createDbTables();
+        } else {
+            $database = $this->getDbInWhichToCreateTables();
+            if( $database === null ) {
+                $this->messages[] = "Datenbank-Installation nicht möglich";
+                $this->messages[] = "Dem angegebenen Benutzer fehlen Rechte zum Anlegen von Benutzern oder Datenbanken und";
+                $this->messages[] = "es wurde keine eindeutige, vorhandene Datenbank gefunden, in der die Tabellen angelegt werden können.";
+                return false;
+            }
+            // use the provided user credentials
+            $this->dbUserName = $CONFIG['dbuser'];
+            $this->dbUserPassword = $CONFIG['dbpassword'];
+            // set the database name
+            $CONFIG['dbname'] = $database;
+            $this->switchToDbAndUser($database);
+            $okay = $this->createDbTables();
+        }
+
         if( $okay ) {
             $okay = $this->createConfigFile($CONFIG);
             if( !$okay ) {
@@ -40,34 +58,71 @@ class DatabaseInstaller {
         return $this->messages;
     }
 
+    private function canCreateDbAndUser(): bool {
+        try {
+            $stmt = $this->dbConnection->prepare(
+                "SELECT PRIVILEGE_TYPE FROM INFORMATION_SCHEMA.USER_PRIVILEGES"
+                . " WHERE PRIVILEGE_TYPE IN ('CREATE USER', 'CREATE') AND "
+                .       "GRANTEE = CONCAT(\"'\", SUBSTRING_INDEX(USER(), '@', 1), "
+                .            "\"'@'\", SUBSTRING_INDEX(USER(), '@', -1), \"'\")");
+            $stmt->execute();
+            $privileges = $stmt->fetchAll(\PDO::FETCH_COLUMN);
+            return in_array('CREATE USER', $privileges) && in_array('CREATE', $privileges);
+        } catch( \PDOException $ex) {
+            $this->messages[] = $ex->getMessage();
+            return false;
+        }
+    }
+
+    private function getDbInWhichToCreateTables(): ?string {
+        try {
+            $stmt = $this->dbConnection->prepare(
+                "SHOW DATABASES WHERE `Database` != 'information_schema'");
+            $stmt->execute();
+            $databases = $stmt->fetchAll(\PDO::FETCH_COLUMN);
+            $stmt = $this->dbConnection->prepare("SHOW GRANTS");
+            $stmt->execute();
+            $grants = $stmt->fetchAll(\PDO::FETCH_COLUMN); 
+            foreach( $databases as $database ) {
+                // check if there is a GRANT to CREATE [tables] in this database
+                foreach( $grants as $grant ) {
+                    if(preg_match("/GRANT .*, CREATE,.* ON `$database`.*/", $grant) ) {
+                        return $database;
+                    }
+                }
+            }
+            return null;
+        } catch( \PDOException $ex) {
+            $this->messages[] = $ex->getMessage();
+            return null;
+        }
+    }
     private function createDbUser(): bool {
-        $this->dbUserName = 'la_planner';
+        $this->dbUserName = 'tfat_planner';
         $this->dbUserPassword = $this->randomPassword();
 
         try {
-            // TODO: check if the current user has the right to create users or
-            //       is already a limited user who can only create tables in their own db
             $stmt = $this->dbConnection->prepare(
-                "CREATE OR REPLACE USER la_planner@localhost IDENTIFIED BY :password PASSWORD EXPIRE NEVER");
+                "CREATE OR REPLACE USER tfat_planner@localhost IDENTIFIED BY :password PASSWORD EXPIRE NEVER");
             $stmt->bindParam('password', $this->dbUserPassword);
             $stmt->execute();
             // TODO: remove once user and pwd are stored securely
             $this->dbConnection->exec(
-                "CREATE DATABASE IF NOT EXISTS la_planner CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci");
+                "CREATE DATABASE IF NOT EXISTS tfat_planner CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci");
             $this->dbConnection->exec(
-                "GRANT ALL PRIVILEGES ON la_planner.* TO la_planner@localhost");
+                "GRANT ALL PRIVILEGES ON tfat_planner.* TO tfat_planner@localhost");
             return true;
         } catch( \PDOException $ex) {
             $this->messages[] = $ex->getMessage();
             return false;
         }
     }
-    private function switchToDbUser(): bool {
+    private function switchToDbAndUser($dbname='tfat_planner'): bool {
         try {
             global $CONFIG;
             $CONFIG = [
                 'dbhost' => 'localhost',
-                'dbname'   => 'la_planner',
+                'dbname'   => $dbname,
                 'dbuser' => $this->dbUserName,
                 'dbpassword' => $this->dbUserPassword   
             ];

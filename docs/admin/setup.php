@@ -57,7 +57,7 @@ require 'install.php';
             <div class="col s12 l6 offset-l3 red">
               <?php
                 foreach($suMessages as $message) {
-                  echo $message;
+                  echo $message. "<br>";
                 }
               ?> 
             </div>
@@ -67,11 +67,18 @@ require 'install.php';
             <div class="col s12 l6 offset-l3">Und gib Name und Passwort des
               Datenbank-Benutzers ('root' oder Adminstrator) an, mit dem sich
               die App zur Installation mit der Datenbank verbinden kann. Dieser
-               Datenbank-Benutzer wird nach der Installation nicht mehr für die
+              Datenbank-Benutzer wird nach der Installation nicht mehr für die
               Datenbank-Verbindung verwendet. Stattdessen wird während der
-              Installation ein neuer Datenbank-Benutzer <em>la_planner</em>
+              Installation ein neuer Datenbank-Benutzer <strong>tfat_planner</strong>
               mit einem generierten Passwort angelegt, und dessen Name und
-              Passwort in Datei db.env gespeichert.
+              Passwort in Datei config/config.php gespeichert.<br>
+              Alternativ gib den Namen und Passwort eines Datenbank-Benutzers an,
+              der bereits die notwendigen Rechte zum Anlegen der Tabellen in
+              einer bereits vorhandenen (am besten leeren!) Datenbank besitzt.<br>
+              <strong>Hinweis:</strong> Besitzt dieser Benutzer Rechte zum Anlegen
+              von Tabellen in mehreren Datenbanken, so verwendet diese App die
+              <strong>erste</strong>, die von `SELECT PRIVILEGE_TYPE FROM
+              INFORMATION_SCHEMA.USER_PRIVILEGES` zurückgegeben wird!
             </div>
           </div>
           <div class="row">
@@ -93,7 +100,7 @@ require 'install.php';
             <div class="col s12 l6 offset-l3 red">
               <?php
                 foreach($dbMessages as $message) {
-                  echo $message;
+                  echo $message . "<br>";
                 }
               ?> 
             </div>
