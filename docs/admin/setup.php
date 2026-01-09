@@ -7,8 +7,8 @@ require 'install.php';
     <title>Installation des Planers für Leichtathletik-Trainings</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-    <link rel="icon" type="image/x-icon" href="../assets/tsvlogo.png">
-    <link rel="apple-touch-icon" type="image/png" href="../assets/tsvlogo.png">
+    <link rel="icon" type="image/x-icon" href="../assets/logo.png">
+    <link rel="apple-touch-icon" type="image/png" href="../assets/logo.png">
     <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
     <!-- Compiled and minified CSS -->
     <link rel="stylesheet"
@@ -21,7 +21,7 @@ require 'install.php';
     <header>
       <nav class="red darken-1">
         <div class="nav-wrapper">
-          <a href="#" class="brand-logo left"><img src="../assets/tsvlogo.png" alt="Logo" height="50" class="left">Installation</a>
+          <a href="#" class="brand-logo left"><img src="../assets/logo.png" alt="Logo" height="50" class="left">Installation</a>
           <ul class="right">
             <li><a href="../login" id="loginBtn"
               class="btn-small red"><i class="material-icons">login</i></a></li>
@@ -32,10 +32,16 @@ require 'install.php';
     <main class="container">
       <section>
         <h4 class="center">Installation der Trainings-Planer App abschließen</h4>
-        <p>Lege zur Fertigstellung der Trainings-Planer App Installation</p>
+        <?php if( $version['withDB']) { ?>
+          <div class="card-panel red center">Achtung! Die Installation der App ist bereits abgeschlossen.<br>
+            Möchtest Du die Installation wirklich erneut durchführen? <br>
+            Dies überschreibt die bestehende Datenbank und alle darin gespeicherten Daten werden gelöscht!
+          </div>
+        <?php } ?>
         <form name="installForm" method="post" action="#">
           <div class="row">
-            <div class="col s12 l6 offset-l3">einen Super-User für die App selbst an:
+            <div class="col s12 l6 offset-l3">Lege zur Fertigstellung der Trainings-Planer App Installation
+              einen Super-User für die App selbst an:
             </div>
           </div>
           <div class="row">
@@ -64,21 +70,20 @@ require 'install.php';
           </div>
           <?php } ?>
           <div class="row">
-            <div class="col s12 l6 offset-l3">Und gib Name und Passwort des
-              Datenbank-Benutzers ('root' oder Adminstrator) an, mit dem sich
-              die App zur Installation mit der Datenbank verbinden kann. Dieser
-              Datenbank-Benutzer wird nach der Installation nicht mehr für die
-              Datenbank-Verbindung verwendet. Stattdessen wird während der
-              Installation ein neuer Datenbank-Benutzer <strong>tfat_planner</strong>
-              mit einem generierten Passwort angelegt, und dessen Name und
-              Passwort in Datei config/config.php gespeichert.<br>
-              Alternativ gib den Namen und Passwort eines Datenbank-Benutzers an,
-              der bereits die notwendigen Rechte zum Anlegen der Tabellen in
-              einer bereits vorhandenen (am besten leeren!) Datenbank besitzt.<br>
-              <strong>Hinweis:</strong> Besitzt dieser Benutzer Rechte zum Anlegen
-              von Tabellen in mehreren Datenbanken, so verwendet diese App die
-              <strong>erste</strong>, die von `SELECT PRIVILEGE_TYPE FROM
-              INFORMATION_SCHEMA.USER_PRIVILEGES` zurückgegeben wird!
+            <div class="col s12 l6 offset-l3">Gib Name und Passwort eines
+              Datenbankadministrators (z.B. 'root' ) an, mit dem sich die App
+              zur Installation mit der Datenbank verbinden kann. Dieser
+              Datenbank-Benutzer wird <strong>nach</strong> der Installation
+              nicht mehr verwendet. Stattdessen wird während der Installation
+              ein neuer Datenbank-Benutzer <strong>tfat_planner</strong> mit
+              einem generierten Passwort angelegt.<br>
+              Alternativ gib den Namen und Passwort eines Datenbank-Benutzers
+              an, der bereits die notwendigen Rechte zum Anlegen der Tabellen in
+              <strong>genau einer</strong> bereits vorhandenen (am besten leeren!)
+              Datenbank besitzt.<br>
+              Name und Passwort des Datenbank-Benutzers, den die App nach der
+              Installation zur Verbindung mit der Datenbank verwendet, werden
+              in Datei <code>config/config.php</code> gespeichert.<br>
             </div>
           </div>
           <div class="row">

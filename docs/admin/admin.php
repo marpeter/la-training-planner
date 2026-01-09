@@ -15,8 +15,8 @@ if( isset($version['username']) ) {
     <title>Hilfs-Funktionen für den Planer für Leichtathletik-Trainings</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-    <link rel="icon" type="image/x-icon" href="../assets/tsvlogo.png">
-    <link rel="apple-touch-icon" type="image/png" href="../assets/tsvlogo.png">
+    <link rel="icon" type="image/x-icon" href="../assets/logo.png">
+    <link rel="apple-touch-icon" type="image/png" href="../assets/logo.png">
     <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
     <!-- Compiled and minified CSS -->
     <link rel="stylesheet"
@@ -27,7 +27,7 @@ if( isset($version['username']) ) {
     <header>
       <nav class="red darken-1">
         <div class="nav-wrapper">
-          <a href="#" class="brand-logo left"><img src="../assets/tsvlogo.png" alt="Logo" height="50" class="left">Einrichtung</a>
+          <a href="#" class="brand-logo left"><img src="../assets/logo.png" alt="Logo" height="50" class="left">Einrichtung</a>
           <ul class="right">
             <li><a href="<?= $loginButtonHref ?>" id="loginBtn"
               class="btn-small red"><i class="material-icons"><?= $icon ?></i></a></li>

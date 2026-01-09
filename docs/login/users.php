@@ -7,8 +7,8 @@ require 'db_users.php';
     <title>Benutzerverwaltung für den Planer für Leichtathletik-Trainings</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-    <link rel="icon" type="image/x-icon" href="../assets/tsvlogo.png">
-    <link rel="apple-touch-icon" type="image/png" href="../assets/tsvlogo.png">
+    <link rel="icon" type="image/x-icon" href="../assets/logo.png">
+    <link rel="apple-touch-icon" type="image/png" href="../assets/logo.png">
     <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
     <!-- Compiled and minified CSS -->
     <link rel="stylesheet"
@@ -21,7 +21,7 @@ require 'db_users.php';
     <header>
       <nav class="red darken-1">
         <div class="nav-wrapper">
-          <a href="#" class="brand-logo left"><img src="../assets/tsvlogo.png" alt="Logo" height="50" class="left">Benutzerverwaltung</a>
+          <a href="#" class="brand-logo left"><img src="../assets/logo.png" alt="Logo" height="50" class="left">Benutzerverwaltung</a>
           <ul class="right">
             <li class="active"><a href="<?= $loginButtonHref ?>" id="loginBtn"
               class="btn-small red <?= $loginMenuItemDisabled ?>"><i class="material-icons"><?= $loggedIn ? 'logout' : 'login' ?></i></a></li>

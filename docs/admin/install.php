@@ -33,8 +33,6 @@ class DatabaseInstaller {
             $database = $this->getDbInWhichToCreateTables();
             if( $database === null ) {
                 $this->messages[] = "Datenbank-Installation nicht möglich";
-                $this->messages[] = "Dem angegebenen Benutzer fehlen Rechte zum Anlegen von Benutzern oder Datenbanken und";
-                $this->messages[] = "es wurde keine eindeutige, vorhandene Datenbank gefunden, in der die Tabellen angelegt werden können.";
                 return false;
             }
             // use the provided user credentials
@@ -69,7 +67,7 @@ class DatabaseInstaller {
             $privileges = $stmt->fetchAll(\PDO::FETCH_COLUMN);
             return in_array('CREATE USER', $privileges) && in_array('CREATE', $privileges);
         } catch( \PDOException $ex) {
-            $this->messages[] = $ex->getMessage();
+            $this->messages[] = htmlspecialchars($ex->getMessage());
             return false;
         }
     }
@@ -82,18 +80,28 @@ class DatabaseInstaller {
             $databases = $stmt->fetchAll(\PDO::FETCH_COLUMN);
             $stmt = $this->dbConnection->prepare("SHOW GRANTS");
             $stmt->execute();
-            $grants = $stmt->fetchAll(\PDO::FETCH_COLUMN); 
-            foreach( $databases as $database ) {
-                // check if there is a GRANT to CREATE [tables] in this database
+            $grants = $stmt->fetchAll(\PDO::FETCH_COLUMN);
+            // check if there is exactly one database with a GRANT to CREATE [tables] in it
+            $databases = array_filter($databases, function($db) use ($grants) {
                 foreach( $grants as $grant ) {
-                    if(preg_match("/GRANT .*, CREATE,.* ON `$database`.*/", $grant) ) {
-                        return $database;
+                    if(preg_match("/GRANT .*, CREATE,.* ON `$db`.*/", $grant) ) {
+                        return true;
                     }
                 }
+                return false;
+            });
+            switch( count($databases) ) {
+                case 0:
+                    $this->messages[] = "Dem angegebenen Benutzer fehlen Rechte zum Anlegen von Tabellen in einer Datenbank.";
+                    return null;
+                case 1:
+                    return $databases[0];
+                default:
+                    $this->messages[] = "Es wurde mehr als eine Datenbank gefunden, in der Tabellen angelegt werden könnten.";
+                    return null;
             }
-            return null;
         } catch( \PDOException $ex) {
-            $this->messages[] = $ex->getMessage();
+            $this->messages[] = htmlspecialchars($ex->getMessage());
             return null;
         }
     }
@@ -113,7 +121,7 @@ class DatabaseInstaller {
                 "GRANT ALL PRIVILEGES ON tfat_planner.* TO tfat_planner@localhost");
             return true;
         } catch( \PDOException $ex) {
-            $this->messages[] = $ex->getMessage();
+            $this->messages[] = htmlspecialchars($ex->getMessage());
             return false;
         }
     }
@@ -129,7 +137,7 @@ class DatabaseInstaller {
             $this->dbConnection = connectDB();
             return true;
         } catch( \PDOException $ex) {
-            $this->messages[] = $ex->getMessage();
+            $this->messages[] = htmlspecialchars($ex->getMessage());
             return false;
         }
     }
@@ -148,7 +156,7 @@ class DatabaseInstaller {
             }
             return true;
         } catch( \PDOException $ex) {
-            $this->messages[] = $ex->getMessage();
+            $this->messages[] = htmlspecialchars($ex->getMessage());
             return false;
         }
     }
@@ -164,7 +172,7 @@ class DatabaseInstaller {
             }
             return file_put_contents(__DIR__ . '/../config/config.php', $configContent);
         } catch( \Exception $ex) {
-            $this->messages[] = $ex->getMessage();
+            $this->messages[] = htmlspecialchars($ex->getMessage());
             return false;
         }
     }     
@@ -199,7 +207,7 @@ if( isset($_POST['action']) ) {
                     }   
                     $dbMessages = $dbInstaller->getMessages();
                 } catch(\PDOException $ex) {
-                    $dbMessages[] = $ex->getMessage();
+                    $dbMessages[] = htmlspecialchars($ex->getMessage());
                 }
             }
             $suMessages = $superUser->getMessages();
