@@ -10,26 +10,26 @@
         <!-- Compiled and minified CSS -->
         <link rel="stylesheet"
               href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css">
-        <link rel="stylesheet" href="../ownstyle.css">
+        <link rel="stylesheet" href="../theme/theme.css">
         <!-- Compiled and minified JavaScript -->
         <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
         <script type="module" src="controller.js"></script>
    </head>
    <body>
     <header>
-      <nav class="red darken-1">
+      <nav class="tfat darken-1">
         <div class="nav-wrapper">
-          <a href="#" class="brand-logo left"><img src="../assets/logo.png" alt="Logo" height="50" class="left">Übungen bearbeiten</a>
+          <a href="#" class="brand-logo left"><img src="../assets/logo.png" alt="Logo" class="tfat-logo">Übungen bearbeiten</a>
           <ul class="right">
-            <li><a href="login/" id="loginBtn" class="btn-small red"><i class="material-icons">login</i></a></li>  
+            <li><a href="login/" id="loginBtn" class="btn-small tfat"><i class="material-icons">login</i></a></li>  
           </ul>
         </div>
       </nav>
     </header>
     <div class="row">
       <div class="col s4"><!-- Übungsliste zum Auswählen -->
-        <ul class="collection with-header" id="exercise-list">
-          <li class="collection-header"><h6>Wähle die Übung aus:</h6>
+        <ul class="collection with-header tfat-background" id="exercise-list">
+          <li class="collection-header tfat-background"><h6>Wähle die Übung aus:</h6>
             <form class="col s12" id="exercise-list-form">
               <div class="input-field col s12">
                 <i class="material-icons prefix">search</i>
@@ -106,13 +106,13 @@
               </div>
             </div>
             <p class="center">Übung
-              <button id="save-exercise" class="btn red darken-1" name="save-exercise" type="button">speichern
+              <button id="save-exercise" class="btn tfat darken-1" name="save-exercise" type="button">speichern
                 <i class="material-icons right">save</i>
               </button>
-              <button id="copy-exercise" class="btn red darken-1" name="copy-exercise" type="button">kopieren
+              <button id="copy-exercise" class="btn tfat darken-1" name="copy-exercise" type="button">kopieren
                 <i class="material-icons right">content_copy</i>
               </button>
-              <button id="delete-exercise" class="btn red darken-1" name="delete-exercise" type="button">löschen
+              <button id="delete-exercise" class="btn tfat darken-1" name="delete-exercise" type="button">löschen
                 <i class="material-icons right">delete</i>
               </button>
             </p>
@@ -122,11 +122,11 @@
             <div id="confirm-delete-content" class="modal-content">
               <h4>Übung löschen</h4>
               <p>Soll die Übung wirklich gelöscht werden?</p>
-              <div id="confirm-delete-exercise-name" class="red-text"></div>
+              <div id="confirm-delete-exercise-name" class="tfat-text"></div>
             </div>
             <div class="modal-footer">
-              <button id="confirm-delete-yes" class="btn red darken-1 modal-close">Ja</button>
-              <button id="confirm-delete-no" class="btn red darken-1 modal-close">Nein</button>
+              <button id="confirm-delete-yes" class="btn tfat darken-1 modal-close">Ja</button>
+              <button id="confirm-delete-no" class="btn tfat darken-1 modal-close">Nein</button>
             </div>
           </div>
           <!-- Modaler Dialog bei Wechsel zu anderer Übung ohne zu speichern -->
@@ -134,11 +134,11 @@
             <div id="save-edits-content" class="modal-content">
               <h4>Übung speichern?</h4>
               <p>Du hast Daten verändert. Soll die angezeigte Übung gespeichert werden?</p>
-              <div id="save-edits-exercise-name" class="red-text"></div>
+              <div id="save-edits-exercise-name" class="tfat-text"></div>
             </div>
             <div class="modal-footer">
-              <button id="confirm-save-yes" class="btn red darken-1 modal-close">Speichern</button>
-              <button id="confirm-save-no" class="btn red darken-1 modal-close">Änderungen verwerfen</button>
+              <button id="confirm-save-yes" class="btn tfat darken-1 modal-close">Speichern</button>
+              <button id="confirm-save-no" class="btn tfat darken-1 modal-close">Änderungen verwerfen</button>
             </div>
           </div>
         </div>
@@ -147,13 +147,13 @@
     <div class="divider"></div>
     <div class="center grey-text">Version <span id="version">0.13.0</span>,<br>&copy; 2025 Markus Peter</div>
     <footer>
-      <nav class="red darken-1">
+      <nav class="tfat darken-1">
         <div class="nav-wrapper">
           <ul>
-            <li><a href="../" class="btn-small red"><i class="material-icons">home</i></a></li>
-            <li><a href="../help/" class="btn-small red"><i class="material-icons">help_center</i></a></li>
-            <li class="active"><a href="./" id="editBtn" class="btn-small red"><i class="material-icons">construction</i></a></li>
-            <li><a href="../admin/" class="btn-small red"><i class="material-icons">import_export</i></a></li>
+            <li><a href="../" class="btn-small tfat"><i class="material-icons">home</i></a></li>
+            <li><a href="../help/" class="btn-small tfat"><i class="material-icons">help_center</i></a></li>
+            <li class="active"><a href="./" id="editBtn" class="btn-small tfat"><i class="material-icons">construction</i></a></li>
+            <li><a href="../admin/" class="btn-small tfat"><i class="material-icons">import_export</i></a></li>
           </ul>
         </div>
       </nav>      

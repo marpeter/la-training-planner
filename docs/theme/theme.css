@@ -1,0 +1,178 @@
+@import url('colors.css');
+
+.tfat {
+  background-color: var(--tfat-color) !important;
+}
+
+.tfat-text {
+  color: var(--tfat-color) !important;
+}
+
+.tfat-background {
+  background-color: var(--tfat-bg-color) !important;
+}
+
+.tfat.lighten-5 {
+  background-color: #e0f2f1 !important;
+}
+
+.tfat-text.text-lighten-5 {
+  color: #e0f2f1 !important;
+}
+
+.tfat.lighten-4 {
+  background-color: #b2dfdb !important;
+}
+
+.tfat-text.text-lighten-4 {
+  color: #b2dfdb !important;
+}
+
+.tfat.lighten-3 {
+  background-color: #80cbc4 !important;
+}
+
+.tfat-text.text-lighten-3 {
+  color: #80cbc4 !important;
+}
+
+.tfat.lighten-2 {
+  background-color: #4db6ac !important;
+}
+
+.tfat-text.text-lighten-2 {
+  color: #4db6ac !important;
+}
+
+.tfat.lighten-1 {
+  background-color: #26a69a !important;
+}
+
+.tfat-text.text-lighten-1 {
+  color: #26a69a !important;
+}
+
+.tfat.darken-1 {
+  background-color: #00897b !important;
+}
+
+.tfat-text.text-darken-1 {
+  color: #00897b !important;
+}
+
+.tfat.darken-2 {
+  background-color: #00796b !important;
+}
+
+.tfat-text.text-darken-2 {
+  color: #00796b !important;
+}
+
+.tfat.darken-3 {
+  background-color: #00695c !important;
+}
+
+.tfat-text.text-darken-3 {
+  color: #00695c !important;
+}
+
+.tfat.darken-4 {
+  background-color: #004d40 !important;
+}
+
+.tfat-text.text-darken-4 {
+  color: #004d40 !important;
+}
+
+.tfat.accent-1 {
+  background-color: #a7ffeb !important;
+}
+
+.tfat-text.text-accent-1 {
+  color: #a7ffeb !important;
+}
+
+.tfat.accent-2 {
+  background-color: #64ffda !important;
+}
+
+.tfat-text.text-accent-2 {
+  color: #64ffda !important;
+}
+
+.tfat.accent-3 {
+  background-color: #1de9b6 !important;
+}
+
+.tfat-text.text-accent-3 {
+  color: #1de9b6 !important;
+}
+
+.tfat.accent-4 {
+  background-color: #00bfa5 !important;
+}
+
+.tfat-text.text-accent-4 {
+  color: #00bfa5 !important;
+}
+
+.tfat-success {
+  background-color: var(--tfat-success-color) !important;
+}
+
+.tfat-warning {
+  background-color: var(--tfat-warning-color) !important;
+}
+
+.tfat-error {
+  background-color: var(--tfat-error-color) !important;
+}
+
+.tfat-logo {
+    height: 2.1rem;
+    margin-left: 0.5rem;
+    margin-right: 0.5rem;
+} 
+
+footer {
+    position: fixed !important;
+    padding: 0.2em;
+    bottom: 0;
+    left: 0;
+    width: 100%;   
+}
+
+body {
+  background-color: var(--tfat-bg-color);
+  padding-bottom: 5em;
+}
+
+.disziplin {
+    max-height: 40px;
+    max-width: 40px;
+    margin: 10px auto -10px;
+    display: inline-block;
+    position: relative;
+}
+
+[type="radio"]:checked, [type="radio"]:checked+span:after, [type="radio"].with-gap:checked+span:before, [type="radio"].with-gap:checked+span:after {
+    background-color: var(--tfat-color) !important;
+    border: 2px solid var(--tfat-color) !important;
+}
+
+/* label focus color */
+input[type=text]:focus + label, input[type=number]:focus + label, textarea:focus + label, select:focus + label {
+  color: #000 !important;
+}
+
+/* input field underline color */
+.input-field input.valid[type=text], input.valid[type=number], textarea.valid {
+  border-bottom: 1px solid #9e9e9e !important;
+  box-shadow: 0 1px 0 0 #9e9e9e !important;
+}
+
+/* input field underline focus color */
+.input-field input[type=text]:focus, input[type=number]:focus, textarea:focus {
+  border-bottom: 1px solid #000 !important;
+  box-shadow: 0 1px 0 0 #000 !important;
+}

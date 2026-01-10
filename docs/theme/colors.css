@@ -1,0 +1,7 @@
+:root {
+    --tfat-color: #009688; /* materialize teal */
+    --tfat-bg-color: #adf8d9; /* not exactly materialize teal accent-1 */
+    --tfat-success-color: #66bb6a ; /* materialize green lighten-1*/
+    --tfat-warning-color: #ff6e40; /* materialize deep-orange accent-2 */
+    --tfat-error-color: #ff5252; /* materialize red accent-2 */
+}

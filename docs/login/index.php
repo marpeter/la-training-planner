@@ -15,16 +15,16 @@ require 'login.php';
            href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css">
     <!-- Compiled and minified JavaScript -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
-    <link rel="stylesheet" href="../ownstyle.css">
+    <link rel="stylesheet" href="../theme/theme.css">
   </head>
   <body>
     <header>
-      <nav class="red darken-1">
+      <nav class="tfat darken-1">
         <div class="nav-wrapper">
-          <a href="#" class="brand-logo left"><img src="../assets/logo.png" alt="Logo" height="50" class="left">Benutzeranmeldung</a>
+          <a href="#" class="brand-logo left"><img src="../assets/logo.png" alt="Logo" class="tfat-logo">Benutzeranmeldung</a>
           <ul class="right">
             <li class="active"><a href="<?= $loginButtonHref ?>" id="loginBtn"
-              class="btn-small red <?= $loginMenuItemDisabled ?>"><i class="material-icons"><?= $loggedIn ? 'logout' : 'login' ?></i></a></li>
+              class="btn-small tfat <?= $loginMenuItemDisabled ?>"><i class="material-icons"><?= $loggedIn ? 'logout' : 'login' ?></i></a></li>
           </ul>
         </div>
       </nav>
@@ -46,9 +46,9 @@ require 'login.php';
           <?php } else { ?>
             <div class="col s12 l6 offset-l3">
                Willkommen <?= $version['username'] ?>. Du bist angemeldet mit Rolle <?= $version['userrole'] ?>.
-               <a href="<?= $loginButtonHref ?>" class="btn red"><i class="material-icons right">logout</i>Abmelden</a>
+               <a href="<?= $loginButtonHref ?>" class="btn tfat"><i class="material-icons right">logout</i>Abmelden</a>
                <?php if( $canManageUsers ) { ?>
-                <a href="users.php" class="btn center red">Benutzer verwalten
+                <a href="users.php" class="btn center tfat">Benutzer verwalten
                    <i class="material-icons right">manage_accounts</i>
                 </a>
               <?php } ?>
@@ -72,15 +72,15 @@ require 'login.php';
           <div class="row">            
               <div class="col s12 l6 offset-l3">
               <?php if( $loggedIn ) { ?>
-                <button id="changePwdBtn" name='action' value='changePassword'class="btn center red">Passwort ändern</button>
+                <button id="changePwdBtn" name='action' value='changePassword'class="btn center tfat">Passwort ändern</button>
               <?php } else { ?>
-                <button id="loginBtn" name='action' value='login' class="btn center red <?= $canLogin ?>">Anmelden</button>
+                <button id="loginBtn" name='action' value='login' class="btn center tfat <?= $canLogin ?>">Anmelden</button>
               <?php } ?>
             </div>
           </div>                           
         </form>
         <div class="row">
-          <div class="col s12 l6 offset-l3 red">
+          <div class="col s12 l6 offset-l3 tfat">
             <?php
               foreach($messages as $message) {
                 echo $message;
@@ -92,13 +92,13 @@ require 'login.php';
     </main>
     <div class="center grey-text">Version <span id="version"><?php echo $version['number'] ?></span>, &copy; 2025 Markus Peter</div>
     <footer>
-      <nav class="red darken-1">
+      <nav class="tfat darken-1">
         <div class="nav-wrapper">
           <ul>
-            <li><a href="../" class="btn-small red"><i class="material-icons">home</i></a></li>
-            <li><a href="../help/" class="btn-small red"><i class="material-icons">help_center</i></a></li> 
-            <li><a href="../edit/" id="editBtn" class="btn-small red"><i class="material-icons">construction</i></a></li>
-            <li><a href="../admin/" class="btn-small red"><i class="material-icons">import_export</i></a></li>
+            <li><a href="../" class="btn-small tfat"><i class="material-icons">home</i></a></li>
+            <li><a href="../help/" class="btn-small tfat"><i class="material-icons">help_center</i></a></li> 
+            <li><a href="../edit/" id="editBtn" class="btn-small tfat"><i class="material-icons">construction</i></a></li>
+            <li><a href="../admin/" class="btn-small tfat"><i class="material-icons">import_export</i></a></li>
           </ul>
         </div>
       </nav>

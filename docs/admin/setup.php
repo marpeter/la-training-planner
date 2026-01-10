@@ -15,16 +15,16 @@ require 'install.php';
            href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css">
     <!-- Compiled and minified JavaScript -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
-    <link rel="stylesheet" href="../ownstyle.css">
+    <link rel="stylesheet" href="../theme/theme.css">
   </head>
   <body>
     <header>
-      <nav class="red darken-1">
+      <nav class="tfat darken-1">
         <div class="nav-wrapper">
-          <a href="#" class="brand-logo left"><img src="../assets/logo.png" alt="Logo" height="50" class="left">Installation</a>
+          <a href="#" class="brand-logo left"><img src="../assets/logo.png" alt="Logo" class="tfat-logo">Installation</a>
           <ul class="right">
             <li><a href="../login" id="loginBtn"
-              class="btn-small red"><i class="material-icons">login</i></a></li>
+              class="btn-small tfat"><i class="material-icons">login</i></a></li>
           </ul>
         </div>
       </nav>
@@ -33,7 +33,7 @@ require 'install.php';
       <section>
         <h4 class="center">Installation der Trainings-Planer App abschließen</h4>
         <?php if( $version['withDB']) { ?>
-          <div class="card-panel red center">Achtung! Die Installation der App ist bereits abgeschlossen.<br>
+          <div class="card-panel tfat-warning center">Achtung! Die Installation der App ist bereits abgeschlossen.<br>
             Möchtest Du die Installation wirklich erneut durchführen? <br>
             Dies überschreibt die bestehende Datenbank und alle darin gespeicherten Daten werden gelöscht!
           </div>
@@ -60,7 +60,7 @@ require 'install.php';
           </div>
           <?php if( count($suMessages) > 0 ) { ?>
           <div class="row">
-            <div class="col s12 l6 offset-l3 red">
+            <div class="col s12 l6 offset-l3 tfat">
               <?php
                 foreach($suMessages as $message) {
                   echo $message. "<br>";
@@ -102,7 +102,7 @@ require 'install.php';
           </div>
           <?php if( count($dbMessages) > 0 ) { ?>
           <div class="row">
-            <div class="col s12 l6 offset-l3 red">
+            <div class="col s12 l6 offset-l3 tfat">
               <?php
                 foreach($dbMessages as $message) {
                   echo $message . "<br>";
@@ -113,7 +113,7 @@ require 'install.php';
           <?php } ?>
           <div class="row">            
               <div class="col s12 l6 offset-l3">
-                <button id="installBtn" name='action' value='setusers' class="btn center red">Installation abschließen</button>
+                <button id="installBtn" name='action' value='setusers' class="btn center tfat">Installation abschließen</button>
             </div>
           </div>   
         </form>
@@ -122,13 +122,13 @@ require 'install.php';
     <div class="divider"></div>
     <div class="center grey-text">Version <span id="version"><?php echo $version['number'] ?></span>, &copy; 2025 Markus Peter</div>
     <footer>
-      <nav class="red darken-1">
+      <nav class="tfat darken-1">
         <div class="nav-wrapper">
           <ul>
-            <li><a href="../" class="btn-small red"><i class="material-icons">home</i></a></li>
-            <li><a href="../help/" class="btn-small red"><i class="material-icons">help_center</i></a></li> 
-            <li><a href="../edit/" id="editBtn" class="btn-small red"><i class="material-icons">construction</i></a></li>
-            <li class="active"><a href="./" class="btn-small red"><i class="material-icons">import_export</i></a></li>
+            <li><a href="../" class="btn-small tfat"><i class="material-icons">home</i></a></li>
+            <li><a href="../help/" class="btn-small tfat"><i class="material-icons">help_center</i></a></li> 
+            <li><a href="../edit/" id="editBtn" class="btn-small tfat"><i class="material-icons">construction</i></a></li>
+            <li class="active"><a href="./" class="btn-small tfat"><i class="material-icons">import_export</i></a></li>
           </ul>
         </div>
       </nav>

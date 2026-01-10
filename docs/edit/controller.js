@@ -76,9 +76,9 @@ const view = {
       // skip the "Auslaufen" exercise, it is always the last one
       if (!exercise.sticky && exercise.name.startsWith(this.model.exerciseListFilter)) {
         let item = document.createElement("li");
-        item.classList.add("collection-item", "left-align");
+        item.classList.add("collection-item", "left-align", "tfat-background");
         let anchor = document.createElement("a");
-        anchor.classList.add("red-text");
+        anchor.classList.add("tfat-text");
         anchor.innerHTML = exercise.name;
         anchor.setAttribute("href", "#!");
         anchor.setAttribute("data-id", exercise.id);
@@ -247,17 +247,17 @@ const controller = {
       let okay = true;
       let helper = document.getElementById("exercise-phases-helper"); 
       if(view.exercisePhases.value === "") {
-        helper.classList.add("red-text");
+        helper.classList.add("tfat-text");
         okay = false;
       } else {
-        helper.classList.remove("red-text");
+        helper.classList.remove("tfat-text");
       }
       helper = document.getElementById("exercise-disciplines-helper");
       if(view.exerciseDisciplines.value === "") {
-        helper.classList.add("red-text");
+        helper.classList.add("tfat-text");
         okay = false;
       } else {
-        helper.classList.remove("red-text");
+        helper.classList.remove("tfat-text");
       }
       return okay;
     },
@@ -267,22 +267,22 @@ const controller = {
                  controller.checkExerciseDuration() &&
                  controller.checkExerciseEditForm();
       if(!okay) {
-        M.toast({html: "Bitte fülle alle Felder korrekt aus.", classes: "red accent-3 rounded"});
+        M.toast({html: "Bitte fülle alle Felder korrekt aus.", classes: "tfat-error rounded"});
       } else {
         let modifiedExercise = controller.getExerciseFromForm();
         return modifiedExercise.save()
         .then(data => {
           if(data.success) {
-            M.toast({html: "Übung erfolgreich gespeichert.", classes: "green accent-3 rounded"});
+            M.toast({html: "Übung erfolgreich gespeichert.", classes: "tfat-success rounded"});
           } else {
             console.error("Error saving exercise:", data);
-            M.toast({html: "Fehler beim Speichern der Übung: " + data.message, classes: "red accent-3 rounded"});
+            M.toast({html: "Fehler beim Speichern der Übung: " + data.message, classes: "tfat-error rounded"});
           }
         })
         .then( () =>  view.fillExerciseList() ) // update the exercise list in case an exercise was copied or a name changed
         .catch(error => {
           console.error("Error saving exercise:", error);
-          M.toast({html: "Fehler beim Speichern der Übung.", classes: "red accent-3 rounded"});
+          M.toast({html: "Fehler beim Speichern der Übung.", classes: "tfat-error rounded"});
         });
       }
     },
@@ -309,7 +309,7 @@ const controller = {
         `<h4>Übung löschen.</h4><p>Soll die Übung <strong>${view.model.selectedExercise.name}</strong> wirklich gelöscht werden?</p>`
         + ( favoritePlans.length === 0 ? 
             "<p>Die Übung ist in keinem Favoriten-Trainingsplan enthalten.</p>" :
-            `<p class="red-text">Die Übung ist in Favoriten-Trainingsplänen enthalten:</br>${favoritePlans.map( plan => plan.description ).join(', ')}</p>`
+            `<p class="teal-text">Die Übung ist in Favoriten-Trainingsplänen enthalten:</br>${favoritePlans.map( plan => plan.description ).join(', ')}</p>`
           );
       confirmDialog.open();
     },
@@ -327,11 +327,11 @@ const controller = {
           view.fillExerciseList();
           view.updateExerciseForm();
         } else {
-          M.toast({html: "Fehler beim Löschen der Übung: " + data.message, classes: "red accent-3 rounded"});
+          M.toast({html: "Fehler beim Löschen der Übung: " + data.message, classes: "tfat-error rounded"});
         }
       }).catch(error => {
         console.error("Error saving exercise:", error);
-        M.toast({html: "Fehler beim Löschen der Übung.", classes: "red accent-3 rounded"});
+        M.toast({html: "Fehler beim Löschen der Übung.", classes: "tfat-error rounded"});
       }); 
     },
 

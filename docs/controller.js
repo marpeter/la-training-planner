@@ -53,7 +53,7 @@ const view = {
   createDisciplineCardList() {
     this.model.disciplines.forEach( (discipline) => {
       let disciplineChip = document.createElement("div");
-      disciplineChip.classList.add("chip", "red", "lighten-4");
+      disciplineChip.classList.add("chip", "tfat", "lighten-4");
       disciplineChip.id = discipline.id;
       if(discipline.image) {
         let disciplineImage = document.createElement("img");
@@ -112,7 +112,7 @@ const view = {
     let exerciseDiv = document.createElement("div");
     exerciseDiv.classList.add("col", "s12", "m6");
     let exerciseCard = document.createElement("div");
-    exerciseCard.classList.add("card", "red", "lighten-4");
+    exerciseCard.classList.add("card", "tfat", "lighten-4");
     let exerciseContent = document.createElement("div");
     exerciseContent.classList.add("card-content");
     let exerciseDescription = (exercise.details.length>0) ?
@@ -152,7 +152,7 @@ const view = {
 
   createFloatingButton(icon, disabled=false) {
     let floatingButton = document.createElement("a");
-    floatingButton.classList.add("btn-floating", "red", "lighten-1", "right");
+    floatingButton.classList.add("btn-floating", "tfat", "lighten-1", "right");
     if(disabled) floatingButton.classList.add("disabled");
     floatingButton.innerHTML = `<i class="large material-icons">${icon}</i>`;
     return floatingButton;
@@ -319,12 +319,12 @@ const controller = {
 
   onSavePlanBtnPressed() {
     if(view.model.selectedFavorite===undefined || view.model.plan===undefined) {
-      M.toast({html: "Es gibt keinen Plan zum Speichern!", classes: "red accent-3 rounded"});
+      M.toast({html: "Es gibt keinen Plan zum Speichern!", classes: "tfat-error rounded"});
       return;
     }
     view.model.plan.save().then( (data) => {
       if(data.success) {
-        M.toast({html: "Plan erfolgreich gespeichert.", classes: "green accent-3 rounded"});
+        M.toast({html: "Plan erfolgreich gespeichert.", classes: "tfat-success rounded"});
         // reload favorites and update UI
         view.model.favorites = TrainingPlan.getAvailableFavorites(view.model.selectedDisciplines, view.model.duration);
         view.model.selectedFavorite = view.model.favorites.findIndex(fav => fav.id == data.message.id);
@@ -332,11 +332,11 @@ const controller = {
         view.updatePlan();
         controller.resetFavoriteSaveDeleteButtons();
       } else {
-        M.toast({html: "Fehler beim Speichern des Plans: " + data.message, classes: "red accent-3 rounded"});
+        M.toast({html: "Fehler beim Speichern des Plans: " + data.message, classes: "tfat-error rounded"});
       }
     }).catch(error => {
       console.error("Error saving exercise:", error);
-      M.toast({html: "Fehler beim Speichern des Plans. " + error, classes: "red accent-3 rounded"});
+      M.toast({html: "Fehler beim Speichern des Plans. " + error, classes: "tfat-error rounded"});
     });
   },
 
@@ -348,7 +348,7 @@ const controller = {
     view.model.plan.saveAs(description)
     .then( (data) => {
       if(data.success) {
-        M.toast({html: "Plan erfolgreich gespeichert.", classes: "green accent-3 rounded"});
+        M.toast({html: "Plan erfolgreich gespeichert.", classes: "tfat-success rounded"});
         // reload favorites and update UI
         view.model.favorites = TrainingPlan.getAvailableFavorites(view.model.selectedDisciplines, view.model.duration);
         view.model.selectedFavorite = view.model.favorites.findIndex(fav => fav.id == data.message.id);
@@ -356,33 +356,33 @@ const controller = {
         view.updatePlan();
         controller.updateFavoritesButtons();;
       } else {
-        M.toast({html: "Fehler beim Speichern des Plans: " + data.message, classes: "red accent-3 rounded"});
+        M.toast({html: "Fehler beim Speichern des Plans: " + data.message, classes: "tfat-error rounded"});
       }
     }).catch(error => {
       console.error("Error saving exercise:", error);
-      M.toast({html: "Fehler beim Speichern des Plans. " + error, classes: "red accent-3 rounded"});
+      M.toast({html: "Fehler beim Speichern des Plans. " + error, classes: "tfat-error rounded"});
     });
   },
 
   onDeletePlanBtnPressed() {
     if(view.model.selectedFavorite===undefined) {
-      M.toast({html: "Es gibt keinen Plan zum Löschen!", classes: "red accent-3 rounded"});
+      M.toast({html: "Es gibt keinen Plan zum Löschen!", classes: "tfat-error rounded"});
       return;
     }
     if(confirm("Soll der Plan wirklich gelöscht werden?")) {
       view.model.plan.delete().then( (data) => {
         if(data.success) {
-          M.toast({html: "Plan erfolgreich gelöscht.", classes: "green accent-3 rounded"});
+          M.toast({html: "Plan erfolgreich gelöscht.", classes: "tfat-success rounded"});
           view.model.selectedFavorite = undefined;
           view.model.plan = undefined; // clear the current plan
           view.updatePlan();
           controller.onCriteriaChanged(); // reload favorites and update UI
         } else {
-          M.toast({html: "Fehler beim Löschen des Plans: " + data.message, classes: "red accent-3 rounded"});
+          M.toast({html: "Fehler beim Löschen des Plans: " + data.message, classes: "tfat-error rounded"});
         }
       }).catch(error => {
         console.error("Error saving exercise:", error);
-        M.toast({html: "Fehler beim Löschen des Plans. " + error, classes: "red accent-3 rounded"});
+        M.toast({html: "Fehler beim Löschen des Plans. " + error, classes: "tfat-error rounded"});
       });
     }
   }

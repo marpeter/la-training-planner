@@ -15,16 +15,16 @@ require 'db_users.php';
            href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css">
     <!-- Compiled and minified JavaScript -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
-    <link rel="stylesheet" href="../ownstyle.css">
+    <link rel="stylesheet" href="../theme/theme.css">
   </head>
   <body>
     <header>
-      <nav class="red darken-1">
+      <nav class="tfat darken-1">
         <div class="nav-wrapper">
-          <a href="#" class="brand-logo left"><img src="../assets/logo.png" alt="Logo" height="50" class="left">Benutzerverwaltung</a>
+          <a href="#" class="brand-logo left"><img src="../assets/logo.png" alt="Logo" class="tfat-logo">Benutzerverwaltung</a>
           <ul class="right">
             <li class="active"><a href="<?= $loginButtonHref ?>" id="loginBtn"
-              class="btn-small red <?= $loginMenuItemDisabled ?>"><i class="material-icons"><?= $loggedIn ? 'logout' : 'login' ?></i></a></li>
+              class="btn-small tfat <?= $loginMenuItemDisabled ?>"><i class="material-icons"><?= $loggedIn ? 'logout' : 'login' ?></i></a></li>
           </ul>
         </div>
       </nav>
@@ -48,7 +48,7 @@ require 'db_users.php';
                 <?php
                   foreach($users as $user) { ?>
                   <li class="collection-item left-align">
-                    <a class="red-text" href="?filterBy=<?= $filter ?>&selected=<?= urlencode($user->getName()) ?>"><?= $user->getName() ?></a>
+                    <a class="tfat-text" href="?filterBy=<?= $filter ?>&selected=<?= urlencode($user->getName()) ?>"><?= $user->getName() ?></a>
                   </li>
                 <?php
                   }
@@ -85,12 +85,12 @@ require 'db_users.php';
                 </div>          
                 <div class="row">
                   <div class="col s12">
-                    <button id="createUserBtn" name="action" value="create" class="btn center red">Anlegen
+                    <button id="createUserBtn" name="action" value="create" class="btn center tfat">Anlegen
                       <i class="material-icons right">person_add</i>
                     </button>
-                    <button id="updateUserBtn" name="action" value="update" class="btn center red">Ändern
+                    <button id="updateUserBtn" name="action" value="update" class="btn center tfat">Ändern
                       <i class="material-icons right">save</i></button>
-                    <button id="deleteUserBtn" name="action" value="delete" class="btn center red">Löschen
+                    <button id="deleteUserBtn" name="action" value="delete" class="btn center tfat">Löschen
                       <i class="material-icons right">delete</i>
                     </button>
                   </div>
@@ -114,13 +114,13 @@ require 'db_users.php';
     </main>
     <div class="center grey-text">Version <span id="version"><?php echo $version['number'] ?></span>, &copy; 2025 Markus Peter</div>
     <footer>
-      <nav class="red darken-1">
+      <nav class="tfat darken-1">
         <div class="nav-wrapper">
           <ul>
-            <li><a href="../" class="btn-small red"><i class="material-icons">home</i></a></li>
-            <li><a href="../help/" class="btn-small red"><i class="material-icons">help_center</i></a></li> 
-            <li><a href="../edit/" id="editBtn" class="btn-small red"><i class="material-icons">construction</i></a></li>
-            <li><a href="../admin/" class="btn-small red"><i class="material-icons">import_export</i></a></li>
+            <li><a href="../" class="btn-small tfat"><i class="material-icons">home</i></a></li>
+            <li><a href="../help/" class="btn-small tfat"><i class="material-icons">help_center</i></a></li> 
+            <li><a href="../edit/" id="editBtn" class="btn-small tfat"><i class="material-icons">construction</i></a></li>
+            <li><a href="../admin/" class="btn-small tfat"><i class="material-icons">import_export</i></a></li>
           </ul>
         </div>
       </nav>
