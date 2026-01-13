@@ -55,7 +55,7 @@ abstract class DataSaver {
             $this->dbConnection->commit();
             $result =  [
                 'success' => true,
-                'message' => $data,
+                'message' => '',
             ];
         } catch (\PDOException $ex) {
             $this->dbConnection->rollBack();
@@ -78,30 +78,32 @@ class DisciplineSaver extends DataSaver {
     public function createEntityBulk(array $disciplines, $dbConnection): array {
         $messages = [];
         $this->dbConnection = $dbConnection;
+        $stmt = $this->dbConnection->prepare('INSERT INTO ' . self::HEADER_TABLE . 
+            ' ( id,  name,  image) VALUES' . 
+            ' (:id, :name, :image)');
+        $stmt->bindParam('id', $disciplineId, \PDO::PARAM_STR);
+        $stmt->bindParam('name', $disciplineName, \PDO::PARAM_STR);
+        $stmt->bindParam('image', $disciplineImage, \PDO::PARAM_STR);
         foreach($disciplines[0] as $discipline) {
             try {
-                $this->createEntity($discipline);
+                $disciplineId = strip_tags($discipline['id']);
+                $disciplineName = strip_tags($discipline['name']);
+                $disciplineImage = strip_tags($discipline['image']);
+                $stmt->execute();
             } catch( \PDOException $ex) {
-                $messages[] =  $$ex->getMessage();
+                $error = $ex->getMessage();
+                $messages[] =  "Einfügen der Disziplin-Zeile $disciplineId," .
+                    " $disciplineName, $disciplineImage ist fehlgeschlagen, " . 
+                    " Fehler: $error.";
             }
         }
         return $messages;
     }
 
     protected function createEntity(array $discipline): void {
-        try {
-            $stmt = $this->dbConnection->prepare('INSERT INTO ' . self::HEADER_TABLE . 
-                ' ( id,  name,  image) VALUES' . 
-                ' (:id, :name, :image)');
-            $stmt->bindParam('id', $discipline['id'], \PDO::PARAM_STR);
-            $stmt->bindParam('name', $discipline['name'], \PDO::PARAM_STR);
-            $stmt->bindParam('image', $discipline['image'], \PDO::PARAM_STR);
-            $stmt->execute();
-        } catch( \PDOException $ex) {
-            $error = $ex->getMessage();
-            throw new \PDOException("Einfügen der Disziplin-Zeile " .
-                "{$discipline['id']}, {$discipline['name']}, " . 
-                "{$discipline['image']} ist fehlgeschlagen, Fehler: $error.");
+        $this->createEntityBulk([$discipline], $this->dbConnection);
+        if( !is_empty($this->messages)) {
+            throw new \PDOException(array_last($this->messages));
         }
     }
 
@@ -130,15 +132,16 @@ class ExerciseSaver extends DataSaver {
                 $exercise['details'] = implode(':',$exercise['details']);
                 $this->createEntity($exercise);
             } catch( \PDOException $ex) {
-                $messages[] =  $$ex->getMessage();
+                $messages[] =  $ex->getMessage();
             }
         }
         return $messages;
     }
 
     protected function createEntity(array $exercise): void {
-        $this->convertPhaseFlags($exercise);     
         try {
+            $this->convertPhaseFlags($exercise);
+            $this->sanitizeAndValidate($exercise);     
             $stmt = $this->dbConnection->prepare(
                 'INSERT INTO ' . self::HEADER_TABLE . 
                 ' (id, name, warmup, runabc, mainex, ending, durationmin, durationmax, material, repeats, details) VALUES ' .
@@ -148,13 +151,15 @@ class ExerciseSaver extends DataSaver {
             $stmt = null;
             $this->insertDependants($exercise);
         } catch (\PDOException $ex) {
-            throw new \PDOException('Fehler beim Erstellen der Übung: ' . $ex->getMessage());
+            throw new \PDOException('Fehler beim Erstellen der Übung ' . 
+                $exercise['id'] . ' : ' . $ex->getMessage());
         }
     }
 
     protected function updateEntity(array $exercise): void {
-        $this->convertPhaseFlags($exercise);
         try {
+            $this->convertPhaseFlags($exercise);
+            $this->sanitizeAndValidate($exercise);
             $stmt = $this->dbConnection->prepare(
                 'UPDATE ' . self::HEADER_TABLE . ' SET name=:name, ' . 
                 'warmup=:warmup, runabc=:runabc, mainex=:mainex, ending=:ending, ' . 
@@ -199,6 +204,27 @@ class ExerciseSaver extends DataSaver {
         $stmt->bindParam('material', $exercise['material'], \PDO::PARAM_STR);
         $stmt->bindParam('repeats', $exercise['repeats'], \PDO::PARAM_STR);
         $stmt->bindParam('details', $exercise['details'], \PDO::PARAM_STR);
+    }
+
+    private function sanitizeAndValidate(array &$exercise): void {
+        if( !is_array($exercise['disciplines']) || count($exercise['disciplines']) == 0 ) {
+            throw new \PDOException('Jede Übung muss mindestens einer Disziplin zugeordnet sein.');
+        }
+        if( !is_numeric($exercise['durationmin']) || !is_numeric($exercise['durationmax']) ) {
+            throw new \PDOException('Die Dauerangaben müssen numerisch sein.');
+        }
+        if( $exercise['durationmin'] < 0 || $exercise['durationmax'] < 0 ) {
+            throw new \PDOException('Die Dauerangaben dürfen nicht negativ sein.');
+        }
+        if( $exercise['durationmin'] > $exercise['durationmax'] ) {
+            throw new \PDOException('Die minimale Dauer darf nicht größer als die maximale Dauer sein.');
+        }
+        $exercise['id'] = strip_tags($exercise['id']);
+        $exercise['name'] = strip_tags($exercise['name'], ALLOWED_TAGS);
+        $exercise['material'] = strip_tags($exercise['material'], ALLOWED_TAGS);
+        $exercise['repeats'] = strip_tags($exercise['repeats'], ALLOWED_TAGS);
+        $exercise['details'] = strip_tags($exercise['details'],ALLOWED_TAGS);
+
     }
 
     private function convertPhaseFlags(array &$exercise): void {

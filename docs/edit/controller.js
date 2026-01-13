@@ -78,7 +78,7 @@ const view = {
         let item = document.createElement("li");
         item.classList.add("collection-item", "left-align", "tfat-background");
         let anchor = document.createElement("a");
-        anchor.classList.add("tfat-text");
+        anchor.classList.add("tfat-text", "darken-4");
         anchor.innerHTML = exercise.name;
         anchor.setAttribute("href", "#!");
         anchor.setAttribute("data-id", exercise.id);

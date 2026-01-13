@@ -31,6 +31,7 @@ if ( !empty($_FILES) ) { // files were uploaded
         'text/tab-separated-values' => 'csv'
     ];
     foreach($_FILES as $file => $data) {
+        $name = htmlspecialchars($data['name']);
         switch ($data['error']) {
             case UPLOAD_ERR_OK:     
                 $type = mime_content_type($data['tmp_name']);
@@ -50,14 +51,14 @@ if ( !empty($_FILES) ) { // files were uploaded
                             break;
                     }
                 } else {
-                    $messages[] = "Die hochgeladene Datei {$data['name']} ist keine Text/CSV-Datei.";
+                    $messages[] = "Die hochgeladene Datei $name ist keine Text/CSV-Datei.";
                 }  
                 break;
             case UPLOAD_ERR_INI_SIZE:
-                $messages[] = "Die Datei {$data['name']} überschreitet die maximal erlaubte Größe.";
+                $messages[] = "Die Datei $name überschreitet die maximal erlaubte Größe.";
                 break;
             case UPLOAD_ERR_FORM_SIZE:
-                $messages[] = "Die Datei  {$data['name']} überschreitet die maximal erlaubte Größe.";
+                $messages[] = "Die Datei  $name überschreitet die maximal erlaubte Größe.";
                 break;
             case UPLOAD_ERR_NO_FILE:
                 // No error if one the other files was uploaded

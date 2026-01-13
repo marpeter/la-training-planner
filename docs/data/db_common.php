@@ -5,6 +5,22 @@ if( file_exists(__DIR__ . '/../config/config.php') ) {
     include __DIR__ . '/../config/config.php';
 }
 
+const ALLOWED_TAGS = '<b><em><i><strong>';
+function getPostedString( string $fieldName ): string {
+    if( isset($_POST[$fieldName]) && is_string($_POST[$fieldName]) ) {
+        return trim($_POST[$fieldName]);
+    } else {
+        return '';
+    }
+}
+function getQueryString( string $fieldName ): string {
+    if( isset($_GET[$fieldName]) && is_string($_GET[$fieldName]) ) {
+        return trim($_GET[$fieldName]);
+    } else {
+        return '';
+    }
+}
+
 function connectDB(): \PDO|false {
     global $CONFIG;
     if( isset($CONFIG) ) {
@@ -196,11 +212,11 @@ class UserRecord {
 
     // Check that the username only contains reasonable characters
     protected function hasAllowedUsername(): bool {
-        if( preg_match('/^[a-zäöüßA-ZÄÖÜ0-9\.\-_@]{4,20}$/', $this->name) ) {
+        if( preg_match('/^[a-zäöüßA-ZÄÖÜ0-9\.\-_@]{4,100}$/', $this->name) ) {
             return true;
         } else {
             $this->messages[] = "Benutzername $this->name enhält ungültige Zeichen, ist zu kurz oder zu lang.";
-            $this->messages[] = 'Er muss aus 4-20 Buchstaben, Ziffern, ., _, @ und - bestehen.';
+            $this->messages[] = 'Er muss aus 4-100 Buchstaben, Ziffern, ., _, @ und - bestehen.';
             return false;
         }
     }  

@@ -5,10 +5,12 @@ require '../data/db_common.php';
 $version = getDbVersion(true);
 $messages = [];
 
-if( isset($_POST['action']) ) {
+if( isset($_POST['action']) && is_string($_POST['action']) ) {
+    $username = getPostedString('username');
+    $password = getPostedString('password');
     switch($_POST['action']) {
         case 'login':
-            $user = new UserRecord($_POST['username'], $_POST['password']);
+            $user = new UserRecord($username, $password);
             if( $user->logIn() ) {
                 $version['username'] = $user->getName();
                 $version['userrole'] = $user->getRole();
@@ -17,8 +19,8 @@ if( isset($_POST['action']) ) {
             $messages = $user->getMessages();
             break;
         case 'changePassword':
-            $user = new UserRecord($version['username'], $_POST['password']);
-            if( $user->login() && $user->setPassword($_POST['new_password']) ) {
+            $user = new UserRecord($version['username'], $password);
+            if( $user->login() && $user->setPassword($password) ) {
                 $user->update();
             }
             $messages = $user->getMessages();

@@ -63,7 +63,7 @@ require 'install.php';
             <div class="col s12 l6 offset-l3 tfat">
               <?php
                 foreach($suMessages as $message) {
-                  echo $message. "<br>";
+                  echo htmlspecialchars($message) . "<br>";
                 }
               ?> 
             </div>
@@ -105,7 +105,7 @@ require 'install.php';
             <div class="col s12 l6 offset-l3 tfat">
               <?php
                 foreach($dbMessages as $message) {
-                  echo $message . "<br>";
+                  echo htmlspecialchars($message) . "<br>";
                 }
               ?> 
             </div>

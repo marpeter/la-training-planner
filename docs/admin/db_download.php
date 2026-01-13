@@ -80,7 +80,8 @@ class FavoriteReader extends AbstractTableToCsvReader {
 }
 
 $reader = null;
-switch(strtolower($_GET['entity'])) {
+$entity = strtolower(getQueryString('entity'));
+switch($entity) {
     case 'disciplines':
         $reader = new DisciplineReader();
         break;
@@ -92,7 +93,7 @@ switch(strtolower($_GET['entity'])) {
         break;
     default:
         http_response_code(400);
-        echo "Unknown entity: " . htmlspecialchars($_GET['entity']);
+        echo "Unknown entity: " . htmlspecialchars($entity);
         exit;
 }
 

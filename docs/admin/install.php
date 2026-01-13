@@ -11,9 +11,9 @@ class DatabaseInstaller {
     private $messages = [];
     private string $dbUserName;
     private string $dbUserPassword;
-    private \PDO $dbConnection;
+    private \PDO|false $dbConnection;
 
-    public function __construct(string $dbAdminName, string $dbAdminPassword) {
+    public function install(string $dbAdminName, string $dbAdminPassword): bool {
         global $CONFIG;
         $CONFIG = [
             'dbhost' => 'localhost',
@@ -22,9 +22,10 @@ class DatabaseInstaller {
             'dbpassword' => $dbAdminPassword
         ];
         $this->dbConnection = connectDB();
-    }
-    public function install(): bool {
-        global $CONFIG;
+        if(!$this->dbConnection ) {
+            $this->messages[] = "Verbindung zur Datenbank nicht möglich.";
+            return false;
+        }
         if( $this->canCreateDbAndUser() ) {
             $okay = $this->createDbUser() &&
                     $this->switchToDbAndUser() &&
@@ -121,7 +122,7 @@ class DatabaseInstaller {
                 "GRANT ALL PRIVILEGES ON tfat_planner.* TO tfat_planner@localhost");
             return true;
         } catch( \PDOException $ex) {
-            $this->messages[] = htmlspecialchars($ex->getMessage());
+            $this->messages[] = $ex->getMessage();
             return false;
         }
     }
@@ -137,7 +138,7 @@ class DatabaseInstaller {
             $this->dbConnection = connectDB();
             return true;
         } catch( \PDOException $ex) {
-            $this->messages[] = htmlspecialchars($ex->getMessage());
+            $this->messages[] = $ex->getMessage();
             return false;
         }
     }
@@ -156,7 +157,7 @@ class DatabaseInstaller {
             }
             return true;
         } catch( \PDOException $ex) {
-            $this->messages[] = htmlspecialchars($ex->getMessage());
+            $this->messages[] = $ex->getMessage();
             return false;
         }
     }
@@ -172,7 +173,7 @@ class DatabaseInstaller {
             }
             return file_put_contents(__DIR__ . '/../config/config.php', $configContent);
         } catch( \Exception $ex) {
-            $this->messages[] = htmlspecialchars($ex->getMessage());
+            $this->messages[] = $ex->getMessage();
             return false;
         }
     }     
@@ -184,21 +185,26 @@ class DatabaseInstaller {
 }
 
 
-if( isset($_POST['action']) ) {
+if( isset($_POST['action']) && is_string($_POST['action']) ) {
     switch($_POST['action']) {
         case 'setusers':
-            $superUser = new UserRecord($_POST['su_name'] ?? '', $_POST['su_password'] ?? '');
+            $superUserName = getPostedString('su_name');
+            $superUserPassword = getPostedString('su_password');
+            $superUser = new UserRecord($superUserName, $superUserPassword);
             $superUser->setRole('superuser');
 
-            $dbUser = new UserRecord($_POST['db_name'] ?? '', $_POST['db_password'] ?? '');
+            $dbUserName = getPostedString('db_name');
+            $dbUserPassword = getPostedString('db_password');
+            $dbUser = new UserRecord($dbUserName, $dbUserPassword);
             $dbUser->setRole('admin'); // only to make canBeCreated() work
+
             if( $superUser->canBeCreated() && $dbUser->canBeCreated() ) {
                 try {
-                    $dbInstaller = new DatabaseInstaller($dbUser->getName(), $_POST['db_password'] ?? '');
-                    if( $dbInstaller->install() ) {
+                    $dbInstaller = new DatabaseInstaller();
+                    if( $dbInstaller->install($dbUser->getName(), $dbUserPassword) ) {
                         $version = getDbVersion(true);
                         // recreate $superUser to refresh DB connection with new settings
-                        $superUser = new UserRecord($_POST['su_name'] ?? '', $_POST['su_password'] ?? '');
+                        $superUser = new UserRecord($superUserName, $superUserPassword);
                         $superUser->setRole('superuser');
                         $superUser->create();
                         $superUser->logIn();
@@ -207,7 +213,7 @@ if( isset($_POST['action']) ) {
                     }   
                     $dbMessages = $dbInstaller->getMessages();
                 } catch(\PDOException $ex) {
-                    $dbMessages[] = htmlspecialchars($ex->getMessage());
+                    $dbMessages[] = $ex->getMessage();
                 }
             }
             $suMessages = $superUser->getMessages();

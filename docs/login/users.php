@@ -36,8 +36,8 @@ require 'db_users.php';
         <?php if( $loggedIn && $canManageUsers ) { ?>
           <div class="row">
             <div class="col s4"><!-- Benutzer zum Auswählen -->
-              <ul class="collection with-header" id="exercise-list">
-                <li class="collection-header"><h6>Wähle den Benutzer aus:</h6>
+              <ul class="collection with-header tfat-background" id="exercise-list">
+                <li class="collection-header tfat-background"><h6>Wähle den Benutzer aus:</h6>
                   <form class="col s12" id="user-list-form" action="#">
                     <div class="input-field col s12">
                       <i class="material-icons prefix">search</i>
@@ -47,8 +47,8 @@ require 'db_users.php';
                 </li>
                 <?php
                   foreach($users as $user) { ?>
-                  <li class="collection-item left-align">
-                    <a class="tfat-text" href="?filterBy=<?= $filter ?>&selected=<?= urlencode($user->getName()) ?>"><?= $user->getName() ?></a>
+                  <li class="collection-item left-align tfat-background">
+                    <a class="tfat-text darken-4" href="?filterBy=<?= $filter ?>&selected=<?= urlencode($user->getName()) ?>"><?= $user->getName() ?></a>
                   </li>
                 <?php
                   }
@@ -100,7 +100,7 @@ require 'db_users.php';
                 <div class="col s12">
                   <?php
                     foreach($messages as $message) {
-                      echo $message;
+                      echo htmlspecialchars($message) . "<br>";
                     }
                   ?>
                 </div>

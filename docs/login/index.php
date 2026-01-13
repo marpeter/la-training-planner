@@ -83,7 +83,7 @@ require 'login.php';
           <div class="col s12 l6 offset-l3 tfat">
             <?php
               foreach($messages as $message) {
-                echo $message;
+                echo htmlspecialchars($message) . "<br>";
               }
             ?>
           </div>

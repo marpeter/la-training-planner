@@ -14,14 +14,18 @@ if( $loggedIn ) {
     $canManageUsers = ( isset($version['userrole']) && ( 
         $version['userrole']==='superuser' ||  $version['userrole']==='admin') );
 
-    $filter = isset($_GET['filterBy']) ? $_GET['filterBy'] : '';
-    $selectedUser = isset($_GET['selected']) ? $_GET['selected'] : '';
+    $filter = getQueryString('filterBy');
+    $selectedUser = getQueryString('selected');
+    $action = getPostedString('action');
 
-    if( $canManageUsers && isset($_POST['username']) 
-            && isset($_POST['password']) && isset($_POST['role']) ) {
-        $user = new UserRecord(strtolower($_POST['username']), $_POST['password']);
-        $user->setRole($_POST['role']);
-        switch($_POST['action']) {
+    if( $canManageUsers && $action !== '') {
+        $username = getPostedString('username');
+        $password = getPostedString('password');
+        $role = getPostedString('role');
+
+        $user = new UserRecord(strtolower($username), $password);
+        $user->setRole($role);
+        switch($action) {
             case 'create':
                 $user->create();
                 break;
