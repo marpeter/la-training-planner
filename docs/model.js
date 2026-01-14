@@ -45,7 +45,7 @@ class Exercise {
     this.durationmax = durationmax;
     this.repeats = repeats;
     this.material = material;
-    this.details = Array.isArray(details) ? ( details.length>0 && details[0].length>0 ? details : '' ) : details;
+    this.details = Array.isArray(details) ? ( (details.length>0 && details[0].length>0) ? details : '' ) : details;
     this.warmup = warmup;
     this.runabc = runabc;
     this.mainex = mainex;
@@ -93,9 +93,11 @@ class Exercise {
   }
 
   equals(that) {
+    let thisDetails = Array.isArray(this.details) ? this.details.join(':') : this.details;
+    let thatDetails = Array.isArray(that.details) ? that.details.join(':') : that.details;
     return this.id === that.id &&
            this.name === that.name &&
-           this.disciplines.join(",") === that.disciplines.join(",") &&
+           this.disciplines.sort().join(",") === that.disciplines.sort().join(",") &&
            this.durationmin === that.durationmin &&
            this.durationmax === that.durationmax &&
            this.warmup === that.warmup &&
@@ -104,7 +106,7 @@ class Exercise {
            this.ending === that.ending &&
            this.repeats === that.repeats &&
            this.material === that.material &&
-           this.details.join(':') === that.details.join(':');
+           thisDetails === thatDetails;
   }
 
   containedInFavoritePlans() {
