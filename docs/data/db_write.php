@@ -4,17 +4,18 @@ require 'db_common.php';
 
 abstract class DataSaver {
     protected $ENTITY = "";
-    protected $dbConnection;
+    protected ?\PDO $dbConnection = null;
 
     /**
      * inserts multiple entries into the DB in a bulk operation.
      * @param array $data array of arrays of entries to insert.
      *              $data[0] contains the array of "header" entries to insert,
      *              $data[1...] contain entries for depending tables (if applicable)
-     * @param $dbConnection active DB connection to use for the bulk insert
+     * @param ?\PDO $dbConnection active DB connection to use for the bulk insert
      * @return array of message strings indicating errors during insert
      */
-    abstract public function createEntityBulk(array $data, $dbConnection): array;
+    abstract public function createEntityBulk(array $data, ?\PDO $dbConnection): array;
+
     /**
      * inserts a single entry into the DB.
      * @param array $data associative array representing the entry to insert
@@ -22,6 +23,7 @@ abstract class DataSaver {
      * @throws \PDOException on error
      */
     abstract protected function createEntity(array $data): void;
+
     /** 
      * updates a single entry in the DB.
      * @param array $data associative array representing the entry to update
@@ -29,26 +31,38 @@ abstract class DataSaver {
      * @throws \PDOException on error
      */
     abstract protected function updateEntity(array $data): void;
+
     /** 
      * deletes a single entry from the DB.
      * @param mixed $id identifier of the entry to delete
      * @return void
      * @throws \PDOException on error
      */
-    abstract protected function deleteEntity($id): void;
+    abstract protected function deleteEntity(string $id): void;
 
-    public final function create($data): array {
+    /** 
+     * checks if a single entry would be consistent in the DB and sanitizes it.
+     * @param array $data associative array representing the entry
+     * @return void
+     * @throws \PDOException on error
+     */
+    abstract protected function sanitizeAndValidateEntity(array &$data): void;
+    
+    public final function create(array $data): array {
         return $this->doAction($data, 'createEntity', 'Anlegen');
     }
-    public final function update($data): array {
+    public final function update(array $data): array {
         return $this->doAction($data, 'updateEntity', 'Ändern');
     }
-    public final function delete($id): array {
+    public final function delete(string $id): array {
         return $this->doAction($id, 'deleteEntity', 'Löschen');
     }
-    private function doAction($data, $action, $actionName): array {
+    private function doAction(array $data, string $action, string $actionName): array {
         $result = "";
         try {
+            if( $action != 'deleteEntity') {
+                $this->sanitizeAndValidateEntity($data);
+            }
             $this->dbConnection = connectDB();
             $this->dbConnection->beginTransaction();
             $this->$action($data);
@@ -75,9 +89,9 @@ class DisciplineSaver extends DataSaver {
 
     protected $ENTITY = "Disziplin";
 
-    public function createEntityBulk(array $disciplines, $dbConnection): array {
+    public function createEntityBulk(array $disciplines, ?\PDO $dbConnection): array {
         $messages = [];
-        $this->dbConnection = $dbConnection;
+        if( $dbConnection ) $this->dbConnection = $dbConnection;
         $stmt = $this->dbConnection->prepare('INSERT INTO ' . self::HEADER_TABLE . 
             ' ( id,  name,  image) VALUES' . 
             ' (:id, :name, :image)');
@@ -86,9 +100,10 @@ class DisciplineSaver extends DataSaver {
         $stmt->bindParam('image', $disciplineImage, \PDO::PARAM_STR);
         foreach($disciplines[0] as $discipline) {
             try {
-                $disciplineId = strip_tags($discipline['id']);
-                $disciplineName = strip_tags($discipline['name']);
-                $disciplineImage = strip_tags($discipline['image']);
+                $this->sanitizeAndValidateEntity($discipline);
+                $disciplineId = $discipline['id'];
+                $disciplineName = $discipline['name'];
+                $disciplineImage = $discipline['image'];
                 $stmt->execute();
             } catch( \PDOException $ex) {
                 $error = $ex->getMessage();
@@ -112,9 +127,18 @@ class DisciplineSaver extends DataSaver {
         // Not needed so far
     }
     
-    protected function deleteEntity($disciplineId): void {
+    protected function deleteEntity(string $disciplineId): void {
         throw new \PDOException("Not implemented because not needed so far.");
         // Not needed so far
+    }
+
+    protected function sanitizeAndValidateEntity(array &$discipline): void {
+        $discipline['id'] = strip_tags($discipline['id']);
+        $discipline['name'] = strip_tags($discipline['name']);
+        if($discipline['name'] === '') {
+            throw new \PDOException('Der Name einer Disziplin darf nicht leer sein.');
+        }
+        $discipline['image'] = strip_tags($discipline['image']);
     }
 }
 
@@ -122,14 +146,15 @@ class ExerciseSaver extends DataSaver {
     use ExerciseTable;
     protected $ENTITY = "Übung";
 
-    public function createEntityBulk(array $exercises, $dbConnection): array {
+    public function createEntityBulk(array $exercises, ?\PDO $dbConnection): array {
         $messages = [];
-        $this->dbConnection = $dbConnection;
+        if( $dbConnection ) $this->dbConnection = $dbConnection;
         foreach($exercises[0] as $exercise) {
             try {
                 // reconvert details array to string because it was split during loading
                 // but is not stored in a separate table on the DB
                 $exercise['details'] = implode(':',$exercise['details']);
+                $this->sanitizeAndValidateEntity($exercise);
                 $this->createEntity($exercise);
             } catch( \PDOException $ex) {
                 $messages[] =  $ex->getMessage();
@@ -140,8 +165,7 @@ class ExerciseSaver extends DataSaver {
 
     protected function createEntity(array $exercise): void {
         try {
-            $this->convertPhaseFlags($exercise);
-            $this->sanitizeAndValidate($exercise);     
+            $this->convertPhaseFlags($exercise);    
             $stmt = $this->dbConnection->prepare(
                 'INSERT INTO ' . self::HEADER_TABLE . 
                 ' (id, name, warmup, runabc, mainex, ending, durationmin, durationmax, material, repeats, details) VALUES ' .
@@ -159,7 +183,6 @@ class ExerciseSaver extends DataSaver {
     protected function updateEntity(array $exercise): void {
         try {
             $this->convertPhaseFlags($exercise);
-            $this->sanitizeAndValidate($exercise);
             $stmt = $this->dbConnection->prepare(
                 'UPDATE ' . self::HEADER_TABLE . ' SET name=:name, ' . 
                 'warmup=:warmup, runabc=:runabc, mainex=:mainex, ending=:ending, ' . 
@@ -176,7 +199,7 @@ class ExerciseSaver extends DataSaver {
         }
     }
 
-    protected function deleteEntity($exerciseId): void {
+    protected function deleteEntity(string $exerciseId): void {
         try {
             $stmt = $this->dbConnection->prepare('DELETE FROM ' .
                  self::HEADER_TABLE . ' WHERE id = :id');
@@ -189,6 +212,36 @@ class ExerciseSaver extends DataSaver {
             $stmt->execute();
         } catch (\PDOException $ex) {
             throw new \PDOException('Fehler beim Löschen der Übung: ' . $ex->getMessage());
+        }
+    }
+
+    protected function sanitizeAndValidateEntity(array &$exercise): void {
+        if( !is_array($exercise['disciplines']) || count($exercise['disciplines']) == 0 ) {
+            throw new \PDOException('Jede Übung muss mindestens einer Disziplin zugeordnet sein.');
+        }
+        // No check of discipline IDs - rely on foreign key constraint of the DB
+        if( !is_numeric($exercise['durationmin']) || !is_numeric($exercise['durationmax']) ) {
+            throw new \PDOException('Die Dauerangaben müssen numerisch sein.');
+        }
+        if( $exercise['durationmin'] < 0 || $exercise['durationmax'] < 0 ) {
+            throw new \PDOException('Die Dauerangaben dürfen nicht negativ sein.');
+        }
+        if( $exercise['durationmin'] > $exercise['durationmax'] ) {
+            throw new \PDOException('Die minimale Dauer darf nicht größer als die maximale Dauer sein.');
+        }
+        $exercise['id'] = strip_tags($exercise['id']);
+        $exercise['name'] = strip_tags($exercise['name'], ALLOWED_TAGS);
+        if($exercise['name'] == '') {
+            throw new \PDOException('Der Name der Übung darf nicht leer sein.');
+        }
+        $exercise['material'] = strip_tags($exercise['material'], ALLOWED_TAGS);
+        $exercise['repeats'] = strip_tags($exercise['repeats'], ALLOWED_TAGS);
+        $exercise['details'] = strip_tags($exercise['details'],ALLOWED_TAGS);
+        foreach(['warmup', 'mainex', 'ending'] as $phase) {
+            $exercise[$phase] = filter_var($exercise[$phase], FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE);
+            if( is_null($exercise[$phase]) ) {
+                throw new \PDOException("Ungültiger Wert für Phasenkennzeichen '$phase'.");
+            }
         }
     }
 
@@ -206,32 +259,11 @@ class ExerciseSaver extends DataSaver {
         $stmt->bindParam('details', $exercise['details'], \PDO::PARAM_STR);
     }
 
-    private function sanitizeAndValidate(array &$exercise): void {
-        if( !is_array($exercise['disciplines']) || count($exercise['disciplines']) == 0 ) {
-            throw new \PDOException('Jede Übung muss mindestens einer Disziplin zugeordnet sein.');
-        }
-        if( !is_numeric($exercise['durationmin']) || !is_numeric($exercise['durationmax']) ) {
-            throw new \PDOException('Die Dauerangaben müssen numerisch sein.');
-        }
-        if( $exercise['durationmin'] < 0 || $exercise['durationmax'] < 0 ) {
-            throw new \PDOException('Die Dauerangaben dürfen nicht negativ sein.');
-        }
-        if( $exercise['durationmin'] > $exercise['durationmax'] ) {
-            throw new \PDOException('Die minimale Dauer darf nicht größer als die maximale Dauer sein.');
-        }
-        $exercise['id'] = strip_tags($exercise['id']);
-        $exercise['name'] = strip_tags($exercise['name'], ALLOWED_TAGS);
-        $exercise['material'] = strip_tags($exercise['material'], ALLOWED_TAGS);
-        $exercise['repeats'] = strip_tags($exercise['repeats'], ALLOWED_TAGS);
-        $exercise['details'] = strip_tags($exercise['details'],ALLOWED_TAGS);
-
-    }
-
     private function convertPhaseFlags(array &$exercise): void {
-        $exercise['warmup'] = $exercise['warmup']=="true" ? 1 : 0;
-        $exercise['runabc'] = $exercise['runabc']=="true" ? 1 : 0;
-        $exercise['mainex'] = $exercise['mainex']=="true" ? 1 : 0;
-        $exercise['ending'] = $exercise['ending']=="true" ? 1 : 0;
+        $exercise['warmup'] = $exercise['warmup']==="true" ? 1 : 0;
+        $exercise['runabc'] = $exercise['runabc']==="true" ? 1 : 0;
+        $exercise['mainex'] = $exercise['mainex']==="true" ? 1 : 0;
+        $exercise['ending'] = $exercise['ending']==="true" ? 1 : 0;
     }
 
     private function deleteDependants($exerciseId): void {
@@ -264,45 +296,39 @@ class FavoriteSaver extends DataSaver {
     use FavoriteTable;
     protected $ENTITY = "Favoriten";
 
-    public function createEntityBulk($favorites, $dbConnection): array {
+    public function createEntityBulk(array $favorites, ?\PDO $dbConnection): array {
         $messages = [];
-        $this->dbConnection = $dbConnection;
+        if( $dbConnection ) $this->dbConnection = $dbConnection;
         // Note that this method expects $favorites to be an array of two arrays:
         //   - [0] = array of favorite headers including associated disciplines, but
         //             without mapping favorite exercises to phases
         //   - [1] = array of favorite exercises
+
+        // sort the favorite exercise by favorite_id to avoid nested loop
+        usort($favorites[1], function($a, $b) {
+            return $a['favorite_id'] - $b['favorite_id'];
+        });
+        $lastFavoriteExerciseId = 0;
         foreach($favorites[0] as $favorite) {
             try {
                 foreach(['warmup', 'mainex', 'ending'] as $phase) {
                     $favorite[$phase] = [];
                 }
+                // assign favorite exercises to phases
+                while( $lastFavoriteExerciseId < count($favorites[1]) &&
+                    $favorites[1][$lastFavoriteExerciseId]['favorite_id'] == $favorite['id']) {
+                    $fex = $favorites[1][$lastFavoriteExerciseId];
+                    $favorite[$fex['phase']][] = [
+                        'id' => $fex['exercise_id'],
+                        'duration' => $fex['duration'],
+                        'position' => $fex['position'],
+                    ];
+                    $lastFavoriteExerciseId++;
+                }
+                $this->sanitizeAndValidateEntity($favorite);
                 $this->createEntity($favorite);
             } catch( \PDOException $ex) {
                 $messages[] =  $ex->getMessage();
-            }
-        }
-        $fex_messages = $this->insertFavoriteExercisesBulk($favorites[1]);
-        return array_merge($messages, $fex_messages);
-    }
-
-    private function insertFavoriteExercisesBulk(array $favoriteExercises): array {
-        $messages = [];
-        $stmt = $this->dbConnection->prepare('INSERT INTO ' . self::LINK_EXERCISES_TABLE . 
-            ' ( favorite_id,  phase,  position,  exercise_id,  duration) VALUES' . 
-            ' (:favorite_id, :phase, :position, :exercise_id, :duration)');
-        $stmt->bindParam(':favorite_id', $favorite_id, \PDO::PARAM_INT);
-        $stmt->bindParam(':phase', $phase, \PDO::PARAM_STR);
-        $stmt->bindParam(':position', $position, \PDO::PARAM_INT);
-        $stmt->bindParam(':exercise_id', $exercise_id, \PDO::PARAM_STR);
-        $stmt->bindParam(':duration', $duration, \PDO::PARAM_INT);
-        foreach($favoriteExercises as ['favorite_id' => $favorite_id,
-                'phase' => $phase, 'position' => $position,
-                'exercise_id' => $exercise_id, 'duration' => $duration]) {
-            try {
-                $stmt->execute();
-            } catch( \PDOException $ex) {
-                $error = $ex->getMessage();
-                $messages[] = "Übung $exercise_id zu Favorit $favorite_id (Phase $phase, Pos. $position, Dauer $duration) ist fehlgeschlagen, Fehler: $error.";
             }
         }
         return $messages;
@@ -336,7 +362,7 @@ class FavoriteSaver extends DataSaver {
         }
     }
 
-    protected function deleteEntity($favoriteId): void {
+    protected function deleteEntity(string $favoriteId): void {
         try {
             $stmt = $this->dbConnection->prepare('DELETE FROM ' .
                 self::HEADER_TABLE . ' WHERE id = :id');
@@ -345,6 +371,30 @@ class FavoriteSaver extends DataSaver {
             $this->deleteDependants($favoriteId);
         } catch (\PDOException $ex) {
             throw new \PDOException('Fehler beim Laden des Favoriten zum Löschen: ' . $ex->getMessage());
+        }
+    }
+
+    protected function sanitizeAndValidateEntity(array &$favorite): void {
+        if( !is_array($favorite['disciplines']) || count($favorite['disciplines']) == 0 ) {
+            throw new \PDOException('Jeder Favorit muss mindestens einer Disziplin zugeordnet sein.');
+        }
+        $favorite['id'] = strip_tags($favorite['id']);
+        $favorite['created_by'] = strip_tags($favorite['created_by']);
+        $favorite['description'] = strip_tags($favorite['description'], ALLOWED_TAGS);
+        foreach(['warmup', 'mainex', 'ending'] as $phase) {
+            foreach($favorite[$phase] as $exercise) {
+                $exercise['id'] = strip_tags($exercise['id']);
+                if( $exercise['id'] == '' ) {
+                    throw new \PDOException('Jede Favoritenübung muss eine Übungs-ID haben.');
+                }
+                if( !is_numeric($exercise['position']) || $exercise['position'] <= 0 ) {
+                    throw new \PDOException("Ungültige Position {$exercise['position']} für Favoritenübung.");
+                }
+                if( !is_numeric($exercise['duration']) || $exercise['duration'] < 0 ) {
+                    throw new \PDOException("Ungültige Dauer '{$exercise['duration']}' für Favoritenübung.");
+                }
+                
+            }
         }
     }
 
@@ -391,7 +441,7 @@ class FavoriteSaver extends DataSaver {
         }
     }
 
-    private function deleteDependants($favoriteId): void {
+    private function deleteDependants(string $favoriteId): void {
         try {   
             $stmt = $this->dbConnection->prepare('DELETE FROM ' . 
                 self::LINK_DISCIPLINES_TABLE . ' WHERE favorite_id = :id');
@@ -406,7 +456,7 @@ class FavoriteSaver extends DataSaver {
             $stmt->bindParam('id', $favoriteId, \PDO::PARAM_INT);
             $stmt->execute();
         } catch (\PDOException $ex) {
-            throw new \PDOException('Fehler beim Löschen der Übungen im Favoriten: ' . $ex->getMessage());
+            throw new \PDOException('Fehler beim Löschen der Übungen des Favoriten: ' . $ex->getMessage());
         }       
     }
 }

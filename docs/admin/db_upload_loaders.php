@@ -13,7 +13,7 @@ class CsvParser {
     /**
      * Takes an array of strings
      * @param $tableLines assumed to be lines of a few tables, with different
-     *        tables separated empty lines
+     *        tables separated by empty lines
      * @param $expectedFields an array of arrays, each internal array the
      *        field names in the table and declared in its first line (header)
      * @param $tableNames and the name of the tables (for error messages)
@@ -197,7 +197,7 @@ class ExerciseLoader extends DataLoader {
 class FavoriteLoader extends DataLoader {
     protected $headerFields = [['id', 'created_by', 'created_at', 'description', 'disciplines[]'],
                                ['favorite_id', 'phase', 'position', 'exercise_id', 'duration']];
-    protected $entityNames = ['Favorit', 1 => 'FavoritenÜbungen'];
+    protected $entityNames = ['Favorit', 'FavoritenÜbungen'];
 
     public function __construct() {
         $this->csvParser = new CsvParser();
