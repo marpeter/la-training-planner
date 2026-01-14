@@ -141,7 +141,7 @@ const view = {
     exerciseCard.appendChild(exerciseContent);
     if (exercise.details.length>0) {
       let exerciseReveal = document.createElement("div");
-      exerciseReveal.classList.add("card-reveal");
+      exerciseReveal.classList.add("card-reveal", "tfat", "lighten-5");
       exerciseReveal.innerHTML = '<span class="card-title grey-text text-darken-4">Details<i class="material-icons right">close</i></span>';
       exercise.details.forEach( (item) => exerciseReveal.innerHTML += `<li>${item}</li>`);
       exerciseCard.appendChild(exerciseReveal);

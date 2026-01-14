@@ -61,7 +61,7 @@ async function dbVersion(pathPrefix="") {
   } catch (error) {
     console.error("Error loading version from DB: " + error + " --> assuming there is no PHP/DB backend.");
     version = {
-      number: "0.13.4 (ohne Backend Datenbank)",
+      number: "0.13.5 (ohne Backend Datenbank)",
       withBackend: false,
       supportsEditing:   false,
       disciplineLoader:  loadDisciplinesFromCSV.bind(null,pathPrefix),

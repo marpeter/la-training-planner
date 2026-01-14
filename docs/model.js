@@ -45,7 +45,7 @@ class Exercise {
     this.durationmax = durationmax;
     this.repeats = repeats;
     this.material = material;
-    this.details = details;
+    this.details = Array.isArray(details) ? ( details.length>0 && details[0].length>0 ? details : '' ) : details;
     this.warmup = warmup;
     this.runabc = runabc;
     this.mainex = mainex;

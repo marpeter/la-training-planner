@@ -57,7 +57,7 @@ abstract class DataSaver {
     public final function delete(string $id): array {
         return $this->doAction($id, 'deleteEntity', 'Löschen');
     }
-    private function doAction(array $data, string $action, string $actionName): array {
+    private function doAction($data, string $action, string $actionName): array {
         $result = "";
         try {
             if( $action != 'deleteEntity') {
@@ -69,7 +69,7 @@ abstract class DataSaver {
             $this->dbConnection->commit();
             $result =  [
                 'success' => true,
-                'message' => '',
+                'message' => $data,
             ];
         } catch (\PDOException $ex) {
             $this->dbConnection->rollBack();
@@ -164,8 +164,7 @@ class ExerciseSaver extends DataSaver {
     }
 
     protected function createEntity(array $exercise): void {
-        try {
-            $this->convertPhaseFlags($exercise);    
+        try { 
             $stmt = $this->dbConnection->prepare(
                 'INSERT INTO ' . self::HEADER_TABLE . 
                 ' (id, name, warmup, runabc, mainex, ending, durationmin, durationmax, material, repeats, details) VALUES ' .
@@ -182,7 +181,6 @@ class ExerciseSaver extends DataSaver {
 
     protected function updateEntity(array $exercise): void {
         try {
-            $this->convertPhaseFlags($exercise);
             $stmt = $this->dbConnection->prepare(
                 'UPDATE ' . self::HEADER_TABLE . ' SET name=:name, ' . 
                 'warmup=:warmup, runabc=:runabc, mainex=:mainex, ending=:ending, ' . 
@@ -237,10 +235,13 @@ class ExerciseSaver extends DataSaver {
         $exercise['material'] = strip_tags($exercise['material'], ALLOWED_TAGS);
         $exercise['repeats'] = strip_tags($exercise['repeats'], ALLOWED_TAGS);
         $exercise['details'] = strip_tags($exercise['details'],ALLOWED_TAGS);
-        foreach(['warmup', 'mainex', 'ending'] as $phase) {
+        foreach(['warmup', 'runabc','mainex', 'ending'] as $phase) {
             $exercise[$phase] = filter_var($exercise[$phase], FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE);
             if( is_null($exercise[$phase]) ) {
                 throw new \PDOException("Ungültiger Wert für Phasenkennzeichen '$phase'.");
+            } else {
+                // convert to boolean
+                $exercise[$phase] = $exercise[$phase] ? 1 : 0;
             }
         }
     }
@@ -257,13 +258,6 @@ class ExerciseSaver extends DataSaver {
         $stmt->bindParam('material', $exercise['material'], \PDO::PARAM_STR);
         $stmt->bindParam('repeats', $exercise['repeats'], \PDO::PARAM_STR);
         $stmt->bindParam('details', $exercise['details'], \PDO::PARAM_STR);
-    }
-
-    private function convertPhaseFlags(array &$exercise): void {
-        $exercise['warmup'] = $exercise['warmup']==="true" ? 1 : 0;
-        $exercise['runabc'] = $exercise['runabc']==="true" ? 1 : 0;
-        $exercise['mainex'] = $exercise['mainex']==="true" ? 1 : 0;
-        $exercise['ending'] = $exercise['ending']==="true" ? 1 : 0;
     }
 
     private function deleteDependants($exerciseId): void {
@@ -387,7 +381,7 @@ class FavoriteSaver extends DataSaver {
                 if( $exercise['id'] == '' ) {
                     throw new \PDOException('Jede Favoritenübung muss eine Übungs-ID haben.');
                 }
-                if( !is_numeric($exercise['position']) || $exercise['position'] <= 0 ) {
+                if( isset($exercise['position']) && (!is_numeric($exercise['position']) || $exercise['position'] <= 0 )) {
                     throw new \PDOException("Ungültige Position {$exercise['position']} für Favoritenübung.");
                 }
                 if( !is_numeric($exercise['duration']) || $exercise['duration'] < 0 ) {
