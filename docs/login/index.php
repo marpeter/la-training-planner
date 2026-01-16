@@ -90,7 +90,7 @@ require 'login.php';
         </div>
       </section>
     </main>
-    <div class="center grey-text">Version <span id="version"><?php echo $version['number'] ?></span>, &copy; 2025 Markus Peter</div>
+    <div class="center grey-text">Version <span id="version"><?php echo $version['number'] ?></span>, &copy; 2026 Markus Peter</div>
     <footer>
       <nav class="tfat darken-1">
         <div class="nav-wrapper">

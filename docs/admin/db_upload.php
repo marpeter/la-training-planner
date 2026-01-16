@@ -35,6 +35,10 @@ if ( !empty($_FILES) ) { // files were uploaded
         switch ($data['error']) {
             case UPLOAD_ERR_OK:     
                 $type = mime_content_type($data['tmp_name']);
+                if(is_uploaded_file($data['tmp_name']) === false) {
+                    $messages[] = "Die Datei $name wurde nicht korrekt hochgeladen.";
+                    break;
+                }
                 if(isset($allowed_mimetypes[$type])) {
                     switch ($file) {
                         case 'DisciplinesFile':
