@@ -4,6 +4,9 @@ namespace LaPlanner;
 require '../data/db_write.php';
 require 'db_upload_loaders.php';
  
+use \TnFAT\Planner\Discipline\CsvLoader as DisciplineLoader;
+use \TnFAT\Planner\Exercise\CsvLoader as ExerciseLoader;
+
 $messages = [];
 $uploadedFiles = 0;
   
@@ -45,7 +48,7 @@ if ( !empty($_FILES) ) { // files were uploaded
                             $workItem[] = [$data['name'], $data['tmp_name'], new DisciplineLoader()];
                             break;
                         case 'ExercisesFile':
-                            $workItem[] = [$data['name'], $data['tmp_name'], new \TnFAT\Planner\Exercise\CsvLoader()];
+                            $workItem[] = [$data['name'], $data['tmp_name'], new ExerciseLoader()];
                             break;
                         case 'FavoritesFile':
                             $workItem[] = [$data['name'], $data['tmp_name'], new FavoriteLoader()];
@@ -76,7 +79,7 @@ if ( !empty($_FILES) ) { // files were uploaded
     // Upload the files that are included with the app
     $workItem = [
         ['Disciplines.csv', '../data/Disciplines.csv', new DisciplineLoader()],
-        ['Exercises.csv', '../data/Exercises.csv', new \TnFAT\Planner\Exercise\CsvLoader()],
+        ['Exercises.csv', '../data/Exercises.csv', new ExerciseLoader()],
         ['Favorites.csv', '../data/Favorites.csv', new FavoriteLoader()]];
 } 
 

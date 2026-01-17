@@ -1,7 +1,7 @@
 <?php
-namespace TnFAT\Planner;
+namespace TnFAT\Planner\Discipline;
 
-trait DisciplineTable {
+trait DatabaseTable {
     const HEADER_TABLE = 'disciplines';
     public function getTableNames(): array {
         return [self::HEADER_TABLE];

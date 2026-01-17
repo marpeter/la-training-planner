@@ -3,15 +3,8 @@ namespace LaPlanner;
   
 require 'db_common.php';
 
-use \TnFAT\Planner\Exercise\DatabaseReader;
-
-class DisciplineReader extends AbstractTableReader {
-    use \TnFAT\Planner\DisciplineTable;
-
-    protected function deserialize(): string {
-        return json_encode($this->data[self::HEADER_TABLE]);
-    }
-}
+use \TnFAT\Planner\Discipline\DatabaseReader as DisciplineReader;
+use \TnFAT\Planner\Exercise\DatabaseReader as ExerciseReader;
 
 class FavoriteReader extends AbstractTableReader {
     use \TnFAT\Planner\FavoriteTable;
@@ -37,7 +30,7 @@ switch(strtolower($_GET['entity'])) {
         $reader = new DisciplineReader();
         break;
     case 'exercises':
-        $reader = new DatabaseReader();
+        $reader = new ExerciseReader();
         break;
     case 'favorites':
         $reader = new FavoriteReader();

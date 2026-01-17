@@ -3,21 +3,6 @@ namespace LaPlanner;
 
 require '../data/db_common.php';
 
-class DisciplineReader extends AbstractTableToCsvReader {
-    use \TnFAT\Planner\DisciplineTable;
-
-    protected $fileName = 'Disciplines.csv';
-    public function deserialize(): string {
-        foreach($this->data[self::HEADER_TABLE] as &$discipline) {
-            unset($discipline['created_at']);
-        }
-        $csv_header = array_keys($this->data[self::HEADER_TABLE][0]);
-        $contents = implode(",", $csv_header) . "\n";
-        $contents .= $this->convertToCsv($this->data[self::HEADER_TABLE]);
-        return $contents;
-    }
-}
-
 class FavoriteReader extends AbstractTableToCsvReader {
     use \TnFAT\Planner\FavoriteTable;
 
@@ -49,7 +34,7 @@ $reader = null;
 $entity = strtolower(getQueryString('entity'));
 switch($entity) {
     case 'disciplines':
-        $reader = new DisciplineReader();
+        $reader = new \TnFAT\Planner\Discipline\CsvReader();
         break;
     case 'exercises':
         $reader = new \TnFAT\Planner\Exercise\CsvReader();

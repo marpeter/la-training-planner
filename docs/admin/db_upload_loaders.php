@@ -166,16 +166,6 @@ abstract class DataLoader {
     }
 }
 
-class DisciplineLoader extends DataLoader {
-    protected $headerFields = [['id', 'name', 'image']];
-    protected $entityNames = ['Disziplin'];
-
-    public function __construct() {
-        $this->csvParser = new CsvParser();
-        $this->saver = new DisciplineSaver();
-    }
-}
-
 class FavoriteLoader extends DataLoader {
     protected $headerFields = [['id', 'created_by', 'created_at', 'description', 'disciplines[]'],
                                ['favorite_id', 'phase', 'position', 'exercise_id', 'duration']];
