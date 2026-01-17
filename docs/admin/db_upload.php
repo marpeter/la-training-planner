@@ -45,7 +45,7 @@ if ( !empty($_FILES) ) { // files were uploaded
                             $workItem[] = [$data['name'], $data['tmp_name'], new DisciplineLoader()];
                             break;
                         case 'ExercisesFile':
-                            $workItem[] = [$data['name'], $data['tmp_name'], new ExerciseLoader()];
+                            $workItem[] = [$data['name'], $data['tmp_name'], new \TnFAT\Planner\Exercise\CsvLoader()];
                             break;
                         case 'FavoritesFile':
                             $workItem[] = [$data['name'], $data['tmp_name'], new FavoriteLoader()];
@@ -76,7 +76,7 @@ if ( !empty($_FILES) ) { // files were uploaded
     // Upload the files that are included with the app
     $workItem = [
         ['Disciplines.csv', '../data/Disciplines.csv', new DisciplineLoader()],
-        ['Exercises.csv', '../data/Exercises.csv', new ExerciseLoader()],
+        ['Exercises.csv', '../data/Exercises.csv', new \TnFAT\Planner\Exercise\CsvLoader()],
         ['Favorites.csv', '../data/Favorites.csv', new FavoriteLoader()]];
 } 
 

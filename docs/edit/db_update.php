@@ -3,7 +3,7 @@ namespace LaPlanner;
 
 require '../data/db_write.php';
 
-$SAVERS = ['exercise' => 'LaPlanner\ExerciseSaver', 'favorite' => 'LaPLanner\FavoriteSaver'];
+$SAVERS = ['exercise' => '\TnFAT\Planner\Exercise\DatabaseWriter', 'favorite' => '\LaPlanner\FavoriteSaver'];
 $VERBS = ['create', 'update', 'delete'];
 
 if( !( isset($_POST['entity']) && is_string($_POST['entity']) && isset($SAVERS[$_POST['entity']]) ) ) {

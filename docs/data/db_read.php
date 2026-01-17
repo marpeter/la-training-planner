@@ -3,33 +3,12 @@ namespace LaPlanner;
   
 require 'db_common.php';
 
+use \TnFAT\Planner\Exercise\DatabaseReader;
+
 class DisciplineReader extends AbstractTableReader {
     use \TnFAT\Planner\DisciplineTable;
 
     protected function deserialize(): string {
-        return json_encode($this->data[self::HEADER_TABLE]);
-    }
-}
-
-class ExerciseReader extends AbstractTableReader {
-    use \TnFAT\Planner\ExerciseTable;
-
-    protected function deserialize(): string {
-        foreach ($this->data[self::HEADER_TABLE] as &$exercise) {
-            $exercise['warmup'] = (bool)$exercise['warmup'];
-            $exercise['runabc'] = (bool)$exercise['runabc'];
-            $exercise['mainex'] = (bool)$exercise['mainex'];
-            $exercise['ending'] = (bool)$exercise['ending'];
-            $exercise['durationmin'] = (int)$exercise['durationmin'];
-            $exercise['durationmax'] = (int)$exercise['durationmax'];
-            $exercise['details'] = explode(":",$exercise['details']);
-            $exercise['disciplines'] = [];
-            foreach ($this->data[self::LINK_DISCIPLINES_TABLE] as $exerciseDiscipline) {
-               if ($exercise['id'] == $exerciseDiscipline['exercise_id']) {
-                   $exercise['disciplines'][] = $exerciseDiscipline['discipline_id'];
-               }
-            }
-        }        
         return json_encode($this->data[self::HEADER_TABLE]);
     }
 }
@@ -58,7 +37,7 @@ switch(strtolower($_GET['entity'])) {
         $reader = new DisciplineReader();
         break;
     case 'exercises':
-        $reader = new ExerciseReader();
+        $reader = new DatabaseReader();
         break;
     case 'favorites':
         $reader = new FavoriteReader();

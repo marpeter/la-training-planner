@@ -176,24 +176,6 @@ class DisciplineLoader extends DataLoader {
     }
 }
 
-class ExerciseLoader extends DataLoader {
-    protected $headerFields = [ ['id', 'name', 'warmup', 'runabc', 'mainex', 'ending', 
-        'material', 'durationmin', 'durationmax', 'repeats', 'disciplines[]', 'details[]']];
-    protected $entityNames = ['Übung'];
-
-    public function __construct() {
-        $this->csvParser = new CsvParser(';');
-        $this->saver = new ExerciseSaver();
-    }
-
-    // override to exclude "Auslaufen" exercises
-    protected function getTableNames(): array {
-        $tableNames = $this->saver->getTableNames();
-        $tableNames[0] = $tableNames[0] . ' WHERE NOT id="Auslaufen"';
-        return $tableNames;
-    }
-}
-
 class FavoriteLoader extends DataLoader {
     protected $headerFields = [['id', 'created_by', 'created_at', 'description', 'disciplines[]'],
                                ['favorite_id', 'phase', 'position', 'exercise_id', 'duration']];

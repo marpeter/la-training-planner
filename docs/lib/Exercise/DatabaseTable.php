@@ -1,7 +1,7 @@
 <?php
-namespace TnFAT\Planner;
+namespace TnFAT\Planner\Exercise;
 
-trait ExerciseTable {
+trait DatabaseTable {
     const HEADER_TABLE = 'exercises';
     const LINK_DISCIPLINES_TABLE = 'exercises_disciplines';
     public function getTableNames(): array {
