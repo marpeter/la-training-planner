@@ -1,7 +1,7 @@
 <?php
 namespace TnFAT\Planner\Exercise;
 
-class CsvReader extends \LaPlanner\AbstractTableToCsvReader {
+class CsvReader extends \TnFAT\Planner\AbstractDatabaseToCsvConverter {
     use DatabaseTable;
 
     protected $fileName = 'Exercises.csv';

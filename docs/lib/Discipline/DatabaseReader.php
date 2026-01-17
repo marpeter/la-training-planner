@@ -1,7 +1,7 @@
 <?php
 namespace TnFAT\Planner\Discipline;
 
-class DatabaseReader extends \LaPlanner\AbstractTableReader {
+class DatabaseReader extends \TnFAT\Planner\AbstractDatabaseReader {
     use DatabaseTable;
 
     protected function deserialize(): string {

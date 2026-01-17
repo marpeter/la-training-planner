@@ -1,7 +1,7 @@
 <?php
 namespace TnFAT\Planner\Favorite;
 
-class CsvReader extends \LaPlanner\AbstractTableToCsvReader {
+class CsvReader extends \TnFAT\Planner\AbstractDatabaseToCsvConverter {
     use DatabaseTable;
 
     protected $fileName = 'Favorites.csv';
