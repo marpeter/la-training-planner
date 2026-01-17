@@ -6,6 +6,7 @@ require 'db_upload_loaders.php';
  
 use \TnFAT\Planner\Discipline\CsvLoader as DisciplineLoader;
 use \TnFAT\Planner\Exercise\CsvLoader as ExerciseLoader;
+use \TnFAT\Planner\Favorite\CsvLoader as FavoriteLoader;
 
 $messages = [];
 $uploadedFiles = 0;

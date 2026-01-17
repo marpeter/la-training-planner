@@ -165,14 +165,3 @@ abstract class DataLoader {
         return !$new_messages; // if there are messages, something went wrong
     }
 }
-
-class FavoriteLoader extends DataLoader {
-    protected $headerFields = [['id', 'created_by', 'created_at', 'description', 'disciplines[]'],
-                               ['favorite_id', 'phase', 'position', 'exercise_id', 'duration']];
-    protected $entityNames = ['Favorit', 'FavoritenÜbungen'];
-
-    public function __construct() {
-        $this->csvParser = new CsvParser();
-        $this->saver = new FavoriteSaver();
-    }
-}

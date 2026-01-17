@@ -1,7 +1,7 @@
 <?php
-namespace TnFAT\Planner;
+namespace TnFAT\Planner\Favorite;
 
-trait FavoriteTable {
+trait DatabaseTable {
     const HEADER_TABLE = 'favorite_headers';
     const LINK_DISCIPLINES_TABLE = 'favorite_disciplines';
     const LINK_EXERCISES_TABLE = 'favorite_exercises';

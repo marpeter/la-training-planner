@@ -5,24 +5,7 @@ require 'db_common.php';
 
 use \TnFAT\Planner\Discipline\DatabaseReader as DisciplineReader;
 use \TnFAT\Planner\Exercise\DatabaseReader as ExerciseReader;
-
-class FavoriteReader extends AbstractTableReader {
-    use \TnFAT\Planner\FavoriteTable;
-
-    protected function deserialize(): string {
-        foreach ($this->data[self::HEADER_TABLE] as &$favorite) {
-            $favorite['disciplines'] = [];
-            foreach ($this->data[self::LINK_DISCIPLINES_TABLE] as $favoriteDiscipline) {
-                if ($favorite['id'] == $favoriteDiscipline['favorite_id']) {
-                    $favorite['disciplines'][] = $favoriteDiscipline['discipline_id'];
-                }
-            }
-        }
-        return json_encode(
-            ['headers' => $this->data[self::HEADER_TABLE],
-            'exerciseMap' => $this->data[self::LINK_EXERCISES_TABLE]]);
-    }
-}
+use \TnFAT\Planner\Favorite\DatabaseReader as FavoriteReader;
 
 $reader = null;
 switch(strtolower($_GET['entity'])) {
