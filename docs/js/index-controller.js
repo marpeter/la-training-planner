@@ -1,5 +1,5 @@
 import { App, Discipline, TrainingPlan } from "./model.js";
-import { updateLogInOutButton } from "./common-controller.js";
+import { updateLogInOutButton } from "./common.js";
 
 document.addEventListener('DOMContentLoaded', function() {
   App.loadData().then( (result) => {

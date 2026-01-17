@@ -1,4 +1,4 @@
-import { dbVersion } from "./data/db.js";
+import { dbVersion } from "./db.js";
 
 const MAX_ATTEMPTS = 20;
 const TEMP_PLAN_ID = "$TMP";
@@ -35,6 +35,7 @@ const Discipline = {
     return this.Instances; 
   }
 }
+
 class Exercise {
   constructor(id, name, disciplines, durationmin=0, durationmax=0, warmup=false, 
       runabc=false, mainex=false, ending=false, repeats='', material='', details='') {

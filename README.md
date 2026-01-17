@@ -32,5 +32,5 @@
     );
     ```
     - Laden Sie die Web-Anwendung erneut und melden Sie sich mit dem Benutzer, den Tabelle `la_planner.users` enthält, an. 
-    - Die Tabelleninhalte können über die Hilfsfunktionen `https://.../admin/` gefüllt werden.
+    - Die Tabelleninhalte können über die Hilfsfunktionen `https://.../import-export.html` gefüllt werden.
   

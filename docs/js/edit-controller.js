@@ -1,8 +1,8 @@
-import { App, Discipline, Exercise, TrainingPlan } from "../model.js";
-import { updateLogInOutButton } from "../common-controller.js";
+import { App, Discipline, Exercise, TrainingPlan } from "./model.js";
+import { updateLogInOutButton } from "./common.js";
 
 document.addEventListener('DOMContentLoaded', () => {
-  App.loadData("../").then( (result) => {
+  App.loadData().then( (result) => {
     view.finishUi({
       version: App.version,
       disciplines: Discipline.getAll(),
