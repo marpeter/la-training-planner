@@ -4,7 +4,7 @@ namespace LaPlanner;
 require 'db_common.php';
 
 class DisciplineReader extends AbstractTableReader {
-    use DisciplineTable;
+    use \TnFAT\Planner\DisciplineTable;
 
     protected function deserialize(): string {
         return json_encode($this->data[self::HEADER_TABLE]);
@@ -12,7 +12,7 @@ class DisciplineReader extends AbstractTableReader {
 }
 
 class ExerciseReader extends AbstractTableReader {
-    use ExerciseTable;
+    use \TnFAT\Planner\ExerciseTable;
 
     protected function deserialize(): string {
         foreach ($this->data[self::HEADER_TABLE] as &$exercise) {
@@ -35,7 +35,7 @@ class ExerciseReader extends AbstractTableReader {
 }
 
 class FavoriteReader extends AbstractTableReader {
-    use FavoriteTable;
+    use \TnFAT\Planner\FavoriteTable;
 
     protected function deserialize(): string {
         foreach ($this->data[self::HEADER_TABLE] as &$favorite) {

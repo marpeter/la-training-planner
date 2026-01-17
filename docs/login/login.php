@@ -2,6 +2,9 @@
 namespace LaPlanner;
 
 require '../data/db_common.php';
+
+use TnFAT\Planner\User\UserRecord;
+
 $version = getDbVersion(true);
 $messages = [];
 
