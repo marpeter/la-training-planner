@@ -1,7 +1,5 @@
 <?php
-namespace LaPlanner;
-
-class ParseException extends \Exception {}
+namespace TnFAT\Planner;
 
 class CsvParser {
     private $separator = ',';
@@ -19,7 +17,7 @@ class CsvParser {
      * @param $tableNames and the name of the tables (for error messages)
      * @return an array of assiciative arrays representing the tables if
      *         parsing was successful,
-     * @throws ParseException otherwise
+     * @throws CsvParseException otherwise
      */
     public function parseTables($tableLines, $expectedFields, $tableNames): array {
         $this->dataLength = count($tableLines);
@@ -42,7 +40,7 @@ class CsvParser {
      * @param $expectedFields an array of field names expected in the header
      * @param $tableName and the name of the table (for error messages)
      * @return an array of field positions in the table if the line is valid,
-     * @throws ParseException otherwise
+     * @throws CsvParseException otherwise
      */
     public function getFieldMapping($headerLine, $expectedFields, $tableName): array {
         // preg_replace removes a potential
@@ -50,7 +48,7 @@ class CsvParser {
         $header = explode($this->separator, preg_replace("/\xEF\xBB\xBF/", "", $headerLine));
         $expectedFieldCount = count($expectedFields);
         if( count($header) !== $expectedFieldCount ) {
-            throw new ParseException("Die Kopfzeile der $tableName-Daten $headerLine enthält nicht die erwartete Anzahl an $expectedFieldCount Spalten.");
+            throw new CsvParseException("Die Kopfzeile der $tableName-Daten $headerLine enthält nicht die erwartete Anzahl an $expectedFieldCount Spalten.");
         }
         // Convert field names to lower case
         foreach($header as &$field) {
@@ -60,7 +58,7 @@ class CsvParser {
         if(count(array_diff($header,$expectedFields))>0) {
             $expectedStr = implode(',',$expectedFields);
             $actualStr = implode(',', array_diff($header,$expectedFields));
-            throw new ParseException("Die Kopfzeile der $tableName Daten $headerLine enthält nicht die erwarteten Spaltennamen $expectedStr, der Unterschied ist $actualStr.");
+            throw new CsvParseException("Die Kopfzeile der $tableName Daten $headerLine enthält nicht die erwarteten Spaltennamen $expectedStr, der Unterschied ist $actualStr.");
         }
         // "pivot" the header
         $fieldMap = [];
@@ -100,68 +98,5 @@ class CsvParser {
             }
         }
         return $fields;
-    }
-}
-
-abstract class DataLoader {
-    protected $messages = [];
-    protected $dbConnection = null;
-    // override these properties in each concrete class:
-    protected $headerFields = [];
-    protected $entityNames = [];
-    // initialize these properties in the __construct method of each concrete class:
-    protected ?CsvParser $csvParser = null;
-    protected ?DataSaver $saver = null;
-
-    public function load($data, &$messages): int {
-        $this->messages = &$messages;
-        try {
-            $tableContent = $this->csvParser->parseTables($data,
-                $this->headerFields, $this->getTableNames());
-        } catch(ParseException $ex) {
-            $this->messages[] = $ex->getMessage();
-            return 0;
-        }
-        // process the data
-        $this->dbConnection = connectDB();
-        $this->dbConnection->beginTransaction();
-        // 1. remove current database entries
-        $okay = $this->clearCurrentEntries();
-        // 2. insert the uploaded disciplines
-        $okay = $this->insertEntries($tableContent);
-        // 3. commit or rollback
-        if($okay) {
-            $this->dbConnection->commit();
-            $c1 = count($tableContent[0]);
-            $messages[] = "Es wurden $c1 {$this->entityNames[0]}en geladen.";
-            return 1;
-        } else {
-            $this->dbConnection->rollBack();
-            $messages[] = "Es wurden keine {$this->entityNames[0]}en geladen.";
-            return 0;
-        }
-    }
-
-    protected function getTableNames(): array {
-        return $this->saver->getTableNames();
-    }
-
-    protected function clearCurrentEntries(): bool {
-        try {
-            foreach($this->getTableNames() as $tableName) {
-                $result = $this->dbConnection->exec("DELETE FROM $tableName");
-            }
-            return true;
-        } catch( \PDOException $ex) {
-            $error = $ex->getMessage();
-            $this->messages[] = "Löschen der vorhanden {$this->entityNames[0]} Daten fehlgeschlagen, Fehler: $error.";
-            return false;
-        }      
-    }
-
-    protected function insertEntries($tableEntries): bool {
-        $new_messages = $this->saver->createEntityBulk($tableEntries, $this->dbConnection);
-        $this->messages = array_merge($this->messages,$new_messages);
-        return !$new_messages; // if there are messages, something went wrong
     }
 }

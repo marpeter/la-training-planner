@@ -1,12 +1,12 @@
 <?php
 namespace TnFAT\Planner\Discipline;
 
-class CsvLoader extends \LaPlanner\DataLoader {
+class CsvLoader extends \TnFAT\Planner\AbstractCsvLoader {
     protected $headerFields = [['id', 'name', 'image']];
     protected $entityNames = ['Disziplin'];
 
     public function __construct() {
-        $this->csvParser = new \LaPlanner\CsvParser();
+        $this->csvParser = new \TnFAT\Planner\CsvParser();
         $this->saver = new DatabaseWriter();
     }
 }

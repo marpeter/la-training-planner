@@ -1,7 +1,7 @@
 <?php
 namespace LaPlanner;
 
-require '../data/db_write.php';
+require '../data/db_common.php';
 
 $SAVERS = ['exercise' => '\TnFAT\Planner\Exercise\DatabaseWriter', 'favorite' => '\TnFAT\Planner\Favorite\DatabaseWriter'];
 $VERBS = ['create', 'update', 'delete'];

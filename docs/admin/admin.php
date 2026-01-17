@@ -1,13 +1,5 @@
 <?php
 require 'db_upload.php';
-
-if( isset($version['username']) ) {
-  $icon = 'logout';
-  $loginButtonHref = "../login/logout.php?url=../admin/admin.php";
-} else {
-  $icon = 'login';
-  $loginButtonHref = "../login/";
-}
 ?>
 <!doctype html>
 <html lang="de">

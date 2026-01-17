@@ -1,8 +1,7 @@
 <?php
 namespace LaPlanner;
 
-require '../data/db_write.php';
-require 'db_upload_loaders.php';
+require_once __DIR__ . '/../data/db_common.php';
  
 use \TnFAT\Planner\Discipline\CsvLoader as DisciplineLoader;
 use \TnFAT\Planner\Exercise\CsvLoader as ExerciseLoader;
@@ -97,3 +96,11 @@ if( !empty($workItem) ) {
 }
 
 $version = getDbVersion();
+
+if( isset($version['username']) ) {
+  $icon = 'logout';
+  $loginButtonHref = "../login/logout.php?url=../admin/admin.php";
+} else {
+  $icon = 'login';
+  $loginButtonHref = "../login/";
+}

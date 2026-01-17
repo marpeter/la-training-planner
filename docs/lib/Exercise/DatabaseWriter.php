@@ -1,7 +1,7 @@
 <?php
 namespace TnFAT\Planner\Exercise;
 
-class DatabaseWriter extends \LaPlanner\DataSaver {
+class DatabaseWriter extends \TnFAT\Planner\AbstractDatabaseWriter {
     use DatabaseTable;
     protected $ENTITY = "Übung";
 

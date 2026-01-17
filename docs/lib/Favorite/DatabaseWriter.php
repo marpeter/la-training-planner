@@ -1,6 +1,6 @@
 <?php namespace TnFAT\Planner\Favorite;
 
-class DatabaseWriter extends \LaPlanner\DataSaver {
+class DatabaseWriter extends \TnFAT\Planner\AbstractDatabaseWriter {
     use DatabaseTable;
     protected $ENTITY = "Favoriten";
 

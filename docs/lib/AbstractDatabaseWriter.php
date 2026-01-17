@@ -1,8 +1,7 @@
 <?php
-namespace LaPlanner;
-require 'db_common.php'; 
+namespace TnFAT\Planner;
 
-abstract class DataSaver {
+abstract class AbstractDatabaseWriter {
     protected $ENTITY = "";
     protected ?\PDO $dbConnection = null;
 
@@ -63,7 +62,7 @@ abstract class DataSaver {
             if( $action != 'deleteEntity') {
                 $this->sanitizeAndValidateEntity($data);
             }
-            $this->dbConnection = connectDB();
+            $this->dbConnection = \LaPlanner\connectDB();
             $this->dbConnection->beginTransaction();
             $this->$action($data);
             $this->dbConnection->commit();
