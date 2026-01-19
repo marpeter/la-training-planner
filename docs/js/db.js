@@ -91,7 +91,7 @@ async function saveToDb(pathPrefix,entityName,action,data) {
     body: new URLSearchParams({ verb: action.toLowerCase(),  entity: entityName.toLowerCase(), data : JSON.stringify(data)})
   });
   return fetch(request).then(response => {
-    if(!response.ok) throw new Error(`HTTP error saving exercise: ${response.status}`);
+    if(!response.ok) throw new Error(`HTTP error saving ${entityName}: ${response.status}`);
     return response.json();
   });
 };

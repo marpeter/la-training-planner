@@ -94,7 +94,7 @@ require 'db_upload.php';
           <ul>
             <li><a href="../" class="btn-small tfat"><i class="material-icons">home</i></a></li>
             <li><a href="../help.html" class="btn-small tfat"><i class="material-icons">help_center</i></a></li> 
-            <li><a href="../edit.html" id="editBtn" class="btn-small tfat"><i class="material-icons">construction</i></a></li>
+            <li><a href="../edit.html" id="menuItemEdit" class="btn-small tfat"><i class="material-icons">construction</i></a></li>
             <li class="active"><a href="./" class="btn-small tfat"><i class="material-icons">import_export</i></a></li>
           </ul>
         </div>

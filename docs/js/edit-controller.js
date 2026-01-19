@@ -1,5 +1,5 @@
 import { App, Discipline, Exercise, TrainingPlan } from "./model.js";
-import { updateLogInOutButton } from "./common.js";
+import { updateCommonUiElements } from "./common.js";
 
 document.addEventListener('DOMContentLoaded', () => {
   App.loadData().then( (result) => {
@@ -31,7 +31,6 @@ const view = {
 
   finishUi(model) {
     this.model = model;
-    this.setVersionInfo();
     this.fillDisciplineSelect();
       
     this.exerciseId = document.getElementById("exercise-id");
@@ -44,7 +43,7 @@ const view = {
     this.exerciseReps = document.getElementById("exercise-reps");
     this.exerciseDetails = document.getElementById("exercise-details");
 
-    updateLogInOutButton('loginBtn', this.model.version, '..');
+    updateCommonUiElements(this.model.version);
 
     this.fillExerciseList();
     this.updateExerciseForm();
@@ -60,11 +59,6 @@ const view = {
       disciplineSelect.appendChild(option);
     });
   },
-
-  // update the version number in the footer of the page and enable the edit button if the version supports editing
-  setVersionInfo() {
-    document.getElementById("version").innerHTML = this.model.version.number;
-  }, 
 
   // fill the exercise list with the exercises from the model
   fillExerciseList() {

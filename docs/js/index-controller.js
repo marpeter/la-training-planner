@@ -1,5 +1,5 @@
 import { App, Discipline, TrainingPlan } from "./model.js";
-import { updateLogInOutButton } from "./common.js";
+import { updateCommonUiElements } from "./common.js";
 
 document.addEventListener('DOMContentLoaded', function() {
   App.loadData().then( (result) => {
@@ -36,7 +36,6 @@ const view = {
   finishUi(model) {
     this.model = model,
     this.createDisciplineCardList();
-    this.setVersionInfo();
 
     this.generatePlanButton = document.getElementById("generate-plan");
     this.loadPlanButton = document.getElementById("load-plan");
@@ -46,7 +45,7 @@ const view = {
     this.savePlanAsButton = document.getElementById("save-plan-as");
     this.deletePlanButton = document.getElementById("delete-plan");
 
-    updateLogInOutButton('loginBtn', this.model.version, '.');
+    updateCommonUiElements(this.model.version);
   },
 
   // add the list of disciplines as clickable "chips" to the UI
@@ -65,16 +64,6 @@ const view = {
       disciplineChip.onclick = () => { controller.onDisciplineSelected(discipline.id); };
       document.getElementById("disziplinen").appendChild(disciplineChip);
    });
-  },
-
-  // update the version number in the footer of the page and enable the edit button if the version supports editing
-  setVersionInfo() {
-    document.getElementById("version").innerHTML = this.model.version.number;
-    if(this.model.version.supportsEditing) {
-      document.getElementById("editBtn").classList.remove("disabled");
-    } else {
-      document.getElementById("editBtn").classList.add("disabled");
-    }
   },
 
   // update the plan title and the cards for each phase

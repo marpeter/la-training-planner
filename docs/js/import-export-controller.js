@@ -6,7 +6,7 @@ document.addEventListener('DOMContentLoaded', () => {
       window.location = "./admin/admin.php";
     } else {
       document.getElementById("version").innerHTML = version.number;
-      document.getElementById("editBtn").classList.add("disabled");
+      document.getElementById("menuItemEdit").classList.add("disabled");
     }
   });
 });
