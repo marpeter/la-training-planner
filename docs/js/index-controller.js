@@ -1,16 +1,13 @@
 import { App, Discipline, TrainingPlan } from "./model.js";
-import { updateCommonUiElements } from "./common.js";
+import { initPage } from "./common.js";
 
-document.addEventListener('DOMContentLoaded', function() {
-  App.loadData().then( (result) => {
+initPage(continueInitPage);
 
-    if( App.version.withBackend && !App.version.withDB ) {
-      window.location = "admin/setup.php";
-    }
-
+function continueInitPage(version) {
+  App.loadData().then( () => {
     view.finishUi({
       disciplines: Discipline.getAll(),
-      version: App.version,
+      version: version,
       selectedDisciplines: [],
       duration: 70,
       plan: undefined, // the plan shown - initially undefined
@@ -20,7 +17,7 @@ document.addEventListener('DOMContentLoaded', function() {
     controller.registerEventHandlers();
     controller.onCriteriaChanged();    
   });
-});
+}
 
 const view = {
 
@@ -44,8 +41,6 @@ const view = {
     this.savePlanButton = document.getElementById("save-plan");
     this.savePlanAsButton = document.getElementById("save-plan-as");
     this.deletePlanButton = document.getElementById("delete-plan");
-
-    updateCommonUiElements(this.model.version);
   },
 
   // add the list of disciplines as clickable "chips" to the UI

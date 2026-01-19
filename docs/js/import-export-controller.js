@@ -1,12 +1,9 @@
-import { App } from "./model.js";
+import { initPage } from "./common.js";
 
-document.addEventListener('DOMContentLoaded', () => {
-  App.getVersion().then( (version) => {
-    if( version.withDB) {
-      window.location = "./admin/admin.php";
-    } else {
-      document.getElementById("version").innerHTML = version.number;
-      document.getElementById("menuItemEdit").classList.add("disabled");
-    }
-  });
-});
+initPage(continueInitPage);
+
+function continueInitPage(version) {
+  if( version.withDB) {
+    window.location = "./admin/admin.php";
+  }
+}

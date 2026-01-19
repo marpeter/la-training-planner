@@ -1,3 +1,5 @@
+import { App } from "./model.js";
+
 function updateLogInOutButton(version) {
 
     let logInOutButton = document.getElementById("loginBtn");
@@ -27,10 +29,19 @@ function updateEditMenuItem(version) {
     }
 }
 
-function updateCommonUiElements(version) {
-  updateLogInOutButton(version);
-  updateVersionNumber(version);
-  updateEditMenuItem(version);
+function initPage(continueWith) {
+  document.addEventListener('DOMContentLoaded', () => {
+  App.getVersion().then( (version) => {
+    if( version.withBackend && !version.withDB ) {
+      alert("The application is not yet set up. You will be redirected to the setup page.");
+      window.location = "./admin/setup.php";
+    } else {
+        if( continueWith ) continueWith(version);
+        updateLogInOutButton(version);
+        updateVersionNumber(version);
+        updateEditMenuItem(version);
+    }});
+  });
 }
 
-export { updateCommonUiElements }
+export { initPage }

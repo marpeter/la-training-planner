@@ -1,10 +1,12 @@
 import { App, Discipline, Exercise, TrainingPlan } from "./model.js";
-import { updateCommonUiElements } from "./common.js";
+import { initPage } from "./common.js";
 
-document.addEventListener('DOMContentLoaded', () => {
-  App.loadData().then( (result) => {
+initPage(continueInitPage);
+
+function continueInitPage(version) {
+  App.loadData().then( () => {
     view.finishUi({
-      version: App.version,
+      version: version,
       disciplines: Discipline.getAll(),
       selectedExercise: undefined,
       gotoExercise: undefined, 
@@ -12,7 +14,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
     controller.registerEventHandlers();    
   });
- });
+}
 
 const NULL_EXERCISE = new Exercise("", "", []);
 
@@ -42,8 +44,6 @@ const view = {
     this.exerciseDurationMax = document.getElementById("exercise-duration-max");
     this.exerciseReps = document.getElementById("exercise-reps");
     this.exerciseDetails = document.getElementById("exercise-details");
-
-    updateCommonUiElements(this.model.version);
 
     this.fillExerciseList();
     this.updateExerciseForm();

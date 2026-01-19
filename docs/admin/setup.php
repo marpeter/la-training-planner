@@ -120,15 +120,15 @@ require 'install.php';
       </section>
     </main>
     <div class="divider"></div>
-    <div class="center grey-text">Version <span id="version"><?php echo $version['number'] ?></span>, &copy; 2025 Markus Peter</div>
+    <div class="center grey-text">Version <span id="version"><?php echo $version['number'] ?></span>, &copy; 2026 Markus Peter</div>
     <footer>
       <nav class="tfat darken-1">
         <div class="nav-wrapper">
           <ul>
             <li><a href="../" class="btn-small tfat"><i class="material-icons">home</i></a></li>
             <li><a href="../help.html" class="btn-small tfat"><i class="material-icons">help_center</i></a></li> 
-            <li><a href="../edit.html" id="menuItemEdit" class="btn-small tfat"><i class="material-icons">construction</i></a></li>
-            <li class="active"><a href="./" class="btn-small tfat"><i class="material-icons">import_export</i></a></li>
+            <li><a href="../edit.html" id="menuItemEdit" class="btn-small tfat disabled"><i class="material-icons">construction</i></a></li>
+            <li class="active"><a href="../import-export.html" class="btn-small tfat"><i class="material-icons">import_export</i></a></li>
           </ul>
         </div>
       </nav>

@@ -1,8 +1,3 @@
-import { App } from "./model.js";
-import { updateCommonUiElements } from "./common.js";
+import { initPage } from "./common.js";
 
-document.addEventListener('DOMContentLoaded', () => {
-  App.getVersion().then( (version) => {
-    updateCommonUiElements(version);
-  });
-});
+initPage();
