@@ -9,27 +9,23 @@ const App = {
   async getVersion(pathPrefix="./") {
     if( !this.version) {
       this.version = await dbVersion(pathPrefix);
+      Discipline.loader = this.version.disciplineLoader;
+      Exercise.loader = this.version.exerciseLoader;
+      Exercise.save = this.version.exerciseSaver;
+      TrainingPlan.loader = this.version.favoritesLoader;
+      TrainingPlan.save = this.version.favoritesSaver;
       console.log("App version info: " + JSON.stringify(this.version));
     }
     return this.version;
   },
-
-  async loadData(pathPrefix="") {
-    await this.getVersion(pathPrefix);
-    // Load the Disciplines from the CSV file or the database
-    Discipline.Instances = await this.version.disciplineLoader();
-
-    Exercise.save = this.version.exerciseSaver;
-    // Load the Exercises from the CSV or the database
-    Exercise.createInstances(await this.version.exerciseLoader());
-    // Load the saved (favorite) training plans from the CSV or database
-    TrainingPlan.createFavorites(await this.version.favoritesLoader());
-    TrainingPlan.save = this.version.favoritesSaver;
-  }
 }
 
 const Discipline = {
   Instances: [],
+  async loadAll() {
+    return this.loader()
+      .then( rawData => { this.Instances = rawData;});
+  },
   getAll() {
     this.Instances.sort( (a,b) => a.name.localeCompare(b.name) );
     return this.Instances; 
@@ -37,6 +33,12 @@ const Discipline = {
 }
 
 class Exercise {
+
+  static async loadAll() {
+    return this.loader()
+      .then( rawData => this.createInstances(rawData) );
+  }
+
   constructor(id, name, disciplines, durationmin=0, durationmax=0, warmup=false, 
       runabc=false, mainex=false, ending=false, repeats='', material='', details='') {
     this.id = id;
@@ -69,10 +71,10 @@ class Exercise {
       }
       this.Instances.push(newExercise);
     });
-    this.Instances.sort( (a,b) => a.name.localeCompare(b.name) );
   }
 
   static getAll() {
+    this.Instances.sort( (a,b) => a.name.localeCompare(b.name) );
     return this.Instances;
   }
 
@@ -123,24 +125,25 @@ class Exercise {
   }
 
   save() {
-    this.details = this.details.join(':');
+    this.details = Array.isArray(this.details) ? this.details.join(':') : this.details;
     return Exercise.save(this.isNotInDb() ? "create" : "update" , this)
-      .then( result => 
-        App.loadData("../") // reload data to ensure it is up-to-date
-        .then(() => result)
-    );
+      .then( result => Exercise.loadAll() // reload data to ensure it is up-to-date
+      .then(() => result) );
   }
 
   delete() {
     return Exercise.save("delete" , this.id)
-      .then( result => 
-        App.loadData("../") // reload data to ensure it is up-to-date
-        .then(() => result)
-    );
+      .then( result => Exercise.loadAll() // reload data to ensure it is up-to-date
+      .then(() => result) );
   }
 }
 
 class TrainingPlan {
+
+  static async loadAll() {
+    return this.loader()
+      .then( rawData => this.createInstances(rawData) );
+  }
 
   static messages = [];
   static Favorites = [];
@@ -157,7 +160,7 @@ class TrainingPlan {
     this.suitable = { warmup: [], mainex: [], ending: [], runabc: [] };
   }
 
-  static createFavorites(rawData) {
+  static createInstances(rawData) {
     this.Favorites = [];
     rawData.headers.forEach( (favorite) => {
       let plan = new TrainingPlan(favorite.id, favorite.disciplines, favorite.created_by, favorite.created_at, favorite.description);
@@ -309,10 +312,8 @@ class TrainingPlan {
   
   save() {
     return TrainingPlan.save("update", this)
-    .then( result => 
-      App.loadData("../") // reload data to ensure it is up-to-date
-      .then(() => result)
-    );
+      .then( result => TrainingPlan.loadAll() // reload data to ensure it is up-to-date
+      .then(() => result) );
   }
 
   saveAs(description) {
@@ -323,10 +324,8 @@ class TrainingPlan {
     this.id = parseInt(TrainingPlan.Favorites[TrainingPlan.Favorites.length-1].id) + 1;
     this.created_by = "markus"; // TODO: get the current user
     return TrainingPlan.save("create" , this)
-    .then( result => 
-      App.loadData("../") // reload data to ensure it is up-to-date
-      .then(() => result)
-    );
+      .then( result => TrainingPlan.loadAll() // reload data to ensure it is up-to-date
+      .then(() => result) );
   }
 
   delete() {
@@ -335,12 +334,9 @@ class TrainingPlan {
       return;
     } else {
       return TrainingPlan.save("delete" , this.id)
-      .then( result => 
-        App.loadData("../") // reload data to ensure it is up-to-date
-        .then(() => result)
-    );
+      .then( result => TrainingPlan.loadAll() // reload data to ensure it is up-to-date
+      .then(() => result) );
     }
-
   }
 
 };

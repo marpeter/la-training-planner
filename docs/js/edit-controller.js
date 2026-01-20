@@ -1,19 +1,22 @@
-import { App, Discipline, Exercise, TrainingPlan } from "./model.js";
 import { initPage } from "./common.js";
+import { Discipline, Exercise, TrainingPlan } from "./model.js";
 
 initPage(continueInitPage);
 
 function continueInitPage(version) {
-  App.loadData().then( () => {
-    view.finishUi({
-      version: version,
-      disciplines: Discipline.getAll(),
-      selectedExercise: undefined,
-      gotoExercise: undefined, 
-      exerciseListFilter: "",
-    });
-    controller.registerEventHandlers();    
-  });
+  Promise.all([ Discipline.loadAll(), Exercise.loadAll(), ])
+    .then( () => TrainingPlan.loadAll() )
+    .then( () => {
+      view.finishUi({
+        version: version,
+        disciplines: Discipline.getAll(),
+        selectedExercise: undefined,
+        gotoExercise: undefined, 
+        exerciseListFilter: "",
+      });
+      controller.registerEventHandlers();    
+    }
+  );
 }
 
 const NULL_EXERCISE = new Exercise("", "", []);

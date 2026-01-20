@@ -62,7 +62,7 @@ class DatabaseWriter extends \TnFAT\Planner\AbstractDatabaseWriter {
                  self::HEADER_TABLE . ' WHERE id = :id');
             $stmt->bindParam('id', $exerciseId, \PDO::PARAM_STR);
             $stmt->execute();
-            $this->deleteDependants($exerciseId,$dbConnection);
+            $this->deleteDependants($exerciseId);
             $stmt = $this->dbConnection->prepare('DELETE FROM ' .
                 self::LINK_DISCIPLINES_TABLE . '  WHERE exercise_id=:id');
             $stmt->bindParam('id', $exerciseId, \PDO::PARAM_STR);

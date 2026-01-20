@@ -1,22 +1,25 @@
-import { App, Discipline, TrainingPlan } from "./model.js";
 import { initPage } from "./common.js";
+import { Discipline, Exercise, TrainingPlan } from "./model.js";
 
 initPage(continueInitPage);
 
 function continueInitPage(version) {
-  App.loadData().then( () => {
-    view.finishUi({
-      disciplines: Discipline.getAll(),
-      version: version,
-      selectedDisciplines: [],
-      duration: 70,
-      plan: undefined, // the plan shown - initially undefined
-      favorites: [], // the list of available favorites matching the selected disciplines and duration
-      selectedFavorite: undefined, // index of the selected favorite if the plan was loaded from favorites
-    });
-    controller.registerEventHandlers();
-    controller.onCriteriaChanged();    
-  });
+  Promise.all([ Discipline.loadAll(), Exercise.loadAll(), ])
+    .then( () => TrainingPlan.loadAll() )
+    .then( () => {
+      view.finishUi({
+        disciplines: Discipline.getAll(),
+        version: version,
+        selectedDisciplines: [],
+        duration: 70,
+        plan: undefined, // the plan shown - initially undefined
+        favorites: [], // the list of available favorites matching the selected disciplines and duration
+        selectedFavorite: undefined, // index of the selected favorite if the plan was loaded from favorites
+      });
+      controller.registerEventHandlers();
+      controller.onCriteriaChanged();    
+    }
+  );
 }
 
 const view = {

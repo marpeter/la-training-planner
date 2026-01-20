@@ -14,7 +14,6 @@ function updateLogInOutButton(version) {
       logInOutButton.href = "./login/";
       loginIcon.innerHTML = 'login';   
     }
-
 }
 
 function updateVersionNumber(version) {
