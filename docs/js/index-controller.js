@@ -3,13 +3,13 @@ import { Discipline, Exercise, TrainingPlan } from "./model.js";
 
 initPage(continueInitPage);
 
-function continueInitPage(version) {
+function continueInitPage(user) {
   Promise.all([ Discipline.loadAll(), Exercise.loadAll(), ])
     .then( () => TrainingPlan.loadAll() )
     .then( () => {
       view.finishUi({
         disciplines: Discipline.getAll(),
-        version: version,
+        user: user,
         selectedDisciplines: [],
         duration: 70,
         plan: undefined, // the plan shown - initially undefined
@@ -166,7 +166,7 @@ const controller = {
   },
 
   onCreatePlanButtonPressed() {
-    let { plan: plan, messages: messages } = TrainingPlan.generate(view.model.selectedDisciplines, view.model.duration);
+    let { plan, messages } = TrainingPlan.generate(view.model.selectedDisciplines, view.model.duration);
     view.updateMessages(messages);
     if(plan) {
       view.model.plan = plan;
@@ -239,7 +239,7 @@ const controller = {
   },
 
   resetFavoriteSaveDeleteButtons() {
-    if(!view.model.version.supportsEditing) return;
+    if(!view.model.user.canEdit) return;
 
     if(view.model.selectedFavorite===undefined) {
       view.deletePlanButton.classList.add("disabled");

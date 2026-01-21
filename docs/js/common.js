@@ -1,11 +1,28 @@
-import { App } from "./model.js";
+import { Backend } from "./backend.js";
 
-function updateLogInOutButton(version) {
+function initPage(continueWith) {
+  document.addEventListener('DOMContentLoaded', () => {
+  Backend.bind()
+    .then( () => Backend.getVersionAndUserInfo() ) 
+    .then( ({ version, user }) => {
+      if( version.withBackend && !version.withDB ) {
+        window.location = "./admin/setup.php";
+      } else {
+          if( continueWith ) continueWith(user, version);
+          updateLogInOutButton(version, user);
+          updateVersionNumber(version);
+          updateEditMenuItem(user);
+      }
+    });
+  });
+}
+
+function updateLogInOutButton(version, user) {
 
     let logInOutButton = document.getElementById("loginBtn");
     let loginIcon = logInOutButton.firstChild;
 
-    if( version.username ) {
+    if( user.name ) {
       logInOutButton.classList.remove("disabled");
       logInOutButton.href = "./login/logout.php?url=" + window.location.href;
       loginIcon.innerHTML = 'logout';
@@ -17,30 +34,15 @@ function updateLogInOutButton(version) {
 }
 
 function updateVersionNumber(version) {
-    document.getElementById("version").innerHTML = version.number;
+    document.getElementById("version").innerHTML = version.numberText;
 }
 
-function updateEditMenuItem(version) {
-    if(version.supportsEditing) {
+function updateEditMenuItem(user) {
+    if(user.canEdit) {
       document.getElementById("menuItemEdit").classList.remove("disabled");
     } else {
       document.getElementById("menuItemEdit").classList.add("disabled");
     }
-}
-
-function initPage(continueWith) {
-  document.addEventListener('DOMContentLoaded', () => {
-  App.getVersion().then( (version) => {
-    if( version.withBackend && !version.withDB ) {
-      alert("The application is not yet set up. You will be redirected to the setup page.");
-      window.location = "./admin/setup.php";
-    } else {
-        if( continueWith ) continueWith(version);
-        updateLogInOutButton(version);
-        updateVersionNumber(version);
-        updateEditMenuItem(version);
-    }});
-  });
 }
 
 export { initPage }

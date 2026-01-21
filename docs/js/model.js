@@ -1,31 +1,17 @@
-import { dbVersion } from "./db.js";
+import { Backend } from "./backend.js";
 
 const MAX_ATTEMPTS = 20;
 const TEMP_PLAN_ID = "$TMP";
 
-const App = {
-  version: undefined,
-
-  async getVersion(pathPrefix="./") {
-    if( !this.version) {
-      this.version = await dbVersion(pathPrefix);
-      Discipline.loader = this.version.disciplineLoader;
-      Exercise.loader = this.version.exerciseLoader;
-      Exercise.save = this.version.exerciseSaver;
-      TrainingPlan.loader = this.version.favoritesLoader;
-      TrainingPlan.save = this.version.favoritesSaver;
-      console.log("App version info: " + JSON.stringify(this.version));
-    }
-    return this.version;
-  },
-}
-
 const Discipline = {
   Instances: [],
+
   async loadAll() {
-    return this.loader()
+    return Backend.bind()
+      .then( () => Backend.getBinding().disciplineLoader() )
       .then( rawData => { this.Instances = rawData;});
   },
+  
   getAll() {
     this.Instances.sort( (a,b) => a.name.localeCompare(b.name) );
     return this.Instances; 
@@ -35,7 +21,12 @@ const Discipline = {
 class Exercise {
 
   static async loadAll() {
-    return this.loader()
+    return Backend.bind()
+      .then( () => {
+        let binding = Backend.getBinding();
+        Exercise.save = binding.exerciseSaver;
+        return binding.exerciseLoader();
+      } )
       .then( rawData => this.createInstances(rawData) );
   }
 
@@ -141,7 +132,12 @@ class Exercise {
 class TrainingPlan {
 
   static async loadAll() {
-    return this.loader()
+    return Backend.bind()
+      .then( () => {
+        let binding = Backend.getBinding();
+        TrainingPlan.save = binding.favoritesSaver;
+        return binding.favoritesLoader();
+      })
       .then( rawData => this.createInstances(rawData) );
   }
 
@@ -236,7 +232,7 @@ class TrainingPlan {
       messages.push("Bitte versuche es erneut. Manchmal hilft es, eine weitere Disziplin auszuwählen.");
       return { plan: undefined, messages: messages };
     }
-    return { plan: plan, messages: messages };
+    return { plan, messages };
   }
 
   setSuitableExercises(forDisciplineIds) {
@@ -346,4 +342,4 @@ const minAdder = adder.bind(null, "durationmin");
 const maxAdder = adder.bind(null, "durationmax");
 const durationAdder = adder.bind(null, "duration");
 
-export { App, Discipline, Exercise, TrainingPlan };
+export { Discipline, Exercise, TrainingPlan };

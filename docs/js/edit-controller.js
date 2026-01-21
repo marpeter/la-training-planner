@@ -3,12 +3,12 @@ import { Discipline, Exercise, TrainingPlan } from "./model.js";
 
 initPage(continueInitPage);
 
-function continueInitPage(version) {
+function continueInitPage(user) {
   Promise.all([ Discipline.loadAll(), Exercise.loadAll(), ])
     .then( () => TrainingPlan.loadAll() )
     .then( () => {
       view.finishUi({
-        version: version,
+        user: user,
         disciplines: Discipline.getAll(),
         selectedExercise: undefined,
         gotoExercise: undefined, 
@@ -94,8 +94,8 @@ const view = {
       enable = copying = false;
       exercise = NULL_EXERCISE;
     } else {
-      // enable the form only if the app version supports editing
-      enable = this.model.version.supportsEditing;
+      // enable the form only if the app version supports editing and the user is permitted to
+      enable = this.model.user.canEdit;
       copying = exercise.isNotInDb();
     }
 
