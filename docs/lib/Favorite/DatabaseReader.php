@@ -15,6 +15,7 @@ class DatabaseReader extends \TnFAT\Planner\AbstractDatabaseReader {
         }
         return json_encode(
             ['headers' => $this->data[self::HEADER_TABLE],
-            'exerciseMap' => $this->data[self::LINK_EXERCISES_TABLE]]);
+             'exerciseMap' => $this->data[self::LINK_EXERCISES_TABLE]]
+        );
     }
 }

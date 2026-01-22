@@ -28,7 +28,7 @@ abstract class AbstractDatabaseReader {
     // @getTableNames is added to each concrete class by using the appropriate trait below
     abstract protected function getTableNames(): array;    
 
-    public function echo() {
+    public function read() {
         $this->readFromDb();
         $this->setHeader();
         echo $this->deserialize();

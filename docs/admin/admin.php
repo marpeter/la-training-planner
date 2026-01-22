@@ -31,11 +31,11 @@ require 'db_upload.php';
       <h4 class="center">Download der Daten aus der Datenbank</h4> 
       <!-- <p>Download der Daten aus der Datenbank:</p> -->
       <div class="row">
-        <div class="col s6"> <a id="downloadDisciplinesBtn" href="db_download.php?entity=Disciplines" class="btn center tfat">Disziplinen</a></div>
-        <div class="col s6"> <a id="downloadExercisesBtn" href="db_download.php?entity=Exercises" class="btn center tfat">Übungen</a></div>
+        <div class="col s6"> <a id="downloadDisciplinesBtn" href="../index.php/entity/discipline/?format=csv" class="btn center tfat">Disziplinen</a></div>
+        <div class="col s6"> <a id="downloadExercisesBtn" href="../index.php/entity/exercise/?format=csv" class="btn center tfat">Übungen</a></div>
       </div>
       <div class="row">
-        <div class="col s12"> <a id="downloadFavoritesBtn" href="db_download.php?entity=Favorites" class="btn center tfat">Gespeicherte Pläne (Favoriten)</a></div> 
+        <div class="col s12"> <a id="downloadFavoritesBtn" href="../index.php/entity/favorite/?format=csv" class="btn center tfat">Gespeicherte Pläne (Favoriten)</a></div> 
       </div>
     </section>
     <div class="divider"></div>

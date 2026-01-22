@@ -29,9 +29,9 @@ class Backend {
 
         if(this.#version.withDB) {
           this.#version.numberText = version.number + " (mit Backend Datenbank)";
-          this.#binding.disciplineLoader = loadFromDbTable.bind(null,pathPrefix,"disciplines");
-          this.#binding.exerciseLoader   = loadFromDbTable.bind(null,pathPrefix,"exercises");
-          this.#binding.favoritesLoader  = loadFromDbTable.bind(null,pathPrefix,"favorites");
+          this.#binding.disciplineLoader = loadFromDbTable.bind(null,pathPrefix,"discipline");
+          this.#binding.exerciseLoader   = loadFromDbTable.bind(null,pathPrefix,"exercise");
+          this.#binding.favoritesLoader  = loadFromDbTable.bind(null,pathPrefix,"favorite");
           this.#binding.exerciseSaver = saveToDb.bind(null,pathPrefix,"exercise");
           this.#binding.favoritesSaver = saveToDb.bind(null,pathPrefix,"favorite");
         } else {
@@ -74,7 +74,7 @@ class Backend {
 
 // load (read) all instances of an entity from the database and return it as JSON
 async function loadFromDbTable(pathPrefix,entityName) {
-  return fetch(`${pathPrefix}data/db_read.php?entity=${entityName}`).then( (response) => {
+  return fetch(`${pathPrefix}index.php/entity/${entityName}`).then( (response) => {
     if(!response.ok) throw new Error(`HTTP error: ${response.status}`);
     return response.json();
   }).catch( (error) => {
@@ -86,10 +86,10 @@ async function loadFromDbTable(pathPrefix,entityName) {
 //   entityName: exercise or favorite
 //   verb: create, update, or delete
 async function saveToDb(pathPrefix,entityName,action,data) {
-  let request = new Request(pathPrefix + "edit/db_update.php", {
+  let request = new Request(`${pathPrefix}index.php/entity/${entityName}`, {
     method: "POST",
     headers: { "Content-Type": "application/x-www-form-urlencoded" },
-    body: new URLSearchParams({ verb: action.toLowerCase(),  entity: entityName.toLowerCase(), data : JSON.stringify(data)})
+    body: new URLSearchParams({ verb: action.toLowerCase(), data : JSON.stringify(data)})
   });
   return fetch(request).then(response => {
     if(!response.ok) throw new Error(`HTTP error saving ${entityName}: ${response.status}`);
