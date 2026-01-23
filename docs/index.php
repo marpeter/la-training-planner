@@ -1,6 +1,7 @@
 <?php
 namespace TnFAT\Planner;
   
+require_once __DIR__ . '/lib/autoload.php';
 require 'data/db_common.php';
 
 use \TnFAT\Planner\EntityController as EntityController;
