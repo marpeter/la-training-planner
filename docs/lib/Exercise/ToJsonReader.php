@@ -1,10 +1,10 @@
 <?php
 namespace TnFAT\Planner\Exercise;
 
-class DatabaseReader extends \TnFAT\Planner\AbstractDatabaseReader {
+class ToJsonReader extends \TnFAT\Planner\AbstractEntityReader {
     use DatabaseTable;
 
-    protected function deserialize(): string {
+    protected function format(): string {
         foreach ($this->data[self::HEADER_TABLE] as &$exercise) {
             $exercise['warmup'] = (bool)$exercise['warmup'];
             $exercise['runabc'] = (bool)$exercise['runabc'];

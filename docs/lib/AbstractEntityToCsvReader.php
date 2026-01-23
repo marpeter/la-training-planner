@@ -1,14 +1,16 @@
 <?php
 namespace TnFAT\Planner;
 
-abstract class AbstractDatabaseToCsvConverter extends AbstractDatabaseReader {
+abstract class AbstractEntityToCsvReader extends AbstractEntityReader {
     // override @fileName in each concrete class to hold the desired download file name
     protected $fileName;
+    
     protected function setHeader(): void {
         header('Content-Type: text/csv');
         header('Content-Disposition: attachment; filename="' . $this->fileName . '"');
     }
-    public function convertToCsv($data,$separator = ','): string {
+
+    protected function convertToCsv($data,$separator = ','): string {
         $handle = fopen('php://temp', 'r+');
         foreach($data as $line) {
             fputcsv($handle, $line, $separator, '"');

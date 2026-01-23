@@ -1,11 +1,11 @@
 <?php
 namespace TnFAT\Planner\Exercise;
 
-class CsvReader extends \TnFAT\Planner\AbstractDatabaseToCsvConverter {
+class ToCsvReader extends \TnFAT\Planner\AbstractEntityToCsvReader {
     use DatabaseTable;
 
     protected $fileName = 'Exercises.csv';
-    public function deserialize(): string {
+    public function format(): string {
         // Remove the "Auslaufen" exercise from the CSV to prevent it from being modified by mistake
         $this->data[self::HEADER_TABLE] = array_filter($this->data[self::HEADER_TABLE], function($exercise) {
             return $exercise['name'] !== 'Auslaufen';

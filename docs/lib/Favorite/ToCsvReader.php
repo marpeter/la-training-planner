@@ -1,11 +1,11 @@
 <?php
 namespace TnFAT\Planner\Favorite;
 
-class CsvReader extends \TnFAT\Planner\AbstractDatabaseToCsvConverter {
+class ToCsvReader extends \TnFAT\Planner\AbstractEntityToCsvReader {
     use DatabaseTable;
 
     protected $fileName = 'Favorites.csv';
-    public function deserialize(): string {
+    public function format(): string {
         foreach ($this->data[self::HEADER_TABLE] as &$favorite) {
             $favorite['Disciplines[]'] = array();
             foreach ($this->data[self::LINK_DISCIPLINES_TABLE] as $favoriteDiscipline) {

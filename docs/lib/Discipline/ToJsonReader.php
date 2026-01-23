@@ -1,10 +1,10 @@
 <?php
 namespace TnFAT\Planner\Discipline;
 
-class DatabaseReader extends \TnFAT\Planner\AbstractDatabaseReader {
+class ToJsonReader extends \TnFAT\Planner\AbstractEntityReader {
     use DatabaseTable;
 
-    protected function deserialize(): string {
+    protected function format(): string {
         return json_encode($this->data[self::HEADER_TABLE]);
     }
 }

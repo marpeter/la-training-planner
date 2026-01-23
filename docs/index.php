@@ -16,7 +16,7 @@ while ($token !== false) {
     $token = strtok('/?');
 }
 
-error_log("Request URI tokens: " . var_export($pathTokens, true));
+// error_log("Request URI tokens: " . var_export($pathTokens, true));
 
 switch ($pathTokens[0]) {
     case 'entity':

@@ -8,7 +8,7 @@ spl_autoload_register(function ($class) {
     $prefix = 'TnFAT\\Planner\\';
 
     // base directory for the namespace prefix
-    $base_dir = __DIR__ . '/';
+    $base_dir = __DIR__ . '/../docs/lib/';
 
     // does the class use the namespace prefix?
     $len = strlen($prefix);

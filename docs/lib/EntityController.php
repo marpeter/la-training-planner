@@ -4,6 +4,8 @@ namespace TnFAT\Planner;
 const ENTITIES = ['Discipline', 'Exercise', 'Favorite'];
 const POST_ACTIONS = ['create', 'update', 'delete'];
 
+use TnFAT\Planner\AbstractEntityReader as EntityReader;
+
 class EntityController {
     public static function handle(array $pathTokens): void {
 
@@ -29,9 +31,9 @@ class EntityController {
             case 'GET':
                 $format = strtolower(\LaPlanner\getQueryString('format'));
                 if( $format === '' || $format === 'json' ) {
-                    $readerClass = "\\TnFAT\\Planner\\$entity\\DatabaseReader";
+                    $readerClass = "\\TnFAT\\Planner\\$entity\\ToJsonReader";
                 } else if( $format === 'csv' ) {
-                    $readerClass = "\\TnFAT\\Planner\\$entity\\CsvReader";
+                    $readerClass = "\\TnFAT\\Planner\\$entity\\ToCsvReader";
                 } else {
                     echo json_encode([
                         'success' => false,
@@ -39,8 +41,8 @@ class EntityController {
                     ]);
                     exit;
                 }
-                $reader = new $readerClass();
-                $reader->read();
+                $reader = EntityReader::getReader($entity, $format); // new $readerClass();
+                echo $reader->read();
                 break;
 
             case 'POST':

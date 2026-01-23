@@ -1,11 +1,11 @@
 <?php
 namespace TnFAT\Planner\Discipline;
 
-class CsvReader extends \TnFAT\Planner\AbstractDatabaseToCsvConverter {
+class ToCsvReader extends \TnFAT\Planner\AbstractEntityToCsvReader {
     use DatabaseTable;
 
     protected $fileName = 'Disciplines.csv';
-    public function deserialize(): string {
+    public function format(): string {
         foreach($this->data[self::HEADER_TABLE] as &$discipline) {
             unset($discipline['created_at']);
         }

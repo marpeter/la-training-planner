@@ -1,10 +1,10 @@
 <?php
 namespace TnFAT\Planner\Favorite;
 
-class DatabaseReader extends \TnFAT\Planner\AbstractDatabaseReader {
+class ToJsonReader extends \TnFAT\Planner\AbstractEntityReader {
     use DatabaseTable;
 
-    protected function deserialize(): string {
+    protected function format(): string {
         foreach ($this->data[self::HEADER_TABLE] as &$favorite) {
             $favorite['disciplines'] = [];
             foreach ($this->data[self::LINK_DISCIPLINES_TABLE] as $favoriteDiscipline) {
