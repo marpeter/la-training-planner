@@ -12,7 +12,7 @@ abstract class AbstractDatabaseTable {
      * @return array of associative arrays representing the entries read
      * @throws \PDOException on error
      */
-    public function read(?string $id): array {
+    public function read(?string $id=null): array {
         $data = [];
         $dbConnection = \LaPlanner\connectDB();
         if( $id === null ) { // read all entries
@@ -32,7 +32,7 @@ abstract class AbstractDatabaseTable {
             $stmt = $dbConnection->prepare("SELECT * FROM $tableName WHERE id = :id");
             $stmt->bindParam(':id', $id, \PDO::PARAM_STR);
             if($stmt->execute()) {
-                $this->data[$tableName] = $stmt->fetchAll();
+                $data[$tableName] = $stmt->fetchAll();
                 foreach ($tableNames as $tableName) {
                     $stmt = $dbConnection->prepare("SELECT * FROM $tableName WHERE {$this->entity}_id = :id");
                     $stmt->bindParam(':id', $id, \PDO::PARAM_STR);

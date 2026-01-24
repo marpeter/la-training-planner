@@ -26,16 +26,21 @@ if( $loggedIn ) {
         $role = getPostedString('role');
 
         $user = new UserRecord(strtolower($username), $password);
-        $user->setRole($role);
         switch($action) {
             case 'create':
+                $user->setRole($role);
                 $user->create();
                 break;
             case 'update':
+                $user->readFromDb(); // to fill the id
+                $user->setPassword($password); // TOOD: allow omitting password change
+                $user->setRole($role);
                 $user->update();
                 break;
             case 'delete':
+                $user->readFromDb(); // to fill the id
                 $user->delete();
+                $selectedUser = '';
                 break;
         }
         $messages = $user->getMessages();
