@@ -8,8 +8,7 @@ use \TnFAT\Planner\EntityController as EntityController;
 
 $pathTokens = [];
 $token = strtok(
-    substr(
-        strtolower($_SERVER['REQUEST_URI']), strlen('/la-planer/index.php/')),
+    substr($_SERVER['REQUEST_URI'], strlen('/la-planer/index.php/')),
     '/?');
 while ($token !== false) {
     $pathTokens[] = $token;
@@ -18,9 +17,8 @@ while ($token !== false) {
 
 // error_log("Request URI tokens: " . var_export($pathTokens, true));
 
-switch ($pathTokens[0]) {
+switch ( strtolower(array_shift($pathTokens)) ) {
     case 'entity':
-        array_shift($pathTokens);
         EntityController::handle($pathTokens);
         break;
 

@@ -26,23 +26,17 @@ class EntityController {
             exit;
         }
 
+        $entityId = null;
+        if(count($pathTokens) > 1 && !str_starts_with($pathTokens[1], 'format')) {
+            $entityId = filter_var($pathTokens[1], FILTER_SANITIZE_STRING, FILTER_NULL_ON_FAILURE);
+        }
+
         switch ($_SERVER['REQUEST_METHOD']) {
 
             case 'GET':
                 $format = strtolower(\LaPlanner\getQueryString('format'));
-                if( $format === '' || $format === 'json' ) {
-                    $readerClass = "\\TnFAT\\Planner\\$entity\\ToJsonReader";
-                } else if( $format === 'csv' ) {
-                    $readerClass = "\\TnFAT\\Planner\\$entity\\ToCsvReader";
-                } else {
-                    echo json_encode([
-                        'success' => false,
-                        'message' => 'You must specify a valid format instead of: ' . htmlspecialchars($format),
-                    ]);
-                    exit;
-                }
-                $reader = EntityReader::getReader($entity, $format); // new $readerClass();
-                echo $reader->read();
+                $reader = EntityReader::getReader($entity, $format);
+                echo $reader->read($entityId);
                 break;
 
             case 'POST':
