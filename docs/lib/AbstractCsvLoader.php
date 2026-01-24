@@ -9,7 +9,7 @@ abstract class AbstractCsvLoader {
     protected $entityNames = [];
     // initialize these properties in the __construct method of each concrete class:
     protected ?CsvParser $csvParser = null;
-    protected ?AbstractDatabaseWriter $saver = null;
+    protected ?AbstractDatabaseTable $saver = null;
 
     public function load($data, &$messages): int {
         $this->messages = &$messages;

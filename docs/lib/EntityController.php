@@ -4,7 +4,7 @@ namespace TnFAT\Planner;
 const ENTITIES = ['Discipline', 'Exercise', 'Favorite'];
 const POST_ACTIONS = ['create', 'update', 'delete'];
 
-use TnFAT\Planner\AbstractEntityReader as EntityReader;
+use TnFAT\Planner\EntityFormatterFactory;
 
 class EntityController {
     public static function handle(array $pathTokens): void {
@@ -26,6 +26,7 @@ class EntityController {
             exit;
         }
 
+        // if the URL has the form /entity/{id}[?format=], then extract the id
         $entityId = null;
         if(count($pathTokens) > 1 && !str_starts_with($pathTokens[1], 'format')) {
             $entityId = filter_var($pathTokens[1], FILTER_SANITIZE_STRING, FILTER_NULL_ON_FAILURE);
@@ -35,8 +36,8 @@ class EntityController {
 
             case 'GET':
                 $format = strtolower(\LaPlanner\getQueryString('format'));
-                $reader = EntityReader::getReader($entity, $format);
-                echo $reader->read($entityId);
+                $reader = EntityFormatterFactory::getReader($entity, $format);
+                echo $reader->read($entityId);;
                 break;
 
             case 'POST':
@@ -55,7 +56,7 @@ class EntityController {
                     ]);
                     exit;
                 }
-                $saverClass = "\\TnFAT\\Planner\\$entity\\DatabaseWriter";
+                $saverClass = "\\TnFAT\\Planner\\$entity\\DatabaseTable";
                 $saver = new $saverClass();
                 echo json_encode(
                     $saver->$action(json_decode($_POST['data'],true))

@@ -8,7 +8,7 @@ class CsvLoader extends \TnFAT\Planner\AbstractCsvLoader {
 
     public function __construct() {
         $this->csvParser = new \TnFAT\Planner\CsvParser(';');
-        $this->saver = new DatabaseWriter();
+        $this->saver = new DatabaseTable();
     }
 
     // override to exclude "Auslaufen" exercises

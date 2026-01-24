@@ -1,11 +1,11 @@
 <?php
 namespace TnFAT\Planner;
 
-abstract class AbstractEntityToCsvReader extends AbstractEntityReader {
+abstract class AbstractEntityToCsvFormatter extends AbstractEntityToJsonFormatter {
     // override @fileName in each concrete class to hold the desired download file name
     protected $fileName;
     
-    protected function setHeader(): void {
+    public function setHeader(): void {
         header('Content-Type: text/csv');
         header('Content-Disposition: attachment; filename="' . $this->fileName . '"');
     }

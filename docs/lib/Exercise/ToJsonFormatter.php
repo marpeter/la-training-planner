@@ -1,11 +1,14 @@
 <?php
 namespace TnFAT\Planner\Exercise;
 
-class ToJsonReader extends \TnFAT\Planner\AbstractEntityReader {
-    use DatabaseTable;
+class ToJsonFormatter extends \TnFAT\Planner\AbstractEntityToJsonFormatter {
 
-    protected function format(): string {
-        foreach ($this->data[self::HEADER_TABLE] as &$exercise) {
+    public function __construct() {
+        $this->reader = new DatabaseTable();
+    }
+
+    public function format(): string {
+        foreach ($this->data[DatabaseTable::HEADER_TABLE] as &$exercise) {
             $exercise['warmup'] = (bool)$exercise['warmup'];
             $exercise['runabc'] = (bool)$exercise['runabc'];
             $exercise['mainex'] = (bool)$exercise['mainex'];
@@ -14,12 +17,12 @@ class ToJsonReader extends \TnFAT\Planner\AbstractEntityReader {
             $exercise['durationmax'] = (int)$exercise['durationmax'];
             $exercise['details'] = explode(":",$exercise['details']);
             $exercise['disciplines'] = [];
-            foreach ($this->data[self::LINK_DISCIPLINES_TABLE] as $exerciseDiscipline) {
+            foreach ($this->data[DatabaseTable::LINK_DISCIPLINES_TABLE] as $exerciseDiscipline) {
                if ($exercise['id'] == $exerciseDiscipline['exercise_id']) {
                    $exercise['disciplines'][] = $exerciseDiscipline['discipline_id'];
                }
             }
         }        
-        return json_encode($this->data[self::HEADER_TABLE]);
+        return json_encode($this->data[DatabaseTable::HEADER_TABLE]);
     }
 }
