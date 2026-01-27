@@ -33,7 +33,7 @@ if( $loggedIn ) {
                 break;
             case 'update':
                 $user->readFromDb(); // to fill the id
-                $user->setPassword($password); // TOOD: allow omitting password change
+                if( $password !== '') $user->setPassword($password);
                 $user->setRole($role);
                 $user->update();
                 break;

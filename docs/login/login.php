@@ -23,7 +23,10 @@ if( isset($_POST['action']) && is_string($_POST['action']) ) {
             break;
         case 'changePassword':
             $user = new UserRecord($version['username'], $password);
-            if( $user->login() && $user->setPassword($password) ) {
+            $newPassword = getPostedString('new_password');
+            $newPasswordRepeat = getPostedString('new_password_repeat');
+            if( $user->logIn() && $newPassword == $newPasswordRepeat &&
+                $user->setPassword($newPassword) ) {
                 $user->update();
             }
             $messages = $user->getMessages();

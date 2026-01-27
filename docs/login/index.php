@@ -68,6 +68,12 @@ require 'login.php';
                 <label for="newpassword">Neues Passwort</label>
               </div>
             </div>
+            <div class="row">
+              <div class="input-field col s12 l6 offset-l3">
+                <input type="password" id="newpasswordrepeat" name="new_password_repeat">
+                <label for="newpasswordrepeat">Neues Passwort wiederholt</label>
+              </div>
+            </div>
           <?php } ?>
           <div class="row">            
               <div class="col s12 l6 offset-l3">

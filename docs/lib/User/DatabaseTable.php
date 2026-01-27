@@ -23,7 +23,6 @@ class DatabaseTable extends \TnFAT\Planner\AbstractDatabaseTable {
         }
     }
 
-
     public function getTableNames(): array {
         return [self::HEADER_TABLE];
     }
@@ -51,7 +50,6 @@ class DatabaseTable extends \TnFAT\Planner\AbstractDatabaseTable {
 
     protected function updateEntity(array $user): void {
         try {
-            error_log("User update: " . var_export($user,true));
             $stmt = $this->dbConnection->prepare(
                 'UPDATE ' . self::HEADER_TABLE 
                 . ' SET password=:password, role=:role ' // TODO: allow changing the name?
@@ -79,9 +77,17 @@ class DatabaseTable extends \TnFAT\Planner\AbstractDatabaseTable {
     }
 
     protected function sanitizeAndValidateEntity(array &$user): void {
-        // if(!is_string($user['password']) || $user['password']=='') {
-
-        // }
+        if( !is_string($user['password']) || $user['password']=='' ) {
+            throw new \PDOException('Das Passwort muss ein nicht-leerer String sein.');
+        }
+        if( !(is_string($user['role']) && in_array($user['role'], ['user', 'admin', 'superuser'])) ) {
+            throw new \PDOException('Es muss eine gültige Rolle angegeben werden.');
+        }
+        // Check that the username only contains reasonable characters
+        if( !(is_string($user['username']) && preg_match('/^[a-zäöüßA-ZÄÖÜ0-9\.\-_@]{4,100}$/', $user['username'])) ) {
+            throw new \PDOException('Der angegebene Benutzername enhält ungültige Zeichen, ist zu kurz oder zu lang.' 
+                . 'Er muss aus 4-100 Buchstaben, Ziffern, ., _, @ und - bestehen.');
+        }
     }
 
 }

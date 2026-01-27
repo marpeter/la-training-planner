@@ -125,7 +125,7 @@ abstract class AbstractDatabaseTable {
                 'message' => $data,
             ];
         } catch (\PDOException $ex) {
-            $this->dbConnection->rollBack();
+            if($this->dbConnection != null) $this->dbConnection->rollBack();
             return [
                 'success' => false,
                 'message' => "Fehler beim {$actionName} der {$this->ENTITY_LOCALIZED}: " . $ex->getMessage(),

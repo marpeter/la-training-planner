@@ -2,9 +2,9 @@
 namespace TnFAT\Planner\User;
 
 // Note that instances of the following class represent a single user
-// record in the DB, not the whole table like the DatabaseTable instances.
+// record, not the whole table like the DatabaseTable instances.
 class UserRecord {
-    private int $id;
+    private ?int $id;
     private string $name;
     private string $password;
     private string $passwordHash = '';
@@ -17,8 +17,9 @@ class UserRecord {
         $userRecords = [];
         $users = $dbTable->read()[DatabaseTable::HEADER_TABLE];
         foreach($users as $user) {
-            $userRecord = new static($user['username'],$user['password']);
+            $userRecord = new static($user['username'], '');
             $userRecord->id = $user['id'];
+            $userRecord->passwordHash = $user['password'];
             $userRecord->role = $user['role'];
             $userRecords[] = $userRecord;
         }
@@ -91,18 +92,23 @@ class UserRecord {
     }
 
     public function create(): bool {
-        if( $this->canBeCreated() ) {
+        if( $this->hasAllowedPassword() ) {
             try {
                 $password = password_hash($this->password, PASSWORD_DEFAULT);
-                $this->dbTable->create([
+                $result = $this->dbTable->create([
                     'username' => $this->name,
                     'password' => $password,
                     'role' => $this->role,
                     ]);
-                $this->readFromDB(); // to get the id
-                $this->messages[] = "Benutzer $this->name wurde mit Rolle "
-                    . "$this->role angelegt.";
-                return true;
+                if( $result['success'] ) {
+                    $this->readFromDB(); // to get the id
+                    $this->messages[] = "Benutzer $this->name wurde mit Rolle "
+                        . "$this->role angelegt.";
+                    return true;
+                } else {
+                    $this->messages[] = $result['message'];
+                    return false;
+                };
             } catch(\PDOException $ex) {
                 $this->messages[] = $ex->getMessage();
                 return false;
@@ -113,18 +119,26 @@ class UserRecord {
     }
 
     public function update(): bool {
-        if( $this->canBeCreated() ) {
+        if( $this->password !== '') {
+            $this->passwordHash = password_hash($this->password, PASSWORD_DEFAULT);
+        }
+        if( ( $this->password === '' && $this->passwordHash !== '' ) // assume password left unchanged 
+            || $this->hasAllowedPassword() ) {
             try {
-                $this->passwordHash = password_hash($this->password, PASSWORD_DEFAULT);
-                $this->dbTable->update([
+                $result = $this->dbTable->update([
                     'id' => $this->id,
                     'username' => $this->name,
                     'password' => $this->passwordHash,
                     'role' => $this->role,
                     ]);
-                $this->messages[] = "Benutzer $this->name wurde mit Rolle "
-                    . "$this->role aktualisiert.";
-                return true;                
+                if( $result['success'] ) {
+                    $this->messages[] = "Benutzer $this->name wurde mit Rolle "
+                        . "$this->role aktualisiert.";
+                    return true;
+                } else {
+                    $this->messages[] = $result['message'];
+                    return false;
+                };                
             } catch(\PDOException $ex) {
                 $this->messages[] = $ex->getMessage();
                 return false;
@@ -145,23 +159,6 @@ class UserRecord {
         }
     }
 
-    public function canBeCreated(): bool {
-        return $this->hasAllowedUsername()
-            && $this->hasAllowedPassword()
-            && $this->hasValidRole();
-    }
-
-    // Check that the username only contains reasonable characters
-    protected function hasAllowedUsername(): bool {
-        if( preg_match('/^[a-zäöüßA-ZÄÖÜ0-9\.\-_@]{4,100}$/', $this->name) ) {
-            return true;
-        } else {
-            $this->messages[] = "Benutzername $this->name enhält ungültige Zeichen, ist zu kurz oder zu lang.";
-            $this->messages[] = 'Er muss aus 4-100 Buchstaben, Ziffern, ., _, @ und - bestehen.';
-            return false;
-        }
-    }  
-
     // Check that the password has a minimum length
     // TODO: also check for minimum complexity?
     protected function hasAllowedPassword(): bool {
@@ -173,14 +170,5 @@ class UserRecord {
             $this->messages[] = 'und darf nicht mit Leerzeichen beginnen oder enden.';
             return false;
         }
-    }
-
-    protected function hasValidRole(): bool {
-        if( in_array($this->role, ['user', 'admin', 'superuser']) ) {
-            return true;
-        } else {
-            $this->messages[] = 'Es gibt keine Rolle ' . $this->role;
-            return false;
-        }        
     }
 }
