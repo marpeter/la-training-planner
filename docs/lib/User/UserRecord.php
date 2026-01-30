@@ -33,6 +33,9 @@ class UserRecord {
         $this->dbTable = new DatabaseTable();
     }
 
+    public function getId(): string {
+        return $this->id;
+    }
     public function getRole(): string {
         return $this->role;
     }

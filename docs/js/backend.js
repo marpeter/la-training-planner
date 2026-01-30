@@ -32,8 +32,10 @@ class Backend {
           this.#binding.disciplineLoader = loadFromDbTable.bind(null,pathPrefix,"discipline");
           this.#binding.exerciseLoader   = loadFromDbTable.bind(null,pathPrefix,"exercise");
           this.#binding.favoritesLoader  = loadFromDbTable.bind(null,pathPrefix,"favorite");
+          this.#binding.usersLoader = loadUsersFromDbTable;
           this.#binding.exerciseSaver = saveToDb.bind(null,pathPrefix,"exercise");
           this.#binding.favoritesSaver = saveToDb.bind(null,pathPrefix,"favorite");
+          this.#binding.usersSaver = saveUserToDb;
         } else {
           this.#version.numberText = version.number + " (mit PHP Backend, aber noch ohne Datenbank)";
           this.#binding.disciplineLoader = loadDisciplinesFromCSV.bind(null,pathPrefix);
@@ -72,13 +74,23 @@ class Backend {
 
 };
 
-// load (read) all instances of an entity from the database and return it as JSON
+// load (read) all instances of an entity from the database and return them as JSON
 async function loadFromDbTable(pathPrefix,entityName) {
   return fetch(`${pathPrefix}index.php/entity/${entityName}`).then( (response) => {
     if(!response.ok) throw new Error(`HTTP error: ${response.status}`);
     return response.json();
   }).catch( (error) => {
     console.error(`Error loading table ${entityName}: ` + error);
+  });
+}
+
+// load (read) all user instances from the database and return them as JSON
+async function loadUsersFromDbTable() {
+  return fetch(`index.php/user/list`).then( (response) => {
+    if(!response.ok) throw new Error(`HTTP error: ${response.status}`);
+    return response.json();
+  }).catch( (error) => {
+    console.error(`Error loading users: ` + error);
   });
 }
 
@@ -96,6 +108,21 @@ async function saveToDb(pathPrefix,entityName,action,data) {
     return response.json();
   });
 };
+
+// save a user to the database:
+//   entityName: exercise or favorite
+//   verb: create, update, or delete
+async function saveUserToDb(action, user) {
+  let request = new Request(`index.php/user/${user.id}`, {
+    method: "POST",
+    headers: { "Content-Type": "application/x-www-form-urlencoded" },
+    body: new URLSearchParams({ verb: action.toLowerCase(), data : JSON.stringify(user)})
+  });
+  return fetch(request).then(response => {
+    if(!response.ok) throw new Error(`HTTP error saving user ${user.id}: ${response.status}`);
+    return response.json();
+  });  
+}
 
 function convertCsv(csv, fieldSeparator=/,/) {
   const newLine = /\r?\n/;

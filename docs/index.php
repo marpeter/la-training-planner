@@ -2,9 +2,7 @@
 namespace TnFAT\Planner;
   
 require_once __DIR__ . '/lib/autoload.php';
-require 'data/db_common.php';
-
-use \TnFAT\Planner\EntityController as EntityController;
+require_once 'data/db_common.php';
 
 $pathTokens = [];
 $token = strtok(
@@ -20,6 +18,11 @@ while ($token !== false) {
 switch ( strtolower(array_shift($pathTokens)) ) {
     case 'entity':
         EntityController::handle($pathTokens);
+        break;
+
+    case 'user': // not treated like a regular entity because access needs
+                 // protection and passwords special treatment
+        UserController::handle($pathTokens); 
         break;
 
     default:

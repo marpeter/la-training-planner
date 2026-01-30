@@ -48,7 +48,7 @@ require 'login.php';
                Willkommen <?= $version['username'] ?>. Du bist angemeldet mit Rolle <?= $version['userrole'] ?>.
                <a href="<?= $loginButtonHref ?>" class="btn tfat"><i class="material-icons right">logout</i>Abmelden</a>
                <?php if( $canManageUsers ) { ?>
-                <a href="users.php" class="btn center tfat">Benutzer verwalten
+                <a href="../users.html" class="btn center tfat">Benutzer verwalten
                    <i class="material-icons right">manage_accounts</i>
                 </a>
               <?php } ?>
