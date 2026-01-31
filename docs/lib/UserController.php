@@ -8,7 +8,6 @@ use \TnFAT\Planner\User\UserRecord;
 class UserController {
 
     public static function handle(array $pathTokens): void {
-
         if (count($pathTokens) < 1) {
             echo json_encode([
                 'success' => false,
@@ -23,12 +22,20 @@ class UserController {
             case 'GET':
                 if( is_numeric($action) ) {
                     echo json_encode(self::getSingleUser((int)$action));
-                } else if ($action == 'list' ) {
-                    $users = self::getUserList($pathTokens);
-                    echo json_encode($users);
                 } else {
-                    http_response_code(405);
-                    echo "Unsupported action: " . htmlspecialchars($action);
+                    switch($action) {
+                        case 'list':
+                            $users = self::getUserList($pathTokens);
+                            echo json_encode($users);
+                            break;
+                        case 'logout':
+                            // echo json_encode(self::logout());
+                            self::logout();
+                            break;
+                        default:
+                            http_response_code(405);
+                            echo "Unsupported action: " . htmlspecialchars($action);
+                    }
                 }
                 break;
 
@@ -40,9 +47,7 @@ class UserController {
                         case 'login':
                             echo json_encode(self::login());
                             break;
-                        case 'logout':
-                            echo json_encode(self::logout());
-                            break;
+
                         default:
                             http_response_code(405);
                             echo "Unsupported action: " . htmlspecialchars($action);
@@ -166,7 +171,18 @@ class UserController {
     }
 
     private static function logout(): array {
-       return [
+        $url = nl2br(\LaPlanner\getQueryString('url'));
+        if($url==='') $url = './index.html';
+
+        error_log("Url: " . $url);
+        
+        $version = \LaPlanner\getDbVersion();
+        header("Location: $url");
+
+        session_unset();
+        session_destroy();
+        setcookie(session_name(), '', 0, '/');
+        return [
             'success' => false,
             'message' => "Cannot logout yet"
         ];

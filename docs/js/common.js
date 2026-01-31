@@ -24,7 +24,7 @@ function updateLogInOutButton(version, user) {
 
     if( user.name ) {
       logInOutButton.classList.remove("disabled");
-      logInOutButton.href = "./login/logout.php?url=" + window.location.href;
+      logInOutButton.href = "./index.php/user/logout?url=" + window.location.href;
       loginIcon.innerHTML = 'logout';
     } else {
       if( !version.withDB ) logInOutButton.classList.add("disabled");
