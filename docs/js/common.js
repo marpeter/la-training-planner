@@ -28,7 +28,7 @@ function updateLogInOutButton(version, user) {
       loginIcon.innerHTML = 'logout';
     } else {
       if( !version.withDB ) logInOutButton.classList.add("disabled");
-      logInOutButton.href = "./login/";
+      logInOutButton.href = "./login.html";
       loginIcon.innerHTML = 'login';   
     }
 }

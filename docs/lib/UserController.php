@@ -29,7 +29,6 @@ class UserController {
                             echo json_encode($users);
                             break;
                         case 'logout':
-                            // echo json_encode(self::logout());
                             self::logout();
                             break;
                         default:
@@ -46,6 +45,10 @@ class UserController {
                     switch($action) {
                         case 'login':
                             echo json_encode(self::login());
+                            break;
+
+                        case 'changePassword':
+                            echo json_encode(self::changePassword());
                             break;
 
                         default:
@@ -164,17 +167,52 @@ class UserController {
     }
 
     private static function login(): array {
+        $username = \LaPlanner\getPostedString('username');
+        $password = \LaPlanner\getPostedString('password');
+        $user = new UserRecord($username, $password);
+        if( $user->logIn() ) {
+            session_start();
+            $version['username'] = $user->getName();
+            $version['userrole'] = $user->getRole();
+            $_SESSION['username'] = $user->getName();
+            return [
+                'success' => true,
+                'message' => "Logged in"
+            ];
+        }
+        $messages = $user->getMessages();
         return [
             'success' => false,
-            'message' => "Cannot login yet"
+            'message' => array_pop($messages)
         ];
     }
 
-    private static function logout(): array {
+    private static function changePassword(): array {
+        $version = \LaPlanner\getDbVersion();
+        $username = $version['username'] ?? '';
+        $password = \LaPlanner\getPostedString('password');
+        $newPassword = \LaPlanner\getPostedString('newpassword');
+        $newPasswordRepeat = \LaPlanner\getPostedString('newpasswordrepeat');
+        if( $newPassword !== $newPasswordRepeat ) {
+            return [
+                'success' => false,
+                'message' => "Das wiederholte neue Passwort weicht vom neuen Passwort ab"
+             ];
+        }
+        $user = new UserRecord($username, $password);
+        $success = ( $user->logIn()
+            && $user->setPassword($newPassword)
+            && $user->update());
+        $messages = $user->getMessages();
+        return [
+            'success' => $success,
+            'message' => implode('<br>',$messages)
+        ];
+    }
+
+    private static function logout(): void {
         $url = nl2br(\LaPlanner\getQueryString('url'));
         if($url==='') $url = './index.html';
-
-        error_log("Url: " . $url);
         
         $version = \LaPlanner\getDbVersion();
         header("Location: $url");
@@ -182,15 +220,12 @@ class UserController {
         session_unset();
         session_destroy();
         setcookie(session_name(), '', 0, '/');
-        return [
-            'success' => false,
-            'message' => "Cannot logout yet"
-        ];
     }
 
     private static function currentUserCanManageUsers(): bool {
         $version = \LaPlanner\getDbVersion();
-        return ( $version['userrole'] ==='superuser' ||  $version['userrole']==='admin' );
+        return ( isset($version['userrole']) &&
+            ($version['userrole'] ==='superuser' ||  $version['userrole']==='admin') );
     }
 
     private static function userToArray(UserRecord $user): array {

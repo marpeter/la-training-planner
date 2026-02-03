@@ -4,64 +4,61 @@ class Backend {
   static #binding = {};
 
   static async bind(pathPrefix="./") {
-    if( !this.#version) {
-      try {
-        let version = await fetch(pathPrefix + "data/db_version.php")
-          .then( (response) => {
-            if(!response.ok) {
-              throw new Error(`HTTP error accessing db_version.php: ${response.status}`);
-            }
-            return response.json();
-        });
-
-        this.#version = {
-          date: version.date,
-          number: version.number,
-          withBackend: true,
-          withDB: convertIfBoolean(version.withDB),
-        };
-
-        this.#user = {
-          name: version.username,
-          role: version.userrole,
-          canEdit: convertIfBoolean(version.supportsEditing),
-        };
-
-        if(this.#version.withDB) {
-          this.#version.numberText = version.number + " (mit Backend Datenbank)";
-          this.#binding.disciplineLoader = loadFromDbTable.bind(null,pathPrefix,"discipline");
-          this.#binding.exerciseLoader   = loadFromDbTable.bind(null,pathPrefix,"exercise");
-          this.#binding.favoritesLoader  = loadFromDbTable.bind(null,pathPrefix,"favorite");
-          this.#binding.usersLoader = loadUsersFromDbTable;
-          this.#binding.exerciseSaver = saveToDb.bind(null,pathPrefix,"exercise");
-          this.#binding.favoritesSaver = saveToDb.bind(null,pathPrefix,"favorite");
-          this.#binding.usersSaver = saveUserToDb;
-        } else {
-          this.#version.numberText = version.number + " (mit PHP Backend, aber noch ohne Datenbank)";
-          this.#binding.disciplineLoader = loadDisciplinesFromCSV.bind(null,pathPrefix);
-          this.#binding.exerciseLoader = loadExercisesFromCsv.bind(null,pathPrefix);
-          this.#binding.favoritesLoader = loadFavoritesFromCsv.bind(null,pathPrefix);
-        }
-      } catch (error) {
-        console.error("Error loading version from DB: " + error + " --> assuming there is no PHP/DB backend.");
-        this.#version = {
-          number: "0.13.6",
-          numberText: "0.13.6 (ohne Backend Datenbank)",
-          withBackend: false,
-        };
-        this.#user = {
-          name: "guest",
-          role: "guest",
-          canEdit: false,
-        };
-        this.#binding = {
-          disciplineLoader: loadDisciplinesFromCSV.bind(null,pathPrefix),
-          exerciseLoader:   loadExercisesFromCsv.bind(null,pathPrefix),
-          favoritesLoader:  loadFavoritesFromCsv.bind(null,pathPrefix),
-        };
+    try {
+      let version = await fetch(pathPrefix + "data/db_version.php")
+        .then( (response) => {
+          if(!response.ok) {
+            throw new Error(`HTTP error accessing db_version.php: ${response.status}`);
+          }
+          return response.json();
+      });
+      this.#version = {
+        date: version.date,
+        number: version.number,
+        withBackend: true,
+        withDB: convertIfBoolean(version.withDB),
+      };
+      this.#user = {
+        name: version.username,
+        role: version.userrole,
+        loggedIn: (version.username != undefined),
+        canEdit: convertIfBoolean(version.supportsEditing),
+      };
+      if(this.#version.withDB) {
+        this.#version.numberText = version.number + " (mit Backend Datenbank)";
+        this.#binding.disciplineLoader = loadFromDbTable.bind(null,pathPrefix,"discipline");
+        this.#binding.exerciseLoader   = loadFromDbTable.bind(null,pathPrefix,"exercise");
+        this.#binding.favoritesLoader  = loadFromDbTable.bind(null,pathPrefix,"favorite");
+        this.#binding.usersLoader = loadUsersFromDbTable;
+        this.#binding.exerciseSaver = saveToDb.bind(null,pathPrefix,"exercise");
+        this.#binding.favoritesSaver = saveToDb.bind(null,pathPrefix,"favorite");
+        this.#binding.usersSaver = saveUserToDb;
+      } else {
+        this.#version.numberText = version.number + " (mit PHP Backend, aber noch ohne Datenbank)";
+        this.#binding.disciplineLoader = loadDisciplinesFromCSV.bind(null,pathPrefix);
+        this.#binding.exerciseLoader = loadExercisesFromCsv.bind(null,pathPrefix);
+        this.#binding.favoritesLoader = loadFavoritesFromCsv.bind(null,pathPrefix);
       }
-      console.log("App version info: " + JSON.stringify(this.#version));
+    } catch (error) {
+      console.error("Error loading version from DB: " + error + " --> assuming there is no PHP/DB backend.");
+      this.#version = {
+        number: "0.13.6",
+        numberText: "0.13.6 (ohne Backend Datenbank)",
+        withBackend: false,
+      };
+      this.#user = {
+        name: "guest",
+        role: "guest",
+        loggedIn: false,
+        canEdit: false,
+      };
+      this.#binding = {
+        disciplineLoader: loadDisciplinesFromCSV.bind(null,pathPrefix),
+        exerciseLoader:   loadExercisesFromCsv.bind(null,pathPrefix),
+        favoritesLoader:  loadFavoritesFromCsv.bind(null,pathPrefix),
+      };
     }
+    console.log("App version info: " + JSON.stringify(this.#version));
   }
 
   static getVersionAndUserInfo() {

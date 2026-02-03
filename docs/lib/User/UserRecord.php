@@ -64,8 +64,8 @@ class UserRecord {
     }
     public function logIn(): bool {
         try {
-            $this->readFromDB();
-            if( password_verify($this->password, $this->passwordHash) ) {
+            if( $this->readFromDB() && 
+                password_verify($this->password, $this->passwordHash) ) {
                 if( password_needs_rehash($this->passwordHash, PASSWORD_DEFAULT) ) {
                     return $this->update();
                 }
@@ -82,7 +82,7 @@ class UserRecord {
 
     public function readFromDB(): bool {
         $user = $this->dbTable->read($this->name);
-        if( is_array($user) && count($user)==1) {
+        if( is_array($user) && count($user)==1 && $user[0]['id']!=null) {
             $this->id = $user[0]['id'];
             $this->name = $user[0]['username'];
             $this->role = $user[0]['role'];
