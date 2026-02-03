@@ -5,6 +5,7 @@ const ENTITIES = ['Discipline', 'Exercise', 'Favorite'];
 const POST_ACTIONS = ['create', 'update', 'delete'];
 
 use TnFAT\Planner\EntityFormatterFactory;
+use TnFAT\Planner\Utils;
 
 class EntityController {
     public static function handle(array $pathTokens): void {
@@ -35,7 +36,7 @@ class EntityController {
         switch ($_SERVER['REQUEST_METHOD']) {
 
             case 'GET':
-                $format = strtolower(\LaPlanner\getQueryString('format'));
+                $format = strtolower(Utils::getQueryString('format'));
                 $reader = EntityFormatterFactory::getReader($entity, $format);
                 echo $reader->read($entityId);;
                 break;
@@ -48,7 +49,7 @@ class EntityController {
                     ]);
                     exit;
                 }
-                $action = strtolower(\LaPlanner\getPostedString('verb'));
+                $action = strtolower(Utils::getPostedString('verb'));
                 if (!in_array($action, POST_ACTIONS)) {
                     echo json_encode([
                         'success' => false,

@@ -1,6 +1,8 @@
 <?php
 namespace TnFAT\Planner\Exercise;
 
+use TnFAT\Planner\Utils;
+
 class DatabaseTable extends \TnFAT\Planner\AbstractDatabaseTable {
     const HEADER_TABLE = 'exercises';
     const LINK_DISCIPLINES_TABLE = 'exercises_disciplines';
@@ -93,13 +95,13 @@ class DatabaseTable extends \TnFAT\Planner\AbstractDatabaseTable {
             throw new \PDOException('Die minimale Dauer darf nicht größer als die maximale Dauer sein.');
         }
         $exercise['id'] = strip_tags($exercise['id']);
-        $exercise['name'] = strip_tags($exercise['name'], \LaPlanner\ALLOWED_TAGS);
+        $exercise['name'] = strip_tags($exercise['name'], Utils::ALLOWED_TAGS);
         if($exercise['name'] == '') {
             throw new \PDOException('Der Name der Übung darf nicht leer sein.');
         }
-        $exercise['material'] = strip_tags($exercise['material'], \LaPlanner\ALLOWED_TAGS);
-        $exercise['repeats'] = strip_tags($exercise['repeats'], \LaPlanner\ALLOWED_TAGS);
-        $exercise['details'] = strip_tags($exercise['details'], \LaPlanner\ALLOWED_TAGS);
+        $exercise['material'] = strip_tags($exercise['material'], Utils::ALLOWED_TAGS);
+        $exercise['repeats'] = strip_tags($exercise['repeats'], Utils::ALLOWED_TAGS);
+        $exercise['details'] = strip_tags($exercise['details'], Utils::ALLOWED_TAGS);
         foreach(['warmup', 'runabc','mainex', 'ending'] as $phase) {
             $exercise[$phase] = filter_var($exercise[$phase], FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE);
             if( is_null($exercise[$phase]) ) {

@@ -7,22 +7,6 @@ if( file_exists(__DIR__ . '/../config/config.php') ) {
     include __DIR__ . '/../config/config.php';
 }
 
-const ALLOWED_TAGS = '<b><em><i><strong>';
-function getPostedString( string $fieldName ): string {
-    if( isset($_POST[$fieldName]) && is_string($_POST[$fieldName]) ) {
-        return trim($_POST[$fieldName]);
-    } else {
-        return '';
-    }
-}
-function getQueryString( string $fieldName ): string {
-    if( isset($_GET[$fieldName]) && is_string($_GET[$fieldName]) ) {
-        return trim($_GET[$fieldName]);
-    } else {
-        return '';
-    }
-}
-
 function connectDB(): \PDO|false {
     global $CONFIG;
     if( isset($CONFIG) ) {

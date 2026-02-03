@@ -99,8 +99,10 @@ $version = getDbVersion();
 
 if( isset($version['username']) ) {
   $icon = 'logout';
-  $loginButtonHref = "../login/logout.php?url=../admin/admin.php";
+  $loginButtonHref = "../index.php/user/logout?url=http" .
+    (isset($_SERVER['HTTPS']) ? "s" : "" ) . "://" . 
+    $_SERVER['SERVER_NAME'] . ":" . $_SERVER['SERVER_PORT'] . $_SERVER['PHP_SELF'];
 } else {
   $icon = 'login';
-  $loginButtonHref = "../login/";
+  $loginButtonHref = "../login.html";
 }

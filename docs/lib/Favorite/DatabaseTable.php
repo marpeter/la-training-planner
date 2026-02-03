@@ -1,5 +1,7 @@
 <?php namespace TnFAT\Planner\Favorite;
 
+use TnFAT\Planner\Utils;
+
 class DatabaseTable extends \TnFAT\Planner\AbstractDatabaseTable {
     const HEADER_TABLE = 'favorite_headers';
     const LINK_DISCIPLINES_TABLE = 'favorite_disciplines';
@@ -98,7 +100,7 @@ class DatabaseTable extends \TnFAT\Planner\AbstractDatabaseTable {
         }
         $favorite['id'] = strip_tags($favorite['id']);
         $favorite['created_by'] = strip_tags($favorite['created_by']);
-        $favorite['description'] = strip_tags($favorite['description'], \LaPlanner\ALLOWED_TAGS);
+        $favorite['description'] = strip_tags($favorite['description'], Utils::ALLOWED_TAGS);
         foreach(['warmup', 'mainex', 'ending'] as $phase) {
             foreach($favorite[$phase] as $exercise) {
                 $exercise['id'] = strip_tags($exercise['id']);

@@ -4,6 +4,7 @@ namespace TnFAT\Planner;
 require_once 'data/db_common.php';
 
 use \TnFAT\Planner\User\UserRecord;
+use TnFAT\Planner\Utils;
 
 class UserController {
 
@@ -73,7 +74,7 @@ class UserController {
         // if the current user has no "manage user" privilege, only the user itself
         // should be findable
         if( !UserController::currentUserCanManageUsers() ) {
-            $userName = $version['username'];
+            $userName = $version['username'] ?? '';
             $userRecords = array_filter($userRecords, function($user) use ($userName) {
                 return $user->getName() === $userName; });
         }
@@ -94,7 +95,7 @@ class UserController {
     private static function getUserList($params): array {
         if( self::currentUserCanManageUsers() ) {
             $userRecords = UserRecord::readAll();
-            $filter = \LaPlanner\getQueryString('filterBy');
+            $filter = Utils::getQueryString('filterBy');
 
             return array_map(
                 '\TnFAT\Planner\UserController::userToArray',
@@ -108,10 +109,10 @@ class UserController {
     }
 
     private static function updateUser(int $userId): array {
-        $action = \LaPlanner\getPostedString("verb");
+        $action = Utils::getPostedString("verb");
 
         if( self::currentUserCanManageUsers() ) {
-            $data = json_decode(\LaPlanner\getPostedString("data"), true);
+            $data = json_decode(Utils::getPostedString("data"), true);
             $username = array_key_exists('name', $data) ? $data['name']: '';
             $password = array_key_exists('password', $data) ? $data['password'] : '';
             $role = array_key_exists('role', $data) ? $data['role'] : '';
@@ -167,8 +168,8 @@ class UserController {
     }
 
     private static function login(): array {
-        $username = \LaPlanner\getPostedString('username');
-        $password = \LaPlanner\getPostedString('password');
+        $username = Utils::getPostedString('username');
+        $password = Utils::getPostedString('password');
         $user = new UserRecord($username, $password);
         if( $user->logIn() ) {
             session_start();
@@ -190,9 +191,9 @@ class UserController {
     private static function changePassword(): array {
         $version = \LaPlanner\getDbVersion();
         $username = $version['username'] ?? '';
-        $password = \LaPlanner\getPostedString('password');
-        $newPassword = \LaPlanner\getPostedString('newpassword');
-        $newPasswordRepeat = \LaPlanner\getPostedString('newpasswordrepeat');
+        $password = Utils::getPostedString('password');
+        $newPassword = Utils::getPostedString('newpassword');
+        $newPasswordRepeat = Utils::getPostedString('newpasswordrepeat');
         if( $newPassword !== $newPasswordRepeat ) {
             return [
                 'success' => false,
@@ -211,7 +212,7 @@ class UserController {
     }
 
     private static function logout(): void {
-        $url = nl2br(\LaPlanner\getQueryString('url'));
+        $url = nl2br(Utils::getQueryString('url'));
         if($url==='') $url = './index.html';
         
         $version = \LaPlanner\getDbVersion();
