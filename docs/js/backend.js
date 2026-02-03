@@ -47,8 +47,8 @@ class Backend {
         withBackend: false,
       };
       this.#user = {
-        name: "guest",
-        role: "guest",
+        name: undefined,
+        role: undefined,
         loggedIn: false,
         canEdit: false,
       };
