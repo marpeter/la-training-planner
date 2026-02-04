@@ -1,8 +1,6 @@
 <?php
 namespace TnFAT\Planner;
 
-require_once 'data/db_common.php';
-
 use \TnFAT\Planner\User\UserRecord;
 use TnFAT\Planner\Utils;
 
@@ -67,7 +65,7 @@ class UserController {
     }
 
     private static function getSingleUser(int $userId): array {
-        $version = \LaPlanner\getDbVersion(true);
+        $version = Utils::getDbVersion(true);
         // TODO: add support for direct read by Id
         $userRecords = UserRecord::readAll();
 
@@ -189,7 +187,7 @@ class UserController {
     }
 
     private static function changePassword(): array {
-        $version = \LaPlanner\getDbVersion();
+        $version = Utils::getDbVersion();
         $username = $version['username'] ?? '';
         $password = Utils::getPostedString('password');
         $newPassword = Utils::getPostedString('newpassword');
@@ -215,7 +213,7 @@ class UserController {
         $url = nl2br(Utils::getQueryString('url'));
         if($url==='') $url = './index.html';
         
-        $version = \LaPlanner\getDbVersion();
+        $version = Utils::getDbVersion();
         header("Location: $url");
 
         session_unset();
@@ -224,7 +222,7 @@ class UserController {
     }
 
     private static function currentUserCanManageUsers(): bool {
-        $version = \LaPlanner\getDbVersion();
+        $version = Utils::getDbVersion();
         return ( isset($version['userrole']) &&
             ($version['userrole'] ==='superuser' ||  $version['userrole']==='admin') );
     }

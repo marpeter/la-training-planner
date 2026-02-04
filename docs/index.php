@@ -2,7 +2,11 @@
 namespace TnFAT\Planner;
   
 require_once __DIR__ . '/lib/autoload.php';
-require_once 'data/db_common.php';
+use TnFAT\Planner\Utils;
+
+if( file_exists(__DIR__ . '/config/config.php') ) {
+    include __DIR__ . '/config/config.php';
+}
 
 $pathTokens = [];
 $token = strtok(
@@ -13,8 +17,6 @@ while ($token !== false) {
     $token = strtok('/?');
 }
 
-// error_log("Request URI tokens: " . var_export($pathTokens, true));
-
 switch ( strtolower(array_shift($pathTokens)) ) {
     case 'entity':
         EntityController::handle($pathTokens);
@@ -23,6 +25,11 @@ switch ( strtolower(array_shift($pathTokens)) ) {
     case 'user': // not treated like a regular entity because access needs
                  // protection and passwords special treatment
         UserController::handle($pathTokens); 
+        break;
+
+    case 'version': // not treated like a regular entity
+        $version = Utils::getDbVersion();
+        echo json_encode($version);
         break;
 
     default:

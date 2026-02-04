@@ -1,6 +1,8 @@
 <?php
 namespace TnFAT\Planner\User;
 
+use TnFAT\Planner\Utils;
+
 class DatabaseTable extends \TnFAT\Planner\AbstractDatabaseTable {
 
     const HEADER_TABLE = 'users';
@@ -11,7 +13,7 @@ class DatabaseTable extends \TnFAT\Planner\AbstractDatabaseTable {
         if( $id===null ) {
             return parent::read();
         } else {
-            $dbConnection = \LaPlanner\connectDB();
+            $dbConnection = Utils::connectDB();
             $stmt = $dbConnection->prepare('SELECT id, password, role FROM users WHERE username = :username');
             $stmt->bindParam('username', $id, \PDO::PARAM_STR);
             $stmt->execute();

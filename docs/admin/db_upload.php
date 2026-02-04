@@ -1,8 +1,12 @@
 <?php
 namespace LaPlanner;
 
-require_once __DIR__ . '/../data/db_common.php';
- 
+require_once __DIR__ . '/../lib/autoload.php';
+if( file_exists(__DIR__ . '/../config/config.php') ) {
+    include __DIR__ . '/../config/config.php';
+}
+
+use \TnFAT\Planner\Utils;
 use \TnFAT\Planner\Discipline\CsvLoader as DisciplineLoader;
 use \TnFAT\Planner\Exercise\CsvLoader as ExerciseLoader;
 use \TnFAT\Planner\Favorite\CsvLoader as FavoriteLoader;
@@ -95,7 +99,7 @@ if( !empty($workItem) ) {
     }
 }
 
-$version = getDbVersion();
+$version = Utils::getDbVersion();
 
 if( isset($version['username']) ) {
   $icon = 'logout';

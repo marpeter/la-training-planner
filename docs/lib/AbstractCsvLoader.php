@@ -1,6 +1,8 @@
 <?php
 namespace TnFAT\Planner;
 
+use TnFAT\Planner\Utils;
+
 abstract class AbstractCsvLoader {
     protected $messages = [];
     protected $dbConnection = null;
@@ -21,7 +23,7 @@ abstract class AbstractCsvLoader {
             return 0;
         }
         // process the data
-        $this->dbConnection = \LaPlanner\connectDB();
+        $this->dbConnection = Utils::connectDB();
         $this->dbConnection->beginTransaction();
         // 1. remove current database entries
         $okay = $this->clearCurrentEntries();

@@ -26,11 +26,14 @@ class User {
 
   static createInstances(rawData) {
     this.Instances = [];
-    rawData.forEach( (user) => {
-      let newUser = new User(user.name, '', user.role);
-      newUser.id = user.id;
-      this.Instances.push(newUser);
-    });
+    if("forEach" in rawData) {
+      // rawData is no Array if loading failed (e.g. because no user logged in)
+      rawData.forEach( (user) => {
+        let newUser = new User(user.name, '', user.role);
+        newUser.id = user.id;
+        this.Instances.push(newUser);
+      });
+    } 
   }
 
   save() {

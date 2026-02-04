@@ -1,6 +1,8 @@
 <?php
 namespace TnFAT\Planner;
 
+use TnFAT\Planner\Utils;
+
 abstract class AbstractDatabaseTable {
     protected $ENTITY_LOCALIZED = ""; // Human-readable entity name, e.g., "Übung"
     protected string $entity = ""; // machine-readable entity name, e.g., "exercise"
@@ -14,7 +16,7 @@ abstract class AbstractDatabaseTable {
      */
     public function read(?string $id=null): array {
         $data = [];
-        $dbConnection = \LaPlanner\connectDB();
+        $dbConnection = Utils::connectDB();
         if( $id === null ) { // read all entries
             foreach ($this->getTableNames() as $tableName) {
                 $sql = "SELECT * FROM $tableName";
@@ -116,7 +118,7 @@ abstract class AbstractDatabaseTable {
             if( $action != 'deleteEntity') {
                 $this->sanitizeAndValidateEntity($data);
             }
-            $this->dbConnection = \LaPlanner\connectDB();
+            $this->dbConnection = Utils::connectDB();
             $this->dbConnection->beginTransaction();
             $this->$action($data);
             $this->dbConnection->commit();

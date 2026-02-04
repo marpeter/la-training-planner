@@ -75,7 +75,6 @@ const view = {
       editing = this.model.loggedInUser.canEdit;
     }
 
-    // this.userId.value = user.id;
     this.userName.value = user.name;
     this.userPassword.value = '';
     Array.from(this.userRole.options)
@@ -98,6 +97,12 @@ const view = {
       document.getElementById("create-user").classList.add("disabled")
     }
 
+    if(editing || creating) {
+      document.getElementById("clear-input").classList.remove("disabled");
+    } else {
+      document.getElementById("clear-input").classList.add("disabled");
+    }
+
     M.updateTextFields();
     M.FormSelect.init(document.getElementById("user-role"));
   },
@@ -109,6 +114,7 @@ const controller = {
       document.getElementById("create-user").onclick = this.onCreateUser;
       document.getElementById("save-user").onclick = this.onSaveChanges;
       document.getElementById("delete-user").onclick = this.onDeleteUser;
+      document.getElementById("clear-input").onclick = this.clearInput;
       // initialize the static select elements
       M.FormSelect.init(document.querySelectorAll('select'));
       // initialize the modal for the delete confirmation
@@ -155,7 +161,6 @@ const controller = {
       // save the changes
       controller.saveUserChanges().then( () => view.updateUserForm() );
     },
-
 
     saveUserChanges() {
       let okay = document.forms["user-edit"].checkValidity();
@@ -218,4 +223,9 @@ const controller = {
       M.Modal.getInstance(document.getElementById("confirm-delete"))
              .close();
     },
+
+    clearInput() {
+      view.model.selectedUser = undefined;
+      view.updateUserForm();
+    }
 }

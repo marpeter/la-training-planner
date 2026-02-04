@@ -5,10 +5,10 @@ class Backend {
 
   static async bind(pathPrefix="./") {
     try {
-      let version = await fetch(pathPrefix + "data/db_version.php")
+      let version = await fetch(pathPrefix + "index.php/version")
         .then( (response) => {
           if(!response.ok) {
-            throw new Error(`HTTP error accessing db_version.php: ${response.status}`);
+            throw new Error(`HTTP error accessing backend information: ${response.status}`);
           }
           return response.json();
       });

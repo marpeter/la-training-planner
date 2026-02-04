@@ -1,9 +1,15 @@
 <?php
-namespace LaPlanner;
+namespace TnFAT\Planner;
 
-require '../data/db_common.php';
+require_once __DIR__ . '/../lib/autoload.php';
+if( file_exists(__DIR__ . '/../config/config.php') ) {
+    include __DIR__ . '/../config/config.php';
+}
 
-$version = getDbVersion();
+use \TnFAT\Planner\Utils;
+use \TnFAT\Planner\User\UserRecord;
+
+$version = Utils::getDbVersion();
 $suMessages = [];
 $dbMessages = [];
 
@@ -21,7 +27,7 @@ class DatabaseInstaller {
             'dbuser' => $dbAdminName,
             'dbpassword' => $dbAdminPassword
         ];
-        $this->dbConnection = connectDB();
+        $this->dbConnection = Utils::connectDB();
         if(!$this->dbConnection ) {
             $this->messages[] = "Verbindung zur Datenbank nicht möglich.";
             return false;
@@ -115,7 +121,6 @@ class DatabaseInstaller {
                 "CREATE OR REPLACE USER tfat_planner@localhost IDENTIFIED BY :password PASSWORD EXPIRE NEVER");
             $stmt->bindParam('password', $this->dbUserPassword);
             $stmt->execute();
-            // TODO: remove once user and pwd are stored securely
             $this->dbConnection->exec(
                 "CREATE DATABASE IF NOT EXISTS tfat_planner CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci");
             $this->dbConnection->exec(
@@ -135,7 +140,7 @@ class DatabaseInstaller {
                 'dbuser' => $this->dbUserName,
                 'dbpassword' => $this->dbUserPassword   
             ];
-            $this->dbConnection = connectDB();
+            $this->dbConnection = Utils::connectDB();
             return true;
         } catch( \PDOException $ex) {
             $this->messages[] = $ex->getMessage();
@@ -188,21 +193,20 @@ class DatabaseInstaller {
 if( isset($_POST['action']) && is_string($_POST['action']) ) {
     switch($_POST['action']) {
         case 'setusers':
-            $superUserName = getPostedString('su_name');
-            $superUserPassword = getPostedString('su_password');
+            $superUserName = Utils::getPostedString('su_name');
+            $superUserPassword = Utils::getPostedString('su_password');
             $superUser = new UserRecord($superUserName, $superUserPassword);
             $superUser->setRole('superuser');
 
-            $dbUserName = getPostedString('db_name');
-            $dbUserPassword = getPostedString('db_password');
+            $dbUserName = Utils::getPostedString('db_name');
+            $dbUserPassword = Utils::getPostedString('db_password');
             $dbUser = new UserRecord($dbUserName, $dbUserPassword);
-            $dbUser->setRole('admin'); // only to make canBeCreated() work
-
-            if( $superUser->canBeCreated() && $dbUser->canBeCreated() ) {
+            
+            if( $superUser->canBeCreated() ) {
                 try {
                     $dbInstaller = new DatabaseInstaller();
                     if( $dbInstaller->install($dbUser->getName(), $dbUserPassword) ) {
-                        $version = getDbVersion(true);
+                        $version = Utils::getDbVersion(true);
                         // recreate $superUser to refresh DB connection with new settings
                         $superUser = new UserRecord($superUserName, $superUserPassword);
                         $superUser->setRole('superuser');

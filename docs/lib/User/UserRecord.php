@@ -162,6 +162,22 @@ class UserRecord {
         }
     }
 
+    public function canBeCreated(): bool {
+        return $this->hasAllowedUsername()
+            && $this->hasAllowedPassword();
+    }
+   
+     // Check that the username only contains reasonable characters
+    protected function hasAllowedUsername(): bool {
+        if( preg_match('/^[a-zäöüßA-ZÄÖÜ0-9\.\-_@]{4,100}$/', $this->name) ) {
+            return true;
+        } else {
+            $this->messages[] = "Benutzername $this->name enhält ungültige Zeichen, ist zu kurz oder zu lang.";
+            $this->messages[] = 'Er muss aus 4-100 Buchstaben, Ziffern, ., _, @ und - bestehen.';
+            return false;
+        }
+    }  
+
     // Check that the password has a minimum length
     // TODO: also check for minimum complexity?
     protected function hasAllowedPassword(): bool {
