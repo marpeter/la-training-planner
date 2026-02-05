@@ -2,6 +2,10 @@
 namespace TnFAT\Planner;
 
 use TnFAT\Planner\User\UserRecord;
+global $CONFIG;
+if( !isset($CONFIG) && file_exists(__DIR__ . '/../config/config.php') ) {
+    include __DIR__ . '/../config/config.php';
+}
 
 class Utils {
 

@@ -2,9 +2,6 @@
 namespace TnFAT\Planner;
 
 require_once __DIR__ . '/../lib/autoload.php';
-if( file_exists(__DIR__ . '/../config/config.php') ) {
-    include __DIR__ . '/../config/config.php';
-}
 
 use \TnFAT\Planner\Utils;
 use \TnFAT\Planner\User\UserRecord;

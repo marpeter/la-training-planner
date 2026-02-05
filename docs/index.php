@@ -4,10 +4,6 @@ namespace TnFAT\Planner;
 require_once __DIR__ . '/lib/autoload.php';
 use TnFAT\Planner\Utils;
 
-if( file_exists(__DIR__ . '/config/config.php') ) {
-    include __DIR__ . '/config/config.php';
-}
-
 $pathTokens = [];
 $token = strtok(
     substr($_SERVER['REQUEST_URI'], strlen('/la-planer/index.php/')),
