@@ -59,14 +59,14 @@ class UserController {
     }
 
     private static function getSingleUser(int $userId): array {
-        $version = Utils::getDbVersion(true);
+        $currentUser = Utils::getUserInfo(true);
         // TODO: add support for direct read by Id
         $userRecords = UserRecord::readAll();
 
         // if the current user has no "manage user" privilege, only the user itself
         // should be findable
         if( !UserController::currentUserCanManageUsers() ) {
-            $userName = $version['username'] ?? '';
+            $userName = $currentUser['name'] ?? '';
             $userRecords = array_filter($userRecords, function($user) use ($userName) {
                 return $user->getName() === $userName; });
         }
@@ -165,8 +165,8 @@ class UserController {
         $user = new UserRecord($username, $password);
         if( $user->logIn() ) {
             session_start();
-            $version['username'] = $user->getName();
-            $version['userrole'] = $user->getRole();
+            // $version['username'] = $user->getName();
+            // $version['userrole'] = $user->getRole();
             $_SESSION['username'] = $user->getName();
             return [
                 'success' => true,
@@ -181,8 +181,8 @@ class UserController {
     }
 
     private static function changePassword(): array {
-        $version = Utils::getDbVersion();
-        $username = $version['username'] ?? '';
+        $user = Utils::getUserInfo();
+        $username = $user['name'] ?? '';
         $password = Utils::getPostedString('password');
         $newPassword = Utils::getPostedString('newpassword');
         $newPasswordRepeat = Utils::getPostedString('newpasswordrepeat');
@@ -207,7 +207,7 @@ class UserController {
         $url = nl2br(Utils::getQueryString('url'));
         if($url==='') $url = './index.html';
         
-        $version = Utils::getDbVersion();
+        $version = Utils::getUserInfo();
         header("Location: $url");
 
         session_unset();
@@ -216,9 +216,8 @@ class UserController {
     }
 
     private static function currentUserCanManageUsers(): bool {
-        $version = Utils::getDbVersion();
-        return ( isset($version['userrole']) &&
-            ($version['userrole'] ==='superuser' ||  $version['userrole']==='admin') );
+        $user = Utils::getUserInfo();
+        return $user['canEdit'];
     }
 
     private static function userToArray(UserRecord $user): array {

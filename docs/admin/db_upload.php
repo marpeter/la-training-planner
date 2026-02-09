@@ -96,7 +96,7 @@ if( !empty($workItem) ) {
     }
 }
 
-$version = Utils::getDbVersion();
+$version = Utils::getSessionInfo();
 
 if( isset($version['username']) ) {
   $icon = 'logout';

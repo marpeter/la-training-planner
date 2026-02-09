@@ -26,7 +26,7 @@ try {
             break;
 
         case 'version': // not treated like a regular entity
-            $version = Utils::getDbVersion();
+            $version = Utils::getSessionInfo();
             echo json_encode($version);
             break;
 

@@ -15,15 +15,14 @@ class Utils {
         global $CONFIG;
         if( isset($CONFIG) ) {
             try {
-                $connection = new \PDO(
+                return new \PDO(
                     'mysql:host=' . $CONFIG['dbhost'] . ';dbname=' . $CONFIG['dbname'],
                     $CONFIG['dbuser'],
                     $CONFIG['dbpassword'],
                     [\PDO::ATTR_ERRMODE => \PDO::ERRMODE_EXCEPTION,
                         \PDO::ATTR_DEFAULT_FETCH_MODE => \PDO::FETCH_ASSOC,
                         \PDO::MYSQL_ATTR_INIT_COMMAND => "SET NAMES utf8mb4 COLLATE utf8mb4_unicode_ci"]
-                );
-                return $connection;            
+                );           
             } catch( \PDOException $ex ){
                 error_log('Cannot connect to DB: ' . $ex->getMessage());
                 return false;
@@ -33,7 +32,35 @@ class Utils {
         }
     }
 
-    static function getDbVersion($keep_session=true): array {
+    static function getSessionInfo(): array {
+        $version = self::getDbVersion();
+        $user = self::getUserInfo();
+        $version['username'] = $user['name'] ?? null;
+        $version['userrole'] = $user['role'] ?? null;
+        $version['supportsEditing'] = $user['canEdit'];
+        return $version;       
+    }
+
+    static function getUserInfo($keep_session=true): array {
+        if( $keep_session) {
+            session_start();
+        } else {
+            session_start(["read_and_close" => true]);
+        }
+        $userInfo['canEdit'] = false;
+        if( isset($_SESSION['username']) ) {
+            $user = new UserRecord($_SESSION['username'], '');
+            $user->readFromDB();
+            $userInfo['name'] = $user->getName();
+            $userInfo['role'] = $user->getRole();
+            if( $userInfo['role']==='admin' || $userInfo['role']==='superuser' ) {
+                $userInfo['canEdit'] = true;
+            }
+        }
+        return $userInfo;
+    }
+
+    static function getDbVersion(): array {
         $dbConnection = self::connectDB();
         if($dbConnection) {
             $sql = 'SELECT field, field_val FROM version';
@@ -41,22 +68,6 @@ class Utils {
                 $version[$row['field']] = $row['field_val'];
             }
             $version['withDB'] = true;
-
-            if( $keep_session) {
-                session_start();
-            } else {
-                session_start(["read_and_close" => true]);
-            }
-            $version['supportsEditing'] = false;
-            if( isset($_SESSION['username']) ) {
-                $user = new UserRecord($_SESSION['username'], '');
-                $user->readFromDB();
-                $version['username'] = $user->getName();
-                $version['userrole'] = $user->getRole();
-                if( $version['userrole']==='admin' || $version['userrole']==='superuser' ) {
-                    $version['supportsEditing'] = true;
-                }
-            }
             return $version;
         } else {
             return [

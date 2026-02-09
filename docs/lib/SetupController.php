@@ -27,8 +27,8 @@ if( isset($_POST['action']) && is_string($_POST['action']) ) {
                 try {
                     $dbInstaller = new DatabaseInstaller();
                     if( $dbInstaller->install($dbUser->getName(), $dbUserPassword) ) {
-                        $version = Utils::getDbVersion(true);
-                        // recreate $superUser to refresh DB connection with new settings
+                        $user = Utils::getUserInfo(true); // to start session
+                        // recreate $superUser to refresh session with new settings
                         $superUser = new UserRecord($superUserName, $superUserPassword);
                         $superUser->setRole('superuser');
                         $superUser->create();
