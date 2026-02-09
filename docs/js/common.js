@@ -6,7 +6,7 @@ function initPage(continueWith) {
     .then( () => Backend.getVersionAndUserInfo() ) 
     .then( ({ version, user }) => {
       if( version.withBackend && !version.withDB ) {
-        window.location = "./admin/setup.php";
+        window.location = "./setup.php";
       } else {
           if( continueWith ) continueWith(user, version);
           updateLogInOutButton(version, user);

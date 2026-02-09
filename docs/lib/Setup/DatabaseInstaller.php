@@ -1,14 +1,7 @@
 <?php
-namespace TnFAT\Planner;
+namespace TnFAT\Planner\Setup;
 
-require_once __DIR__ . '/../lib/autoload.php';
-
-use \TnFAT\Planner\Utils;
-use \TnFAT\Planner\User\UserRecord;
-
-$version = Utils::getDbVersion();
-$suMessages = [];
-$dbMessages = [];
+use TnFAT\Planner\Utils;
 
 class DatabaseInstaller {
     private $messages = [];
@@ -169,11 +162,12 @@ class DatabaseInstaller {
             '$CONFIG = ' .
             var_export($CONFIG, true) . ";\n";
         try {
+            $configFileDir = __DIR__ . '/../../config';
             // Create the config directory if it doesn't exist yet
-            if( !is_dir(__DIR__ . '/../config') ) {
-                mkdir(__DIR__ . '/../config', 0755, true);
+            if( !is_dir($configFileDir) ) {
+                mkdir($configFileDir, 0755, true);
             }
-            return file_put_contents(__DIR__ . '/../config/config.php', $configContent);
+            return file_put_contents($configFileDir . '/config.php', $configContent);
         } catch( \Exception $ex) {
             $this->messages[] = $ex->getMessage();
             return false;
@@ -183,45 +177,5 @@ class DatabaseInstaller {
         $chars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*()_-=+;:,.?";
         $password = substr( str_shuffle( $chars ), 0, $length );
         return $password;
-    }
-}
-
-
-if( isset($_POST['action']) && is_string($_POST['action']) ) {
-    switch($_POST['action']) {
-        case 'setusers':
-            $superUserName = Utils::getPostedString('su_name');
-            $superUserPassword = Utils::getPostedString('su_password');
-            $superUser = new UserRecord($superUserName, $superUserPassword);
-            $superUser->setRole('superuser');
-
-            $dbUserName = Utils::getPostedString('db_name');
-            $dbUserPassword = Utils::getPostedString('db_password');
-            $dbUser = new UserRecord($dbUserName, $dbUserPassword);
-            
-            if( $superUser->canBeCreated() ) {
-                try {
-                    $dbInstaller = new DatabaseInstaller();
-                    if( $dbInstaller->install($dbUser->getName(), $dbUserPassword) ) {
-                        $version = Utils::getDbVersion(true);
-                        // recreate $superUser to refresh DB connection with new settings
-                        $superUser = new UserRecord($superUserName, $superUserPassword);
-                        $superUser->setRole('superuser');
-                        $superUser->create();
-                        $superUser->logIn();
-                        $_SESSION['username'] = $superUser->getName();  
-                        header('Location: admin.php');
-                    }   
-                    $dbMessages = $dbInstaller->getMessages();
-                } catch(\PDOException $ex) {
-                    $dbMessages[] = $ex->getMessage();
-                }
-            }
-            $suMessages = $superUser->getMessages();
-            $dbMessages = array_merge($dbUser->getMessages(), $dbMessages);
-            break;
-    
-        default:
-            break;
     }
 }

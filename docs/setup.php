@@ -1,5 +1,5 @@
 <?php
-require 'install.php';
+require 'lib/SetupController.php';
 ?>
 <!doctype html>
 <html lang="de">
@@ -7,23 +7,23 @@ require 'install.php';
     <title>Installation des Planers für Leichtathletik-Trainings</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-    <link rel="icon" type="image/x-icon" href="../assets/logo.png">
-    <link rel="apple-touch-icon" type="image/png" href="../assets/logo.png">
+    <link rel="icon" type="image/x-icon" href="./assets/logo.png">
+    <link rel="apple-touch-icon" type="image/png" href="./assets/logo.png">
     <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
     <!-- Compiled and minified CSS -->
     <link rel="stylesheet"
            href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css">
     <!-- Compiled and minified JavaScript -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
-    <link rel="stylesheet" href="../theme/theme.css">
+    <link rel="stylesheet" href="./theme/theme.css">
   </head>
   <body>
     <header>
       <nav class="tfat darken-1">
         <div class="nav-wrapper">
-          <a href="#" class="brand-logo left"><img src="../assets/logo.png" alt="Logo" class="tfat-logo">Installation</a>
+          <a href="#" class="brand-logo left"><img src="./assets/logo.png" alt="Logo" class="tfat-logo">Installation</a>
           <ul class="right">
-            <li><a href="../login" id="loginBtn"
+            <li><a href="./login" id="loginBtn"
               class="btn-small tfat"><i class="material-icons">login</i></a></li>
           </ul>
         </div>
@@ -125,10 +125,10 @@ require 'install.php';
       <nav class="tfat darken-1">
         <div class="nav-wrapper">
           <ul>
-            <li><a href="../" class="btn-small tfat"><i class="material-icons">home</i></a></li>
-            <li><a href="../help.html" class="btn-small tfat"><i class="material-icons">help_center</i></a></li> 
-            <li><a href="../edit.html" id="menuItemEdit" class="btn-small tfat disabled"><i class="material-icons">construction</i></a></li>
-            <li class="active"><a href="../import-export.html" class="btn-small tfat"><i class="material-icons">import_export</i></a></li>
+            <li><a href="./" class="btn-small tfat"><i class="material-icons">home</i></a></li>
+            <li><a href="./help.html" class="btn-small tfat"><i class="material-icons">help_center</i></a></li> 
+            <li><a href="./edit.html" id="menuItemEdit" class="btn-small tfat disabled"><i class="material-icons">construction</i></a></li>
+            <li class="active"><a href="./import-export.html" class="btn-small tfat"><i class="material-icons">import_export</i></a></li>
           </ul>
         </div>
       </nav>
