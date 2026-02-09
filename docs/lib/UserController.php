@@ -2,17 +2,14 @@
 namespace TnFAT\Planner;
 
 use \TnFAT\Planner\User\UserRecord;
+use TnFAT\Planner\RequestException;
 use TnFAT\Planner\Utils;
 
 class UserController {
 
-    public static function handle(array $pathTokens): void {
+    public static function handle(array $pathTokens): string {
         if (count($pathTokens) < 1) {
-            echo json_encode([
-                'success' => false,
-                'message' => 'Missing user id or action in request URI.',
-            ]);
-            exit;
+            throw new RequestException('Missing user id or action in request URI.', 400);
         }
 
         $action = filter_var(array_shift($pathTokens), FILTER_SANITIZE_STRING, FILTER_NULL_ON_FAILURE);
@@ -20,47 +17,44 @@ class UserController {
         switch ($_SERVER['REQUEST_METHOD']) {
             case 'GET':
                 if( is_numeric($action) ) {
-                    echo json_encode(self::getSingleUser((int)$action));
+                    return json_encode(self::getSingleUser((int)$action));
                 } else {
                     switch($action) {
                         case 'list':
                             $users = self::getUserList($pathTokens);
-                            echo json_encode($users);
+                            return json_encode($users);
                             break;
                         case 'logout':
                             self::logout();
+                            return '';
                             break;
                         default:
-                            http_response_code(405);
-                            echo "Unsupported action: " . htmlspecialchars($action);
+                            throw new RequestException("Unsupported action: " . htmlspecialchars($action), 405);
                     }
                 }
                 break;
 
             case 'POST':
                 if( is_numeric($action) ) {
-                    echo json_encode(self::updateUser((int)$action));
+                    return json_encode(self::updateUser((int)$action));
                 } else {
                     switch($action) {
                         case 'login':
-                            echo json_encode(self::login());
+                            return json_encode(self::login());
                             break;
 
                         case 'changePassword':
-                            echo json_encode(self::changePassword());
+                            return json_encode(self::changePassword());
                             break;
 
                         default:
-                            http_response_code(405);
-                            echo "Unsupported action: " . htmlspecialchars($action);
+                            throw new RequestException("Unsupported action: " . htmlspecialchars($action), 405);
                     }  
                 }
                 break;
 
             default:
-                http_response_code(405);
-                echo "Unsupported HTTP method: " . htmlspecialchars($_SERVER['REQUEST_METHOD']);
-                exit;
+                throw new RequestException("Unsupported HTTP method: " . htmlspecialchars($_SERVER['REQUEST_METHOD']), 405);
         }
     }
 

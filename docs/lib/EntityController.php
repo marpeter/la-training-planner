@@ -5,26 +5,19 @@ const ENTITIES = ['Discipline', 'Exercise', 'Favorite'];
 const POST_ACTIONS = ['create', 'update', 'delete'];
 
 use TnFAT\Planner\EntityFormatterFactory;
+use TnFAT\Planner\RequestException;
 use TnFAT\Planner\Utils;
 
 class EntityController {
-    public static function handle(array $pathTokens): void {
+    public static function handle(array $pathTokens): string {
 
         if (count($pathTokens) < 1) {
-            echo json_encode([
-                'success' => false,
-                'message' => 'Missing entity in request URI.',
-            ]);
-            exit;
+            throw new RequestException('Missing entity in request URI.', 400);
         }
 
         $entity = ucfirst($pathTokens[0]);
         if(!in_array($entity, ENTITIES)) {
-            echo json_encode([
-                'success' => false,
-                'message' => 'You must specify a valid entity instead of: ' . htmlspecialchars($entity),
-            ]);
-            exit;
+            throw new RequestException('You must specify a valid entity instead of: ' . htmlspecialchars($entity), 400);
         }
 
         // if the URL has the form /entity/{id}[?format=], then extract the id
@@ -38,36 +31,27 @@ class EntityController {
             case 'GET':
                 $format = strtolower(Utils::getQueryString('format'));
                 $reader = EntityFormatterFactory::getReader($entity, $format);
-                echo $reader->read($entityId);;
-                break;
+                return $reader->read($entityId);;
 
             case 'POST':
                 if (!in_array($entity, ENTITIES)) {
-                    echo json_encode([
-                        'success' => false,
-                        'message' => 'You must specify a valid entity instead of: ' . htmlspecialchars($entity),
-                    ]);
-                    exit;
+                    throw new RequestException('You must specify a valid entity instead of: ' . htmlspecialchars($entity), 400);
                 }
+
                 $action = strtolower(Utils::getPostedString('verb'));
                 if (!in_array($action, POST_ACTIONS)) {
-                    echo json_encode([
-                        'success' => false,
-                        'message' => 'You must specify a valid verb instead of: ' . htmlspecialchars($action),
-                    ]);
-                    exit;
+                    throw new RequestException('You must specify a valid verb instead of: ' . htmlspecialchars($action), 400);
                 }
+
                 $saverClass = "\\TnFAT\\Planner\\$entity\\DatabaseTable";
                 $saver = new $saverClass();
-                echo json_encode(
+                return json_encode(
                     $saver->$action(json_decode($_POST['data'],true))
                 );
                 break;
 
             default:
-                http_response_code(405);
-                echo "Unsupported HTTP method: " . htmlspecialchars($_SERVER['REQUEST_METHOD']);
-                exit;
+                throw new RequestException("Unsupported HTTP method: " . htmlspecialchars($_SERVER['REQUEST_METHOD']), 405);
         }
     }
 }
