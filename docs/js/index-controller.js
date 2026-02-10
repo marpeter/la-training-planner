@@ -161,6 +161,12 @@ const controller = {
     document.getElementById("save-plan").onclick = this.onSavePlanBtnPressed;
     document.getElementById("save-plan-as").onclick = this.onSavePlanAsBtnPressed;
     document.getElementById("delete-plan").onclick = this.onDeletePlanBtnPressed;
+
+    M.Modal.init(document.querySelectorAll('.modal'));
+    document.getElementById("confirm-delete-yes").onclick = this.onDeletePlanConfirmed;
+    document.getElementById("confirm-delete-no").onclick = this.onDeletePlanCancelled;
+    document.getElementById("confirm-save-as-yes").onclick = this.onSavePlanAsConfirmed;
+    document.getElementById("confirm-save-as-no").onclick = this.onSavePlanAsCancelled;
     
     document.durationForm.duration.forEach( (radio) => radio.onchange = this.onDurationChanged);
   },
@@ -328,11 +334,19 @@ const controller = {
   },
 
   onSavePlanAsBtnPressed() {
-    let description = prompt("Bitte gib eine Beschreibung für den Plan ein:", view.model.plan.description);
-    if(description===null) {
-      return; // user cancelled the prompt
+    let saveAsDialog = M.Modal.getInstance(document.getElementById("save-plan-as-dialog"));
+    saveAsDialog.options.dismissible = false;
+    document.getElementById("save-plan-as-name").value = view.model.plan.description;
+    saveAsDialog.open();
+  },
+
+  onSavePlanAsConfirmed() {
+    let description = document.getElementById("save-plan-as-name");
+    if(description.value==='') {
+      M.toast({html: "Plan ohne Beschreibung nicht gespeichert.", classes: "tfat-error rounded"});
+      return;
     }
-    view.model.plan.saveAs(description)
+    view.model.plan.saveAs(description.value)
     .then( (data) => {
       if(data.success) {
         M.toast({html: "Plan erfolgreich gespeichert.", classes: "tfat-success rounded"});
@@ -351,26 +365,40 @@ const controller = {
     });
   },
 
+  onSavePlanAsCancelled() {
+    M.Modal.getInstance(document.getElementById("save-plan-as-dialog"))
+           .close();
+  },
+
   onDeletePlanBtnPressed() {
     if(view.model.selectedFavorite===undefined) {
       M.toast({html: "Es gibt keinen Plan zum Löschen!", classes: "tfat-error rounded"});
       return;
     }
-    if(confirm("Soll der Plan wirklich gelöscht werden?")) {
-      view.model.plan.delete().then( (data) => {
-        if(data.success) {
-          M.toast({html: "Plan erfolgreich gelöscht.", classes: "tfat-success rounded"});
-          view.model.selectedFavorite = undefined;
-          view.model.plan = undefined; // clear the current plan
-          view.updatePlan();
-          controller.onCriteriaChanged(); // reload favorites and update UI
-        } else {
-          M.toast({html: "Fehler beim Löschen des Plans: " + data.message, classes: "tfat-error rounded"});
-        }
-      }).catch(error => {
-        console.error("Error saving exercise:", error);
-        M.toast({html: "Fehler beim Löschen des Plans. " + error, classes: "tfat-error rounded"});
-      });
-    }
+    let confirmDialog = M.Modal.getInstance(document.getElementById("confirm-delete"));
+    confirmDialog.options.dismissible = false;
+    confirmDialog.open();
+  },
+
+  onDeletePlanConfirmed() {
+    view.model.plan.delete().then( (data) => {
+      if(data.success) {
+        M.toast({html: "Plan erfolgreich gelöscht.", classes: "tfat-success rounded"});
+        view.model.selectedFavorite = undefined;
+        view.model.plan = undefined; // clear the current plan
+        view.updatePlan();
+        controller.onCriteriaChanged(); // reload favorites and update UI
+      } else {
+        M.toast({html: "Fehler beim Löschen des Plans: " + data.message, classes: "tfat-error rounded"});
+      }
+    }).catch(error => {
+      console.error("Error saving exercise:", error);
+      M.toast({html: "Fehler beim Löschen des Plans. " + error, classes: "tfat-error rounded"});
+    });
+  },
+
+  onDeletePlanCancelled() {
+    M.Modal.getInstance(document.getElementById("confirm-delete"))
+           .close();
   }
 };

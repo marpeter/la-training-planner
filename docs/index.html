@@ -65,6 +65,28 @@
             <i class="material-icons right">delete</i></button>
         </p>
       </section>
+      <!-- Modaler Dialog zur Bestätigung des Löschens -->
+      <div id="confirm-delete" class="modal">
+        <div id="confirm-delete-content" class="modal-content">
+          <h4>Plan löschen</h4>
+          <p>Soll der Plan wirklich gelöscht werden?</p>
+        </div>
+        <div class="modal-footer">
+          <button id="confirm-delete-yes" class="btn tfat darken-1 modal-close">Ja</button>
+          <button id="confirm-delete-no" class="btn tfat darken-1 modal-close">Nein</button>
+        </div>
+      </div>
+      <!-- Modaler Dialog für "Plan sichern als ..." -->
+      <div id="save-plan-as-dialog" class="modal">
+        <div id="save-plan-as-content" class="modal-content">
+          <input id="save-plan-as-name" type="text" maxlength="255">
+          <label for="save-plan-as-name">Beschreibung für den Plan</label>
+        </div>
+        <div class="modal-footer">
+          <button id="confirm-save-as-no" class="btn tfat darken-1 modal-close">Abbrechen</button>
+          <button id="confirm-save-as-yes" class="btn tfat darken-1 modal-close">OK</button>          
+        </div>
+      </div>      
       <div class="divider"></div>
       <div class="center grey-text">Version <span id="version">0.13.0</span>,<br>&copy; 2026 Markus Peter</div>
     </main>
