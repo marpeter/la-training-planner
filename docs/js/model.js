@@ -318,7 +318,6 @@ class TrainingPlan {
     }
     this.description = description.trim();;
     this.id = parseInt(TrainingPlan.Favorites[TrainingPlan.Favorites.length-1].id) + 1;
-    this.created_by = "markus"; // TODO: get the current user
     return TrainingPlan.save("create" , this)
       .then( result => TrainingPlan.loadAll() // reload data to ensure it is up-to-date
       .then(() => result) );

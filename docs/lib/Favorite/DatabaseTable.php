@@ -56,11 +56,12 @@ class DatabaseTable extends \TnFAT\Planner\AbstractDatabaseTable {
 
     protected function createEntity(array $favorite): void {
         try {
+            $user = Utils::getUserInfo();
             $stmt = $this->dbConnection->prepare('INSERT INTO ' . self::HEADER_TABLE .
                 ' (id, created_by, description) VALUES ' . 
                 '(:id, :created_by, :description)');
             $stmt->bindParam('id', $favorite['id'], \PDO::PARAM_INT);
-            $stmt->bindParam('created_by', $favorite['created_by'], \PDO::PARAM_STR);
+            $stmt->bindParam('created_by', $user['name'], \PDO::PARAM_STR);
             $stmt->bindParam('description', $favorite['description'], \PDO::PARAM_STR);
             $stmt->execute();
             $this->insertDependants($favorite);
