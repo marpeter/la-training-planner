@@ -96,9 +96,9 @@ if( !empty($workItem) ) {
     }
 }
 
-$version = Utils::getSessionInfo();
+[$version, $user] = Utils::getSessionInfo();
 
-if( isset($version['username']) ) {
+if( isset($user['name']) ) {
   $icon = 'logout';
   $loginButtonHref = "../index.php/user/logout?url=http" .
     (isset($_SERVER['HTTPS']) ? "s" : "" ) . "://" . 

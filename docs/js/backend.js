@@ -5,7 +5,7 @@ class Backend {
 
   static async bind(pathPrefix="./") {
     try {
-      let version = await fetch(pathPrefix + "index.php/version")
+      let [version, user] = await fetch(pathPrefix + "index.php/version")
         .then( (response) => {
           if(!response.ok) {
             throw new Error(`HTTP error accessing backend information: ${response.status}`);
@@ -19,10 +19,10 @@ class Backend {
         withDB: convertIfBoolean(version.withDB),
       };
       this.#user = {
-        name: version.username,
-        role: version.userrole,
-        loggedIn: (version.username != undefined),
-        canEdit: convertIfBoolean(version.supportsEditing),
+        name: user.name,
+        role: user.role,
+        loggedIn: (user.name != undefined),
+        canEdit: convertIfBoolean(user.canEdit),
       };
       if(this.#version.withDB) {
         this.#version.numberText = version.number + " (mit Backend Datenbank)";

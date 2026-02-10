@@ -35,10 +35,7 @@ class Utils {
     static function getSessionInfo(): array {
         $version = self::getDbVersion();
         $user = self::getUserInfo();
-        $version['username'] = $user['name'] ?? null;
-        $version['userrole'] = $user['role'] ?? null;
-        $version['supportsEditing'] = $user['canEdit'];
-        return $version;       
+        return [$version, $user];       
     }
 
     static function getUserInfo($keep_session=true): array {
@@ -74,7 +71,6 @@ class Utils {
                 'number' => '0.14.200',
                 'date' => '2025-05-13',
                 'withDB' => false,
-                'supportsEditing' => false,
             ];
         }
     }

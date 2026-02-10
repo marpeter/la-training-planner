@@ -46,7 +46,7 @@ require 'db_upload.php';
       <form name="uploadForm" enctype="multipart/form-data" method="POST" action="#">
         <div class="row">
           <div class="col s6">
-            <?php $disabled = $version['supportsEditing'] ? '' : 'disabled' ?> 
+            <?php $disabled = $user['canEdit'] ? '' : 'disabled' ?> 
             <label>Wähle eine CSV-Datei mit der Liste der Disziplinen:
               <input type="file" id="DisciplinesFile" name="DisciplinesFile" accecpt="text/*" <?= $disabled ?>>
             </label>
@@ -95,7 +95,7 @@ require 'db_upload.php';
             <li><a href="../" class="btn-small tfat"><i class="material-icons">home</i></a></li>
             <li><a href="../help.html" class="btn-small tfat"><i class="material-icons">help_center</i></a></li> 
             <li><a href="../edit.html" id="menuItemEdit" class="btn-small tfat"><i class="material-icons">construction</i></a></li>
-            <li class="active"><a href="./" class="btn-small tfat"><i class="material-icons">import_export</i></a></li>
+            <li class="active"><a href="./admin.php" class="btn-small tfat"><i class="material-icons">import_export</i></a></li>
           </ul>
         </div>
       </nav>
