@@ -94,7 +94,7 @@ class CsvParser {
             if( str_ends_with($field,'[]') ) { // "array" field
                 $fields[substr($field,0,-2)] = explode(':', trim($values[$fieldMap[$field]]));
             } else {
-                $fields[$field] = trim($values[$fieldMap[$field]]," \"\n\r\t\v\x00");
+                $fields[$field] = trim($values[$fieldMap[$field]] ?? ''," \"\n\r\t\v\x00");
             }
         }
         return $fields;
