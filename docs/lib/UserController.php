@@ -59,7 +59,7 @@ class UserController {
     }
 
     private static function getSingleUser(int $userId): array {
-        $currentUser = Utils::getUserInfo(true);
+        $currentUser = Utils::getUserInfo();
         // TODO: add support for direct read by Id
         $userRecords = UserRecord::readAll();
 

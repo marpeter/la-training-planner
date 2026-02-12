@@ -23,7 +23,7 @@ require 'lib/SetupController.php';
         <div class="nav-wrapper">
           <a href="#" class="brand-logo left"><img src="./assets/logo.png" alt="Logo" class="tfat-logo">Installation</a>
           <ul class="right">
-            <li><a href="./login" id="loginBtn"
+            <li><a href="./login.html" id="loginBtn"
               class="btn-small tfat"><i class="material-icons">login</i></a></li>
           </ul>
         </div>

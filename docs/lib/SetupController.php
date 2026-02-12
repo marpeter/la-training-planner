@@ -6,6 +6,7 @@ require_once __DIR__ . '/../lib/autoload.php';
 use \TnFAT\Planner\Utils;
 use \TnFAT\Planner\User\UserRecord;
 use \TnFAT\Planner\Setup\DatabaseInstaller;
+use \TnFAT\Planner\Setup\DataLoader;
 
 $version = Utils::getDbVersion();
 $suMessages = [];
@@ -33,10 +34,16 @@ if( isset($_POST['action']) && is_string($_POST['action']) ) {
                         $superUser->setRole('superuser');
                         $superUser->create();
                         $superUser->logIn();
-                        $_SESSION['username'] = $superUser->getName();  
-                        header('Location: admin/admin.php');
+                        $_SESSION['username'] = $superUser->getName();
+
+                        $loader = new DataLoader(DataLoader::ALL);
+                        if($loader->load() === count(DataLoader::ALL)) {
+                            header('Location: ./');
+                        } else {
+                            $dbMessages = $loader->getMessages();
+                        }
                     }   
-                    $dbMessages = $dbInstaller->getMessages();
+                    $dbMessages = array_merge($dbMessages, $dbInstaller->getMessages());
                 } catch(\PDOException $ex) {
                     $dbMessages[] = $ex->getMessage();
                 }

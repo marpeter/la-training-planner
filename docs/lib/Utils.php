@@ -38,7 +38,7 @@ class Utils {
         return [$version, $user];       
     }
 
-    static function getUserInfo($keep_session=true): array {
+    static function getUserInfo($keep_session=false): array {
         if( $keep_session) {
             session_start();
         } else {
@@ -91,4 +91,18 @@ class Utils {
         }
     }
 
+    static function readFromFile($realFileName,$logicalFileName, &$messages): array|false {
+        $handle = fopen($realFileName, 'r');
+        if($handle) {
+            $content = [];
+            while(($buffer = fgets($handle, 4096)) !== false) {
+                $content[] = $buffer;
+            }
+            fclose($handle);
+            return $content;
+        } else {  
+            $messages[] = "Die hochgeladene Datei $logicalFileName kann nicht geöffnet werden.";
+            return false;
+        }
+    }    
 }

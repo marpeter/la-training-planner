@@ -4,6 +4,6 @@ initPage(continueInitPage);
 
 function continueInitPage(user, version) {
   if( version.withDB) {
-    window.location = "./admin/admin.php";
+    window.location = "./import-export.php";
   }
 }
